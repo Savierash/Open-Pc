@@ -4,6 +4,7 @@ import Homepage from './components/Homepage';
 import Dashboard from './components/Dashboard'; 
 import Services from './components/Services';
 import FQs from './components/FQs';
+import Login from './components/Login.jsx';
 
 
 /*STYLES*/
@@ -11,6 +12,7 @@ import './styles/Homepage.css';
 import './styles/Dashboard.css';  
 import './styles/Services.css';
 import './styles/FQs.css';
+import './styles/Login.css';
 
 
 
@@ -23,6 +25,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/services" element={<Services />} />
           <Route path="/faq" element={<FQs />} />
+          <Route path="/login" element={<Login />} />
         </Routes>
     </Router>
   );
