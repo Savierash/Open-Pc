@@ -45,6 +45,18 @@ const Dashboard = () => {
           </li>
           <li>
             <a 
+              href="/about" 
+              className={activeLink === '/about' ? 'active' : ''}
+              onClick={(e) => {
+                e.preventDefault();
+                handleNavClick('/about');
+              }}
+            >
+              About
+            </a>            
+          </li>
+          <li>
+            <a 
               href="/services" 
               className={activeLink === '/services' ? 'active' : ''}
               onClick={(e) => {
@@ -53,30 +65,6 @@ const Dashboard = () => {
               }}
             >
               Services
-            </a>
-          </li>
-          <li>
-            <a 
-              href="/faq" 
-              className={activeLink === '/faq' ? 'active' : ''}
-              onClick={(e) => {
-                e.preventDefault();
-                handleNavClick('/faq');
-              }}
-            >
-              FAQs
-            </a>
-          </li>
-          <li>
-            <a 
-              href="/dashboard" 
-              className={activeLink === '/dashboard' ? 'active' : ''}
-              onClick={(e) => {
-                e.preventDefault();
-                handleNavClick('/dashboard');
-              }}
-            >
-              Dashboard
             </a>
           </li>
         </ul>

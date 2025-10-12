@@ -6,7 +6,7 @@ import Services from './components/Services';
 import FQs from './components/FQs';
 import Login from './components/Login.jsx';
 import Signup from './components/Signup.jsx';
-
+import About from './components/About.jsx';
 
 /*STYLES*/
 import './styles/Homepage.css';
@@ -15,6 +15,7 @@ import './styles/Services.css';
 import './styles/FQs.css';
 import './styles/Login.css';
 import './styles/Signup.css';
+import './styles/About.css';
 
 
 
@@ -29,6 +30,7 @@ function App() {
           <Route path="/faq" element={<FQs />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/about" element={<About />} />
         </Routes>
     </Router>
   );

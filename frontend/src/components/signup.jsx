@@ -17,7 +17,7 @@ const Signup = () => {
 
   const handleNavClick = (path) => { // Fix 2
     setActiveLink(path);
-    // Optional: window.location.href = path; // For navigation
+    window.location.href = path;
   };
 
   return (

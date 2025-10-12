@@ -34,6 +34,16 @@ const Services = () => {
           >
             Home
           </a>
+          <a
+            href="/about" 
+            className={`nav-link ${activeLink === '/about' ? 'active' : ''}`}
+            onClick={(e) => {
+              e.preventDefault();
+              handleNavClick('/about');
+            }}
+          >
+            About
+          </a>
           <a 
             href="/services" 
             className={`nav-link ${activeLink === '/services' ? 'active' : ''}`}
@@ -43,26 +53,6 @@ const Services = () => {
             }}
           >
             Services
-          </a>
-          <a 
-            href="/faq" 
-            className={`nav-link ${activeLink === '/faq' ? 'active' : ''}`}
-            onClick={(e) => {
-              e.preventDefault();
-              handleNavClick('/faq');
-            }}
-          >
-            FAQs
-          </a>
-          <a 
-            href="/dashboard" 
-            className={`nav-link ${activeLink === '/dashboard' ? 'active' : ''}`}
-            onClick={(e) => {
-              e.preventDefault();
-              handleNavClick('/dashboard');
-            }}
-          >
-            Dashboard
           </a>
         </nav>
         <div className="nav-actions">
