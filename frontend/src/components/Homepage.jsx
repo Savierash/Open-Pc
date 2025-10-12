@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import ComputerLogo from '../assets/LOGO.png';
 import '../styles/Homepage.css';
-import BackgroundLogo from "../assets/BACKGROUND 2.png";
+import ComputerLogo1 from '../assets/LOGO1.png';
+import ComputerLogo from '../assets/LOGO.png';
 
 const Homepage = () => {
   const [activeLink, setActiveLink] = useState('/dashboard'); // Default to Dashboard as active
@@ -21,7 +21,7 @@ const Homepage = () => {
       {/* Top Navigation Bar */}
       <header className="top-bar-homepage">
         <div className="logo">
-           <img src={ComputerLogo} alt="PC LOGO" className="computer-logo" />
+           <img src={ComputerLogo1} alt="PC LOGO" className="computer-logo" />
           <span className="logo-text">OpenPC</span>
         </div>
         <nav className="nav-links">

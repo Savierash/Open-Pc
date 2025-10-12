@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import ComputerLogo from '../assets/LOGO.png';
+import '../styles/FQs.css';
+import ComputerLogo1 from '../assets/LOGO1.png';
 
 const FQs = () => {
   const [activeLink, setActiveLink] = useState('/dashboard'); // Default to Dashboard as active
@@ -19,7 +20,7 @@ const FQs = () => {
       {/* Top Navigation Bar */}
       <header className="top-bar-fqs">
         <div className="logo">
-           <img src={ComputerLogo} alt="PC LOGO" className="computer-logo" />
+           <img src={ComputerLogo1} alt="PC LOGO" className="computer-logo" />
           <span className="logo-text">OpenPC</span>
         </div>
         <nav className="nav-links">

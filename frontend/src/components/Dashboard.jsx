@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import '../styles/Dashboard.css'; 
+import ComputerLogo1 from '../assets/LOGO1.png';
 import ComputerLogo from '../assets/LOGO.png';
 import HouseLogo from '../assets/HouseFill.png';
 import GraphLogo from '../assets/GraphUp.png';
@@ -25,7 +27,7 @@ const Dashboard = () => {
       {/* Navigation Bar */}
       <nav className="navbar">
         <div className="logo">
-                   <img src={ComputerLogo} alt="PC LOGO" className="computer-logo" />
+                   <img src={ComputerLogo1} alt="PC LOGO" className="computer-logo" />
           <span>OpenPC</span>
         </div>
         <ul className="nav-menu">
