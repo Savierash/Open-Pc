@@ -5,6 +5,7 @@ import Dashboard from './components/Dashboard';
 import Services from './components/Services';
 import FQs from './components/FQs';
 import Login from './components/Login.jsx';
+import Signup from './components/Signup.jsx';
 
 
 /*STYLES*/
@@ -13,6 +14,7 @@ import './styles/Dashboard.css';
 import './styles/Services.css';
 import './styles/FQs.css';
 import './styles/Login.css';
+import './styles/Signup.css';
 
 
 

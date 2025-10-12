@@ -17,7 +17,7 @@ const FQs = () => {
   return (
     <div className="fqs">
       {/* Top Navigation Bar */}
-      <header className="top-bar">
+      <header className="top-bar-fqs">
         <div className="logo">
            <img src={ComputerLogo} alt="PC LOGO" className="computer-logo" />
           <span className="logo-text">OpenPC</span>
@@ -64,9 +64,9 @@ const FQs = () => {
             Dashboard
           </a>
         </nav>
-        <div className="auth-buttons">
-          <button className="auth-btn login" onClick={() => window.location.href = '/login'}>Login</button>
-          <button className="auth-btn signup" onClick={() => window.location.href = '/signup'}>Sign Up</button>
+        <div className="nav-actions">
+          <button className="btn-login" onClick={() => window.location.href = '/login'}>Login</button>
+          <button className="btn-signup" onClick={() => window.location.href = '/signup'}>Sign Up</button>
         </div>
       </header>
       </div>

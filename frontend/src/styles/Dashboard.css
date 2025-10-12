@@ -8,7 +8,7 @@
 .dashboard {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  -height: 100vhmin;
   background: linear-gradient(135deg, #0a0a0a 0%, #00023f 50%, #000033 100%);
   color: rgb(0, 0, 0);
 }

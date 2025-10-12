@@ -9,7 +9,7 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
- background: linear-gradient(135deg, #0a0a0a 0%, #00023f 50%, #000033 100%);
+  background: linear-gradient(135deg, #0a0a0a 0%, #00023f 50%, #000033 100%);
   color: rgb(0, 0, 0);
 }
 
@@ -20,7 +20,7 @@
   vertical-align: middle;
 }
 
-.top-bar {
+.top-bar-fqs {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -83,12 +83,13 @@
   background: #8a2be2;
 }
 
-.auth-buttons {
+.nav-actions {
   display: flex;
   gap: 10px;
 }
 
-.auth-btn {
+.btn-login,
+.btn-signup {
   padding: 8px 16px;
   border: none;
   border-radius: 4px;
@@ -97,22 +98,22 @@
   transition: background-color 0.3s;
 }
 
-.login {
-  background-color: transparent;
-  color: white;
-  border: 1px solid #fff;
-}
-
-.login:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.signup {
+.btn-login {
   background: transparent;
   color: #fff;
   border: 1px solid #fff;
 }
 
-.signup:hover {
+.btn-login:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.btn-signup {
+  background: transparent;
+  color: #fff;
+  border: solid 1px #fff;
+}
+
+.btn-signup:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
