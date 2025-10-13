@@ -75,7 +75,7 @@ const Signup = () => {
 
       {/* Main Content */}
       <div className="main-container">
-        <h1 className="title">Get started with your account</h1>
+        <h1 className="title-signup">Get started with your account</h1>
         
         <form onSubmit={handleSubmit} className="signup-form">
           {/* Email Field */}

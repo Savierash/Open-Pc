@@ -109,7 +109,7 @@ const Login = () => {
               />
               <img src={LockLogo} alt="Lock icon" className="input-icon" />
             </div>
-            <button type="submit" className="login-btn">
+            <button type="submit" className="login-button">
               Login
             </button>
           </form>

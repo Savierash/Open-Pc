@@ -47,7 +47,7 @@
   font-weight: bold;
 }
 
-.nav-links {
+.nav-links-about {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -57,11 +57,11 @@
   gap: 2rem;
 }
 
-.nav-link {
+.nav-link-about {
   margin-left: 0;
 }
 
-.nav-links a {
+.nav-links-about a {
   color: #fff;
   text-decoration: none;
   font-weight: 500;
@@ -69,19 +69,12 @@
   position: relative;
 }
 
-.nav-links a:hover,
-.nav-links a.active {
-  color: #8a2be2;
-}
-
-.nav-links a.active::after {
-  content: '';
-  position: absolute;
-  bottom: -5px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: #8a2be2;
+.nav-links-about a:hover,
+.nav-links-about a.active {
+  color: #ffffff;
+  background-color: #8a2be2;
+  padding: 5px;
+  border-radius: 5px;
 }
 
 .auth-buttons {

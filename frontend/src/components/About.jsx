@@ -20,10 +20,10 @@ function About() {
              <img src={ComputerLogo1} alt="PC LOGO" className="computer-logo" />
             <span className="logo-text">OpenPC</span>
           </div>
-          <nav className="nav-links">
+          <nav className="nav-links-about">
             <a 
               href="/" 
-              className={`nav-link ${activeLink === '/' ? 'active' : ''}`}
+              className={`nav-link-about ${activeLink === '/' ? 'active' : ''}`}
               onClick={(e) => {
                 e.preventDefault();
                 handleNavClick('/');
@@ -33,7 +33,7 @@ function About() {
             </a>
             <a 
               href="/about" 
-              className={`nav-link ${activeLink === '/about' ? 'active' : ''}`}
+              className={`nav-link-about ${activeLink === '/about' ? 'active' : ''}`}
               onClick={(e) => {
                 e.preventDefault();
                 handleNavClick('/about');
@@ -43,7 +43,7 @@ function About() {
             </a>
             <a 
               href="/services" 
-              className={`nav-link ${activeLink === '/services' ? 'active' : ''}`}
+              className={`nav-link-about ${activeLink === '/services' ? 'active' : ''}`}
               onClick={(e) => {
                 e.preventDefault();
                 handleNavClick('/services');

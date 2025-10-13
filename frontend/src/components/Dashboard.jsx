@@ -30,7 +30,7 @@ const Dashboard = () => {
                    <img src={ComputerLogo1} alt="PC LOGO" className="computer-logo" />
           <span>OpenPC</span>
         </div>
-        <ul className="nav-menu">
+        <ul className="nav-menu-dashboard">
           <li>
             <a 
               href="/" 

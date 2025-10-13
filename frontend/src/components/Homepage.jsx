@@ -24,10 +24,10 @@ const Homepage = () => {
            <img src={ComputerLogo1} alt="PC LOGO" className="computer-logo" />
           <span className="logo-text">OpenPC</span>
         </div>
-        <nav className="nav-links">
+        <nav className="nav-links-homepage">
           <a 
             href="/" 
-            className={`nav-link ${activeLink === '/' ? 'active' : ''}`}
+            className={`nav-link-homepage ${activeLink === '/' ? 'active' : ''}`}
             onClick={(e) => {
               e.preventDefault();
               handleNavClick('/');
@@ -37,7 +37,7 @@ const Homepage = () => {
           </a>
           <a 
             href="/about" 
-            className={`nav-link ${activeLink === '/about' ? 'active' : ''}`}
+            className={`nav-link-homepage ${activeLink === '/about' ? 'active' : ''}`}
             onClick={(e) => {
               e.preventDefault();
               handleNavClick('/about');
@@ -47,7 +47,7 @@ const Homepage = () => {
           </a>
           <a 
             href="/services" 
-            className={`nav-link ${activeLink === '/services' ? 'active' : ''}`}
+            className={`nav-link-homepage ${activeLink === '/services' ? 'active' : ''}`}
             onClick={(e) => {
               e.preventDefault();
               handleNavClick('/services');
@@ -57,7 +57,7 @@ const Homepage = () => {
           </a>
           <a
             href="/dashboard" 
-            className={`nav-link ${activeLink === '/dashboard' ? 'active' : ''}`} 
+            className={`nav-link-homepage ${activeLink === '/dashboard' ? 'active' : ''}`} 
             onClick={(e) => {
               e.preventDefault();
               handleNavClick('/dashboard');

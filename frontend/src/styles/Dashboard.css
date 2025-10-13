@@ -63,18 +63,18 @@
   font-size: 20px;
 }
 
-.nav-menu {
+.nav-menu-dashboard {
   display: flex;
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.nav-menu li {
+.nav-menu-dashboard li {
   margin-left: 2rem;
 }
 
-.nav-menu a {
+.nav-menu-dashboard a {
   color: #fff;
   text-decoration: none;
   font-weight: 500;
@@ -82,20 +82,14 @@
   position: relative;
 }
 
-.nav-menu a:hover,
-.nav-menu a.active {
-  color: #8a2be2;
+.nav-menu-dashboard a:hover,
+.nav-menu-dashboard a.active {
+  color: #ffffff;
+  background-color: #8a2be2;
+  padding: 5px;
+  border-radius: 5px;
 }
 
-.nav-menu a.active::after {
-  content: '';
-  position: absolute;
-  bottom: -5px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: #8a2be2;
-}
 
 .nav-actions {
   display: flex;
