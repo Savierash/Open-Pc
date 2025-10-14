@@ -23,6 +23,7 @@ const Homepage = () => {
         <div className="logo">
            <img src={ComputerLogo1} alt="PC LOGO" className="computer-logo" />
           <span className="logo-text">OpenPC</span>
+          <span className="logo-line">|</span>
         </div>
         <nav className="nav-links-homepage">
           <a 
@@ -54,16 +55,6 @@ const Homepage = () => {
             }}
           >
             Services
-          </a>
-          <a
-            href="/dashboard" 
-            className={`nav-link-homepage ${activeLink === '/dashboard' ? 'active' : ''}`} 
-            onClick={(e) => {
-              e.preventDefault();
-              handleNavClick('/dashboard');
-            }}
-          >
-            Dashboard
           </a>
         </nav>
         <div className="nav-actions">

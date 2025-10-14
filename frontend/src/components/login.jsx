@@ -35,7 +35,8 @@ const Login = () => {
       <nav className="navbar">
         <div className="logo">
           <img src={ComputerLogo1} alt="PC LOGO" className="logo-image" />
-          <span>OpenPC</span>
+          <span className='logo-text'>OpenPC</span>
+          <span className="logo-line">|</span>
         </div>
         <ul className="nav-menu">
           <li>
@@ -115,7 +116,7 @@ const Login = () => {
           </form>
           <div className="links-container">
             <a href="#" className="link" onClick={(e) => { e.preventDefault(); handleSignupClick(); }}>
-              Don't have an account? Sign up
+              Don't have an account?
             </a>
             <a href="#" className="link" onClick={(e) => { e.preventDefault(); handleForgotPasswordClick(); }}>
               Forgot Password?

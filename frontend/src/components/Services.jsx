@@ -25,6 +25,7 @@ const Services = () => {
         <div className="logo">
           <img src={ComputerLogo1} alt="PC LOGO" className="computer-logo" />
           <span className="logo-text">OpenPC</span>
+          <span className="logo-line">|</span>
         </div>
         <nav className="navs">
           <a 
@@ -88,17 +89,14 @@ const Services = () => {
             <div className="card">
               <h2 className="card-title">Computer Status Monitoring Service</h2>
               <p className="card-description">
-                Provides a centralized and real-time overview of all computer units within the laboratory.
-                Through this service, auditors can easily identify the operational status of each workstation,
-                whether it is functional, under maintenance, or out of order.
+                 Provides a centralized and real-time overview of all computer units within the laboratory. Through this service, auditors can easily identify the operational status of each workstation, whether it is functional, under maintenance, or out of order.
               </p>
             </div>
             <div className="card">
               <img src={ArchiveLogo} alt="Archive Logo" className="archive-logo" />
               <h2 className="card-title">Inventory Management Service</h2>
               <p className="card-description">
-                Serves as a digital inventory database, storing essential information such as computer ID,
-                laboratory location, hardware specifications, operating system, and current status of each unit.
+                Serves as a digital inventory database, storing essential information such as the computer ID, laboratory location, hardware specifications, operating system, and current status of each unit.
               </p>
             </div>
           </div>

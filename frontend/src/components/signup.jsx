@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import '../styles/Signup.css';
 import ComputerLogo1 from '../assets/LOGO1.png';
+import PersonLogo from '../assets/Person.png';
+import LockLogo from '../assets/Lock.png';
 
 const Signup = () => {
-  const [email, setEmail] = useState('eg.username23@gmail.com');
-  const [username, setUsername] = useState('eg.username23');
-  const [password, setPassword] = useState('eg.lovewedding123');
-  const [confirmPassword, setConfirmPassword] = useState('eg.lovewedding123');
-  const [activeLink, setActiveLink] = useState('/signup'); // Fix 1
+  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [activeLink, setActiveLink] = useState('/signup');
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -15,7 +17,7 @@ const Signup = () => {
     console.log('Signup submitted:', { email, username, password, confirmPassword });
   };
 
-  const handleNavClick = (path) => { // Fix 2
+  const handleNavClick = (path) => {
     setActiveLink(path);
     window.location.href = path;
   };
@@ -26,7 +28,8 @@ const Signup = () => {
       <nav className="navbar">
         <div className="logo">
           <img src={ComputerLogo1} alt="PC LOGO" className="logo-image" />
-          <span>OpenPC</span>
+          <span className='logo-text'>OpenPC</span>
+          <span className="logo-line">|</span>
         </div>
         <ul className="nav-menu">
           <li>
@@ -68,7 +71,7 @@ const Signup = () => {
         </ul>
         <div className="nav-actions">
           <button className="btn-signup" onClick={() => window.location.href = '/login'}>
-            Login {/* Fix 3 */}
+            Login
           </button>
         </div>
       </nav>  
@@ -81,53 +84,65 @@ const Signup = () => {
           {/* Email Field */}
           <div className="form-group">
             <label className="form-label">Email</label>
-            <input
-              type="email"
-              id="email" // Accessibility improvement
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="form-input"
-              placeholder="eg.username23@gmail.com"
-            />
+            <div className="input-with-icon">
+              <img src={PersonLogo} alt="Email Icon" className="input-icon" />
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="form-input"
+                placeholder="Enter your email"
+              />
+            </div>
           </div>
 
           {/* Username Field */}
           <div className="form-group">
             <label className="form-label">Username</label>
-            <input
-              type="text"
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="form-input"
-              placeholder="eg.username23"
-            />
+            <div className="input-with-icon">
+              <img src={PersonLogo} alt="Username Icon" className="input-icon" />
+              <input
+                type="text"
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="form-input"  
+                placeholder="Enter your username"
+              />
+            </div>
           </div>
 
           {/* Password Field */}
           <div className="form-group">
             <label className="form-label">Password</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="form-input"
-              placeholder="eg.lovewedding123"
-            />
+            <div className="input-with-icon">
+              <img src={LockLogo} alt="Password Icon" className="input-icon" />
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="form-input"
+                placeholder="Enter your password"
+              />
+            </div>
           </div>
 
           {/* Confirm Password Field */}
           <div className="form-group">
             <label className="form-label">Confirm Password</label>
-            <input
-              type="password"
-              id="confirm-password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="form-input"
-              placeholder="eg.lovewedding123"
-            />
+            <div className="input-with-icon">
+              <img src={LockLogo} alt="Confirm Password Icon" className="input-icon" />
+              <input
+                type="password"
+                id="confirm-password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="form-input"
+                placeholder="Confirm your password"
+              />
+            </div>
           </div>
 
           {/* Signup Button */}
