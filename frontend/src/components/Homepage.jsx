@@ -4,7 +4,7 @@ import ComputerLogo1 from '../assets/LOGO1.png';
 import ComputerLogo from '../assets/LOGO.png';
 
 const Homepage = () => {
-  const [activeLink, setActiveLink] = useState('/dashboard'); // Default to Dashboard as active
+  const [activeLink, setActiveLink] = useState('/'); // Default to Home as active for homepage
 
   useEffect(() => {
     // Set initial active link based on current URL path
@@ -21,7 +21,7 @@ const Homepage = () => {
       {/* Top Navigation Bar */}
       <header className="top-bar-homepage">
         <div className="logo">
-           <img src={ComputerLogo1} alt="PC LOGO" className="computer-logo" />
+          <img src={ComputerLogo1} alt="PC LOGO" className="computer-logo" />
           <span className="logo-text">OpenPC</span>
           <span className="logo-line">|</span>
         </div>
@@ -56,6 +56,26 @@ const Homepage = () => {
           >
             Services
           </a>
+          <a 
+            href="/faq" 
+            className={`nav-link-homepage ${activeLink === '/faq' ? 'active' : ''}`}
+            onClick={(e) => {
+              e.preventDefault();
+              handleNavClick('/faq');
+            }}
+          >
+            FAQs
+          </a>
+          <a 
+            href="/dashboard" 
+            className={`nav-link-homepage ${activeLink === '/dashboard' ? 'active' : ''}`}
+            onClick={(e) => {
+              e.preventDefault();
+              handleNavClick('/dashboard');
+            }}
+          >
+            Dashboard
+          </a>
         </nav>
         <div className="nav-actions">
           <button className="btn-login" onClick={() => window.location.href = '/login'}>Login</button>
@@ -64,10 +84,15 @@ const Homepage = () => {
       </header>
 
       <main className="content">
-        {/* Hero Section from the image */}
+        {/* Hero Section */}
         <section className="hero-section">
           <div className="hero-content">
-            <h1 className="hero-title0">OpenPC<span className="hero-computer-logo"><img src={ComputerLogo} alt="PC LOGO" className="hero-computer-logo" /></span></h1>
+            <h1 className="hero-title0">
+              OpenPC
+              <span className="hero-logo-wrapper">
+                <img src={ComputerLogo} alt="PC LOGO" className="hero-computer-logo" />
+              </span>
+            </h1>
             <h1 className="hero-title1">Monitor Smarter.</h1>
             <p className="hero-subtitle">Computer Monitoring and Management System.</p>
             <button className="hero-button">Get Started</button>
@@ -77,6 +102,5 @@ const Homepage = () => {
     </div>
   );
 };
-
 
 export default Homepage;

@@ -35,6 +35,9 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: bold;
 }
 
 .logo-text {
@@ -42,9 +45,15 @@
   font-weight: bold;
 }
 
+.logo-line {
+  color: #fff;
+  font-weight: bold;
+  margin-left: 5px;
+}
+
 .computer-logo {
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
 }
 
 .nav-links-about {
@@ -90,6 +99,7 @@
   cursor: pointer;
   transition: background-color 0.3s;
   font-weight: 500;
+  font-size: 14px;
 }
 
 .btn-login {
@@ -99,23 +109,24 @@
 }
 
 .btn-login:hover {
-  background: white;
-  color: #0c0c3a;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .btn-signup {
-  background: #a855f7;
+  background: transparent;
   color: white;
+  border: 1px solid white;
 }
 
 .btn-signup:hover {
-  background: #9333ea;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .main-container-about {
   padding: 1rem;
   max-width: 1200px;
   margin: 0 auto;
+  flex: 1;
 }
 
 .about-section {
@@ -142,12 +153,25 @@
 }
 
 .about-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 2.5rem;
   margin: 0;
-  background: white;
+  background: linear-gradient(135deg, #fff, #8a2be2);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+.about-logo-wrapper {
+  display: inline-block;
+}
+
+.about-title .computer-logo-about {
+  margin-left: 10px;
+  width: 50px;
+  height: 50px;
 }
 
 .about-description {

@@ -27,10 +27,10 @@ const Services = () => {
           <span className="logo-text">OpenPC</span>
           <span className="logo-line">|</span>
         </div>
-        <nav className="navs">
+        <nav className="nav-links-services">
           <a 
             href="/" 
-            className={`nav_link ${activeLink === '/' ? 'active' : ''}`}
+            className={`nav-link-services ${activeLink === '/' ? 'active' : ''}`}
             onClick={(e) => {
               e.preventDefault();
               handleNavClick('/');
@@ -38,9 +38,9 @@ const Services = () => {
           >
             Home
           </a>
-          <a
+          <a 
             href="/about" 
-            className={`nav-link ${activeLink === '/about' ? 'active' : ''}`}
+            className={`nav-link-services ${activeLink === '/about' ? 'active' : ''}`}
             onClick={(e) => {
               e.preventDefault();
               handleNavClick('/about');
@@ -50,7 +50,7 @@ const Services = () => {
           </a>
           <a 
             href="/services" 
-            className={`nav-link ${activeLink === '/services' ? 'active' : ''}`}
+            className={`nav-link-services ${activeLink === '/services' ? 'active' : ''}`}
             onClick={(e) => {
               e.preventDefault();
               handleNavClick('/services');
@@ -72,14 +72,17 @@ const Services = () => {
               <h1 className="services-title">Our Services</h1>
             </div>
             <p className="services-description">
-              At OpenPC One, we provide a smarter and more efficient way to manage computer laboratories.
+              At OpenPC, we provide a smarter and more efficient way to manage computer laboratories.
               Our web-based system is designed to assist auditors, administrators, and IT staff in monitoring,
               maintaining, and organizing computer units – all in one centralized platform.
             </p>
           </div>
           <div className="cards-container">
             <div className="card">
-              <img src={ShieldLogo} alt="Shield Logo" className="shield-logo" /><h2 className="card-title">User Management Service</h2>
+              <div className="card-header">
+                <img src={ShieldLogo} alt="Shield Logo" className="shield-logo" />
+                <h2 className="card-title">User Management Service</h2>
+              </div>
               <p className="card-description">
                 Ensure secure access for every user. The system provides role-based login for auditors,
                 technicians, and administrators, granting each role specific permissions and functionalities
@@ -87,14 +90,18 @@ const Services = () => {
               </p>
             </div>
             <div className="card">
-              <h2 className="card-title">Computer Status Monitoring Service</h2>
+              <div className="card-header">
+                <h2 className="card-title">Computer Status Monitoring Service</h2>
+              </div>
               <p className="card-description">
                  Provides a centralized and real-time overview of all computer units within the laboratory. Through this service, auditors can easily identify the operational status of each workstation, whether it is functional, under maintenance, or out of order.
               </p>
             </div>
             <div className="card">
-              <img src={ArchiveLogo} alt="Archive Logo" className="archive-logo" />
-              <h2 className="card-title">Inventory Management Service</h2>
+              <div className="card-header">
+                <img src={ArchiveLogo} alt="Archive Logo" className="archive-logo" />
+                <h2 className="card-title">Inventory Management Service</h2>
+              </div>
               <p className="card-description">
                 Serves as a digital inventory database, storing essential information such as the computer ID, laboratory location, hardware specifications, operating system, and current status of each unit.
               </p>

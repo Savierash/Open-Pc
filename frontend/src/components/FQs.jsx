@@ -3,7 +3,7 @@ import '../styles/FQs.css';
 import ComputerLogo1 from '../assets/LOGO1.png';
 
 const FQs = () => {
-  const [activeLink, setActiveLink] = useState('/dashboard'); // Default to Dashboard as active
+  const [activeLink, setActiveLink] = useState('/faq'); // Default to FAQ as active
 
   useEffect(() => {
     // Set initial active link based on current URL path
@@ -20,13 +20,14 @@ const FQs = () => {
       {/* Top Navigation Bar */}
       <header className="top-bar-fqs">
         <div className="logo">
-           <img src={ComputerLogo1} alt="PC LOGO" className="computer-logo" />
+          <img src={ComputerLogo1} alt="PC LOGO" className="computer-logo" />
           <span className="logo-text">OpenPC</span>
+          <span className="logo-line">|</span>
         </div>
-        <nav className="nav-links">
+        <nav className="nav-links-fqs">
           <a 
             href="/" 
-            className={`nav-link ${activeLink === '/' ? 'active' : ''}`}
+            className={`nav-link-fqs ${activeLink === '/' ? 'active' : ''}`}
             onClick={(e) => {
               e.preventDefault();
               handleNavClick('/');
@@ -36,7 +37,7 @@ const FQs = () => {
           </a>
           <a 
             href="/services" 
-            className={`nav-link ${activeLink === '/services' ? 'active' : ''}`}
+            className={`nav-link-fqs ${activeLink === '/services' ? 'active' : ''}`}
             onClick={(e) => {
               e.preventDefault();
               handleNavClick('/services');
@@ -46,7 +47,7 @@ const FQs = () => {
           </a>
           <a 
             href="/faq" 
-            className={`nav-link ${activeLink === '/faq' ? 'active' : ''}`}
+            className={`nav-link-fqs ${activeLink === '/faq' ? 'active' : ''}`}
             onClick={(e) => {
               e.preventDefault();
               handleNavClick('/faq');
@@ -56,7 +57,7 @@ const FQs = () => {
           </a>
           <a 
             href="/dashboard" 
-            className={`nav-link ${activeLink === '/dashboard' ? 'active' : ''}`}
+            className={`nav-link-fqs ${activeLink === '/dashboard' ? 'active' : ''}`}
             onClick={(e) => {
               e.preventDefault();
               handleNavClick('/dashboard');
@@ -70,7 +71,34 @@ const FQs = () => {
           <button className="btn-signup" onClick={() => window.location.href = '/signup'}>Sign Up</button>
         </div>
       </header>
-      </div>
+
+      <main className="main">
+        <section className="faqs-section">
+          <div className="faqs-header">
+            <h1 className="faqs-title">Frequently Asked Questions</h1>
+            <p className="faqs-subtitle">Find answers to common questions about OpenPC</p>
+          </div>
+          <div className="faqs-container">
+            <div className="faq-item">
+              <h2 className="faq-question">What is OpenPC?</h2>
+              <p className="faq-answer">OpenPC is a web-based computer monitoring and management system designed to assist in tracking and maintaining computer units in lab environments.</p>
+            </div>
+            <div className="faq-item">
+              <h2 className="faq-question">How do I get started?</h2>
+              <p className="faq-answer">Sign up for an account and log in to access the dashboard where you can monitor computer status in real-time.</p>
+            </div>
+            <div className="faq-item">
+              <h2 className="faq-question">What features does it offer?</h2>
+              <p className="faq-answer">Features include user management, computer status monitoring, and inventory management for efficient lab oversight.</p>
+            </div>
+            <div className="faq-item">
+              <h2 className="faq-question">Is it secure?</h2>
+              <p className="faq-answer">Yes, OpenPC uses role-based access control to ensure secure and accountable usage.</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
   );
 };
 

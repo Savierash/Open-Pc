@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/Login.css';
 import ComputerLogo1 from '../assets/LOGO1.png';
 import LockLogo from '../assets/Lock.png';
@@ -7,7 +7,12 @@ import PersonLogo from '../assets/Person.png';
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [activeLink, setActiveLink] = useState('/login'); // Updated initial state for login page
+  const [activeLink, setActiveLink] = useState(''); // No default active for login page
+
+  useEffect(() => {
+    // Set initial active link based on current URL path
+    setActiveLink(window.location.pathname);
+  }, []);
 
   const handleNavClick = (path) => {
     setActiveLink(path);
@@ -32,54 +37,48 @@ const Login = () => {
   return (
     <div className="login">
       {/* Navigation Bar */}
-      <nav className="navbar">
+      <header className="top-bar-login">
         <div className="logo">
-          <img src={ComputerLogo1} alt="PC LOGO" className="logo-image" />
-          <span className='logo-text'>OpenPC</span>
+          <img src={ComputerLogo1} alt="PC LOGO" className="computer-logo" />
+          <span className="logo-text">OpenPC</span>
           <span className="logo-line">|</span>
         </div>
-        <ul className="nav-menu">
-          <li>
-            <a 
-              href="/" 
-              className={activeLink === '/' ? 'active' : ''}
-              onClick={(e) => {
-                e.preventDefault();
-                handleNavClick('/');
-              }}
-            >
-              Home
-            </a>
-          </li>
-          <li>
-            <a 
-              href="/about" 
-              className={activeLink === '/about' ? 'active' : ''}
-              onClick={(e) => {
-                e.preventDefault();
-                handleNavClick('/about');
-              }}
-            >
-              About
-            </a>
-          </li>
-          <li>
-            <a 
-              href="/services" 
-              className={activeLink === '/services' ? 'active' : ''}
-              onClick={(e) => {
-                e.preventDefault();
-                handleNavClick('/services');
-              }}
-            >
-              Services
-            </a>
-          </li>
-        </ul>
+        <nav className="nav-links-login">
+          <a 
+            href="/" 
+            className={`nav-link-login ${activeLink === '/' ? 'active' : ''}`}
+            onClick={(e) => {
+              e.preventDefault();
+              handleNavClick('/');
+            }}
+          >
+            Home
+          </a>
+          <a 
+            href="/about" 
+            className={`nav-link-login ${activeLink === '/about' ? 'active' : ''}`}
+            onClick={(e) => {
+              e.preventDefault();
+              handleNavClick('/about');
+            }}
+          >
+            About
+          </a>
+          <a 
+            href="/services" 
+            className={`nav-link-login ${activeLink === '/services' ? 'active' : ''}`}
+            onClick={(e) => {
+              e.preventDefault();
+              handleNavClick('/services');
+            }}
+          >
+            Services
+          </a>
+        </nav>
         <div className="nav-actions">
           <button className="btn-signup" onClick={handleSignupClick}>Sign Up</button>
         </div>
-      </nav>
+      </header>
 
       {/* Login Form */}
       <main className="main">

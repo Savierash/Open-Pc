@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/About.css';
 import ComputerLogo from '../assets/LOGO.png';
 import ComputerLogo1 from '../assets/LOGO1.png';
 
-
 function About() {
   const [activeLink, setActiveLink] = useState('/about');
+
+  useEffect(() => {
+    // Set initial active link based on current URL path
+    setActiveLink(window.location.pathname);
+  }, []);
 
   const handleNavClick = (path) => {
     setActiveLink(path);
@@ -62,7 +66,12 @@ function About() {
         <section className="about-section">
           <div className="about-header-box">
             <div className="about-header">
-              <h1 className="about-title">OpenPc</h1><img src={ComputerLogo} alt="Computer Logo" className="computer-logo-about" />
+              <h1 className="about-title">
+                OpenPC
+                <span className="about-logo-wrapper">
+                  <img src={ComputerLogo} alt="Computer Logo" className="computer-logo-about" />
+                </span>
+              </h1>
             </div>
             <p className="about-description">
               A web-based computer monitoring and management system designed to assist computer laboratory auditors in efficiently tracking and maintaining computer units. Our platform provides a smarter, faster, and more reliable way to monitor the operational status of each computer within a lab environment.
@@ -79,7 +88,7 @@ function About() {
               </p>
             </div>
             <div className="card-about">
-              <h2 className="card-title-about">Our Vission</h2>
+              <h2 className="card-title-about">Our Vision</h2>
               <p className="card-description-about">
                 Provides a centralized and real-time overview of all computer units within the laboratory.
                 Through this service, auditors can easily identify the operational status of each workstation,
