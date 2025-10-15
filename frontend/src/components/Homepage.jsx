@@ -95,7 +95,7 @@ const Homepage = () => {
             </h1>
             <h1 className="hero-title1">Monitor Smarter.</h1>
             <p className="hero-subtitle">Computer Monitoring and Management System.</p>
-            <button className="hero-button">Get Started</button>
+            <button className="hero-button" onClick={() => window.location.href ='/signup'}>Get Started</button>
           </div>
         </section>
       </main>
