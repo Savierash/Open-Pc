@@ -102,9 +102,45 @@ const Dashboard = () => {
 
         {/* Main Content */}
         <main className="main-content">
-          {/* Empty main area; add your dashboard content here */}
           <div className="content-placeholder">
-            {/* Placeholder for future dashboard elements */}
+            {/* Dashboard Cards */}
+            <div className="dashboard-cards">
+              {/* Total Units Card */}
+              <div className="card total-units">
+                <div className="card-header">
+                  <img src={PcDisplayLogo} alt="PC Display Icon" className="card-icon" />
+                  <h3>Total Units</h3>
+                </div>
+                <div className="card-body">
+                  <p className="stat-number">150</p>
+                </div>
+              </div>
+
+              {/* Functional Card */}
+              <div className="card functional">
+                <div className="card-header">
+                  <img src={ClipboardLogo} alt="Clipboard Icon" className="card-icon" />
+                  <h3>Functional</h3>
+                </div>
+                <div className="card-body">
+                  <p className="stat-number">120 / 150</p>
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: '80%' }}></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Out of Order Card */}
+              <div className="card out-of-order">
+                <div className="card-header">
+                  <img src={OctagonLogo} alt="Octagon Icon" className="card-icon" />
+                  <h3>Out of Order</h3>
+                </div>
+                <div className="card-body">
+                  <p className="stat-number">30</p>
+                </div>
+              </div>
+            </div>
           </div>
         </main>
       </div>
