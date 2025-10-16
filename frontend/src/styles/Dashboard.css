@@ -56,12 +56,12 @@
   display: flex;
   align-items: center;
   color: #fff;
-  font-size: 1.5rem;
+  font-size: clamp(1.2rem, 4vw, 1.5rem);
   font-weight: bold;
 }
 
 .logo-text {
-  font-size: 1.5rem;
+  font-size: inherit;
   font-weight: bold;
 }
 
@@ -77,7 +77,7 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  gap: 2rem;
+  gap: clamp(1rem, 3vw, 2rem);
 }
 
 .nav-link-dashboard {
@@ -90,6 +90,7 @@
   font-weight: 500;
   transition: color 0.3s;
   position: relative;
+  padding: 0.5rem 1rem;
 }
 
 .nav-links-dashboard a:hover,
@@ -105,35 +106,12 @@
   gap: 10px;
 }
 
-.btn-login,
-.btn-signup {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s;
-}
-
-.btn-login {
-  background: transparent;
-  color: #fff;
-  border: 1px solid #fff;
-}
-
-.btn-login:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.btn-signup {
-  background: transparent;
-  color: #fff;
-  border: solid 1px #fff;
-}
-
-.btn-signup:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
+.person-icon {
+  width: 30px;
+  height: 30px;
+  margin-left: 10px;
+  vertical-align: middle;
+} 
 
 /* Main Layout */
 .main-layout {
@@ -152,7 +130,7 @@
   backdrop-filter: blur(10px); 
   border-right: 1px solid rgba(0, 0, 0, 0.3);
   display: flex;
-  flex-direction:  column;
+  flex-direction: column;
   color: #fff;
   border-radius: 20px;
   padding: 3rem 0;
@@ -162,6 +140,7 @@
   margin-right: 0.5rem;
   height: 20px;
   width: 20px;
+  flex-shrink: 0;
 }
 
 .sidebar-menu {
@@ -187,6 +166,9 @@
 .sidebar-menu span {
   font-weight: 500;
   color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Main Content */
@@ -235,16 +217,6 @@
   overflow: hidden;
 }
 
-.card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #8a2be2, #00bfff);
-}
-
 .card:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 25px rgba(138, 43, 226, 0.2);
@@ -261,28 +233,21 @@
   height: 24px;
   width: 24px;
   filter: brightness(1.2) saturate(0.8);
+  flex-shrink: 0;
 }
 
 .card-header h3 {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
   color: #fff;
   font-weight: 600;
 }
 
 .stat-number {
-  font-size: 2rem;
+  font-size: clamp(1.5rem, 5vw, 2rem);
   font-weight: bold;
   margin: 0 0 1rem 0;
-  color: #8a2be2;
-}
-
-.progress-bar {
-  width: 100%;
-  height: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-  overflow: hidden;
+  color: #ffffff;
 }
 
 .progress-fill {
@@ -291,44 +256,81 @@
   transition: width 0.3s ease;
 }
 
-/* Specific Card Styles */
-.total-units::before {
-  background: linear-gradient(90deg, #00bfff, #8a2be2);
+/* Tablet adjustments */
+@media (max-width: 1024px) {
+  .dashboard-cards {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .sidebar {
+    width: 200px;
+  }
 }
 
-.functional::before {
-  background: linear-gradient(90deg, #00ff00, #32cd32);
-}
-
-.out-of-order::before {
-  background: linear-gradient(90deg, #ff0000, #ff4500);
-}
-
-/* Responsive adjustments */
+/* Mobile adjustments */
 @media (max-width: 768px) {
   .top-bar-dashboard {
     flex-direction: column;
     gap: 1rem;
     padding: 1rem;
+    margin: 5px;
+    width: calc(100% - 10px);
+  }
+
+  .logo {
+    justify-content: center;
   }
 
   .nav-links-dashboard {
     gap: 1rem;
+    justify-content: center;
+  }
+
+  .nav-actions {
+    justify-content: center;
   }
 
   .main-layout {
     flex-direction: column;
+    padding: 5px;
   }
 
   .sidebar {
     width: 100%;
     height: auto;
     padding: 1rem 0;
+    border-radius: 10px;
+  }
+
+  .sidebar-menu {
+    padding: 0 1rem;
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 1rem;
+  }
+
+  .sidebar-menu li {
+    flex: 0 0 auto;
+    padding: 0.5rem 1rem;
+    border-bottom: none;
+    border-radius: 8px;
+    white-space: nowrap;
+  }
+
+  .sidebar-menu li:hover {
+    background: rgba(255, 255, 255, 0.1);
   }
 
   .main-content {
     padding: 1rem;
     margin-left: 0;
+    border-radius: 10px;
+  }
+
+  .content-placeholder {
+    padding: 1rem;
   }
 
   .dashboard-cards {
@@ -336,7 +338,63 @@
     gap: 1rem;
   }
 
-  .content-placeholder {
+  .card {
     padding: 1rem;
+  }
+}
+
+/* Small mobile adjustments */
+@media (max-width: 480px) {
+  .nav-links-dashboard {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .nav-links-dashboard a {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .nav-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .btn-login,
+  .btn-signup {
+    padding: 6px 12px;
+    font-size: 12px;
+    width: 100%;
+  }
+
+  .logo {
+    font-size: 1.2rem;
+  }
+
+  .computer-logo {
+    width: 32px;
+    height: 32px;
+  }
+
+  .sidebar-menu {
+    padding: 0 0.5rem;
+  }
+
+  .sidebar-menu li {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .card-header h3 {
+    font-size: 1rem;
+  }
+
+  .stat-number {
+    font-size: 1.5rem;
+  }
+
+  .progress-bar {
+    height: 6px;
   }
 }

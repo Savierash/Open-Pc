@@ -78,7 +78,7 @@ const Services = () => {
             </p>
           </div>
           <div className="cards-container">
-            <div className="card">
+            <div className="card-service">
               <div className="card-header">
                 <img src={ShieldLogo} alt="Shield Logo" className="shield-logo" />
                 <h2 className="card-title">User Management Service</h2>
@@ -89,7 +89,7 @@ const Services = () => {
                 to maintain data integrity and accountability.
               </p>
             </div>
-            <div className="card">
+            <div className="card-service">
               <div className="card-header">
                 <h2 className="card-title">Computer Status Monitoring Service</h2>
               </div>
@@ -97,7 +97,7 @@ const Services = () => {
                  Provides a centralized and real-time overview of all computer units within the laboratory. Through this service, auditors can easily identify the operational status of each workstation, whether it is functional, under maintenance, or out of order.
               </p>
             </div>
-            <div className="card">
+            <div className="card-service">
               <div className="card-header">
                 <img src={ArchiveLogo} alt="Archive Logo" className="archive-logo" />
                 <h2 className="card-title">Inventory Management Service</h2>
