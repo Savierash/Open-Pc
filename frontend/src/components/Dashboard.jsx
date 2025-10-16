@@ -7,9 +7,10 @@ import PcDisplayLogo from '../assets/PcDisplayHorizontal.png';
 import ClipboardLogo from '../assets/ClipboardCheck.png';
 import GearLogo from '../assets/GearFill.png';
 import OctagonLogo from '../assets/XOctagonFill.png';
+import StackLogo from '../assets/Stack.png'; // Import for Inventory tab
 
 const Dashboard = () => {
-  const [activeLink, setActiveLink] = useState('/dashboard'); // Default to Dashboard as active
+  const [activeLink, setActiveLink] = useState(window.location.pathname); // Initialize with current path
 
   useEffect(() => {
     // Set initial active link based on current URL path
@@ -74,38 +75,91 @@ const Dashboard = () => {
         <aside className="sidebar">
           <ul className="sidebar-menu">
             <li>
-              <img src={HouseLogo} alt="Home Icon" className="menu-icon" />
-              <span>Dashboard</span>
+              <a 
+                href="/dashboard" 
+                className={`sidebar-link ${activeLink === '/dashboard' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/dashboard');
+                }}
+              >
+                <img src={HouseLogo} alt="Home Icon" className="menu-icon" />
+                <span>Dashboard</span>
+              </a>
             </li>
             <li>
-              <img src={GraphLogo} alt="Graph Icon" className="menu-icon" />
-              <span>Analytics</span>
+              <a 
+                href="/inventory" 
+                className={`sidebar-link ${activeLink === '/inventory' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/inventory');
+                }}
+              >
+                <img src={StackLogo} alt="Inventory Icon" className="menu-icon" />
+                <span>Inventory</span>
+              </a>
             </li>
             <li>
-              <img src={PcDisplayLogo} alt="PC Display Icon" className="menu-icon" />
-              <span>Total Units</span>
+              <a 
+                href="/total-units" 
+                className={`sidebar-link ${activeLink === '/total-units' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/total-units');
+                }}
+              >
+                <img src={PcDisplayLogo} alt="PC Display Icon" className="menu-icon" />
+                <span>Total Units</span>
+              </a>
             </li>
             <li>
-              <img src={ClipboardLogo} alt="Clipboard Icon" className="menu-icon" />
-              <span>Functional</span>
+              <a 
+                href="/functional" 
+                className={`sidebar-link ${activeLink === '/functional' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/functional');
+                }}
+              >
+                <img src={ClipboardLogo} alt="Clipboard Icon" className="menu-icon" />
+                <span>Functional</span>
+              </a>
             </li>
             <li>
-              <img src={GearLogo} alt="Gear Icon" className="menu-icon" />
-              <span>Maintenance</span>
+              <a 
+                href="/maintenance" 
+                className={`sidebar-link ${activeLink === '/maintenance' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/maintenance');
+                }}
+              >
+                <img src={GearLogo} alt="Gear Icon" className="menu-icon" />
+                <span>Maintenance</span>
+              </a>
             </li>
             <li>
-              <img src={OctagonLogo} alt="Octagon Icon" className="menu-icon" />
-              <span>Out of Order</span>
+              <a 
+                href="/out-of-order" 
+                className={`sidebar-link ${activeLink === '/out-of-order' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/out-of-order');
+                }}
+              >
+                <img src={OctagonLogo} alt="Octagon Icon" className="menu-icon" />
+                <span>Out of Order</span>
+              </a>
             </li>
           </ul>
         </aside>
 
         {/* Main Content */}
         <main className="main-content">
-          <div className="content-placeholder">
-            {/* Dashboard Cards */}
+          <div className="dashboard-main-content">
+            
             <div className="dashboard-cards">
-              {/* Total Units Card */}
               <div className="card total-units">
                 <div className="card-header">
                   <img src={PcDisplayLogo} alt="PC Display Icon" className="card-icon" />
@@ -116,7 +170,6 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* Functional Card */}
               <div className="card functional">
                 <div className="card-header">
                   <img src={ClipboardLogo} alt="Clipboard Icon" className="card-icon" />
@@ -130,7 +183,6 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* Out of Order Card */}
               <div className="card out-of-order">
                 <div className="card-header">
                   <img src={OctagonLogo} alt="Octagon Icon" className="card-icon" />
@@ -139,6 +191,15 @@ const Dashboard = () => {
                 <div className="card-body">
                   <p className="stat-number">30</p>
                 </div>
+              </div>
+            </div>
+            
+            <div className="dashboard-bottom-row">
+              <div className="recent-activity-card">
+                <h3>Recent Activity</h3>
+              </div>
+              <div className="system-status-card">
+                <h3>System Status</h3>
               </div>
             </div>
           </div>
