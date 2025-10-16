@@ -15,6 +15,7 @@
 
 .top-bar-login {
   display: flex;
+  width: 90%;
   justify-content: space-between;
   align-items: center;
   padding: 10px 1rem;
@@ -23,10 +24,10 @@
   backdrop-filter: blur(10px);
   position: sticky;
   top: 0;
+  left: 70px;
   z-index: 10;
   border-radius: 20px;
   margin: 10px;
-  width: calc(100% - 20px);
   box-sizing: border-box;
 }
 

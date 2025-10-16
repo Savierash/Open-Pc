@@ -6,7 +6,7 @@ import ComputerLogo1 from '../assets/LOGO1.png';
 import PersonLogo from '../assets/Person.png';
 import LockLogo from '../assets/Lock.png';
 
-const apiBase = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const Signup = () => {
   const [email, setEmail] = useState('');
