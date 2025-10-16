@@ -7,24 +7,23 @@ import PcDisplayLogo from '../assets/PcDisplayHorizontal.png';
 import ClipboardLogo from '../assets/ClipboardCheck.png';
 import GearLogo from '../assets/GearFill.png';
 import OctagonLogo from '../assets/XOctagonFill.png';
-import StackLogo from '../assets/Stack.png'; // Import for Inventory tab
+import StackLogo from '../assets/Stack.png';
+import PersonLogo from '../assets/Person.png';
 
 const Dashboard = () => {
-  const [activeLink, setActiveLink] = useState(window.location.pathname); // Initialize with current path
+  const [activeLink, setActiveLink] = useState(window.location.pathname);
 
   useEffect(() => {
-    // Set initial active link based on current URL path
     setActiveLink(window.location.pathname);
   }, []);
 
   const handleNavClick = (path) => {
     setActiveLink(path);
-    window.location.href = path; // Navigate to the path
+    window.location.href = path;
   };
 
   return (
     <div className="dashboard">
-      {/* Top Navigation Bar */}
       <header className="top-bar-dashboard">
         <div className="logo">
           <img src={ComputerLogo1} alt="PC LOGO" className="computer-logo" />
@@ -64,14 +63,15 @@ const Dashboard = () => {
           </a>
         </nav>
         <div className="nav-actions">
-          <button className="btn-login" onClick={() => window.location.href = '/login'}>Login</button>
-          <button className="btn-signup" onClick={() => window.location.href = '/signup'}>Sign Up</button>
+          <img 
+            src={PersonLogo} 
+            alt="Profile Icon" 
+            className="profile-icon-dashboard"
+          />
         </div>
       </header>
 
-      {/* Main Layout */}
       <div className="main-layout">
-        {/* Sidebar */}
         <aside className="sidebar">
           <ul className="sidebar-menu">
             <li>
@@ -155,7 +155,6 @@ const Dashboard = () => {
           </ul>
         </aside>
 
-        {/* Main Content */}
         <main className="main-content">
           <div className="dashboard-main-content">
             

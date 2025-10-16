@@ -9,6 +9,7 @@ import GearLogo from '../assets/GearFill.png';
 import OctagonLogo from '../assets/XOctagonFill.png';
 import StackLogo from '../assets/Stack.png';
 import ComputerLabImage from '../assets/BACKGROUND 2.png';
+import PersonLogo from '../assets/Person.png';
 
 const Inventory = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
@@ -63,8 +64,11 @@ const Inventory = () => {
           </a>
         </nav>
         <div className="nav-actions">
-          <button className="btn-login" onClick={() => window.location.href = '/login'}>Login</button>
-          <button className="btn-signup" onClick={() => window.location.href = '/signup'}>Sign Up</button>
+          <img 
+            src={PersonLogo} 
+            alt="Profile Icon" 
+            className="profile-icon-dashboard"
+          />
         </div>
       </header>
 

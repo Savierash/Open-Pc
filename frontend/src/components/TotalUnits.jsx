@@ -8,6 +8,7 @@ import ClipboardLogo from '../assets/ClipboardCheck.png';
 import GearLogo from '../assets/GearFill.png';
 import OctagonLogo from '../assets/XOctagonFill.png';
 import StackLogo from '../assets/Stack.png';
+import PersonLogo from '../assets/Person.png';
 
 const TotalUnits = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
@@ -62,8 +63,11 @@ const TotalUnits = () => {
           </a>
         </nav>
         <div className="nav-actions">
-          <button className="btn-login" onClick={() => window.location.href = '/login'}>Login</button>
-          <button className="btn-signup" onClick={() => window.location.href = '/signup'}>Sign Up</button>
+          <img 
+            src={PersonLogo} 
+            alt="Profile Icon" 
+            className="profile-icon-dashboard"
+          />
         </div>
       </header>
 
