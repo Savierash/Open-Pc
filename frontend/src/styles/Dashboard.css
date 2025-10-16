@@ -34,7 +34,6 @@
   vertical-align: middle;
 }
 
-/* Top Navigation Bar */
 .top-bar-dashboard {
   display: flex;
   justify-content: space-between;
@@ -106,14 +105,47 @@
   gap: 10px;
 }
 
-.person-icon {
+.profile-icon-dashboard {
   width: 30px;
   height: 30px;
-  margin-left: 10px;
-  vertical-align: middle;
-} 
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
 
-/* Main Layout */
+.profile-icon-dashboard:hover {
+  transform: scale(1.1);
+}
+
+.btn-login,
+.btn-signup {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.btn-login {
+  background: transparent;
+  color: #fff;
+  border: 1px solid #fff;
+}
+
+.btn-login:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.btn-signup {
+  background: transparent;
+  color: #fff;
+  border: solid 1px #fff;
+}
+
+.btn-signup:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
 .main-layout {
   display: flex;
   flex: 1;
@@ -122,7 +154,6 @@
   padding: 10px;
 }
 
-/* Sidebar */
 .sidebar {
   width: 250px;
   background: rgba(0, 0, 0, 0.3); 
@@ -148,13 +179,12 @@
   padding: 0 1.5rem;
   margin: 0;
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .sidebar-menu li {
-  display: flex;
-  align-items: center;
-  padding: 1rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   cursor: pointer;
   transition: background 0.3s;
 }
@@ -171,12 +201,32 @@
   text-overflow: ellipsis;
 }
 
-/* Main Content */
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #fff;
+  width: 100%;
+  padding: 1rem 1.5rem;
+  box-sizing: border-box;
+  transition: background 0.3s ease;
+}
+
+.sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.sidebar-link.active {
+  background: #8a2be2;
+  border-radius: 10px;
+}
+
 .main-content {
   flex: 1;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-start;
+  align-items: flex-start;
   position: relative;
   z-index: 3;
   border-radius: 20px;
@@ -196,13 +246,13 @@
   align-items: flex-start;
 }
 
-/* Dashboard Cards */
 .dashboard-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 2rem;
   width: 100%;
   max-width: 1200px;
+  justify-content: center; /* Center the grid items horizontally */
 }
 
 .card {
@@ -256,19 +306,18 @@
   transition: width 0.3s ease;
 }
 
-/* Tablet adjustments */
-@media (max-width: 1024px) {
-  .dashboard-cards {
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-  }
-  
-  .sidebar {
-    width: 200px;
-  }
+.total-units::before {
+  background: linear-gradient(90deg, #00bfff, #8a2be2);
 }
 
-/* Mobile adjustments */
+.functional::before {
+  background: linear-gradient(90deg, #00ff00, #32cd32);
+}
+
+.out-of-order::before {
+  background: linear-gradient(90deg, #ff0000, #ff4500);
+}
+
 @media (max-width: 768px) {
   .top-bar-dashboard {
     flex-direction: column;
@@ -343,58 +392,155 @@
   }
 }
 
-/* Small mobile adjustments */
-@media (max-width: 480px) {
-  .nav-links-dashboard {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
+.inventory-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  padding: 2rem;
+  height: 100%;
+}
 
-  .nav-links-dashboard a {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.9rem;
-  }
+.add-lab-button {
+  background-color: #8a2be2;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 2rem;
+  transition: background-color 0.3s ease;
+}
 
-  .nav-actions {
-    flex-direction: column;
-    gap: 0.5rem;
-    width: 100%;
-  }
+.add-lab-button:hover {
+  background-color: #9b48f9;
+}
 
-  .btn-login,
-  .btn-signup {
-    padding: 6px 12px;
-    font-size: 12px;
-    width: 100%;
-  }
+.lab-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+}
 
-  .logo {
-    font-size: 1.2rem;
-  }
+.lab-card,
+.add-lab-card {
+  background: transparent;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  min-height: 200px;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
 
-  .computer-logo {
-    width: 32px;
-    height: 32px;
-  }
+.lab-card:hover,
+.add-lab-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(138, 43, 226, 0.2);
+}
 
-  .sidebar-menu {
-    padding: 0 0.5rem;
-  }
+.lab-card-text {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #fff;
+}
 
-  .sidebar-menu li {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.9rem;
-  }
+.add-lab-card {
+  border: 2px dashed rgba(255, 255, 255, 0.3);
+  background: transparent;
+}
 
-  .card-header h3 {
-    font-size: 1rem;
-  }
+.add-lab-plus {
+  font-size: 3rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 200;
+}
 
-  .stat-number {
-    font-size: 1.5rem;
-  }
+.blank-cards-layout {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  height: 100%;
+  padding: 2rem;
+}
 
-  .progress-bar {
-    height: 6px;
-  }
+.blank-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 20px;
+  flex: 2;
+}
+
+.small-blank-card {
+  background: transparent;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  aspect-ratio: 1 / 1;
+}
+
+.large-blank-card {
+  background: transparent;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  flex: 2;
+}
+
+.dashboard-main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  height: 100%;
+  padding: 2rem;
+  align-items: center; /* Center content horizontally within the column */
+}
+
+.dashboard-bottom-row {
+  display: flex;
+  gap: 20px;
+  flex: 1;
+  width: 100%;
+}
+
+.recent-activity-card,
+.system-status-card {
+  background: transparent;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.recent-activity-card h3,
+.system-status-card h3 {
+  margin-top: 0;
+  font-size: 1.5rem;
+  color: #fff;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.system-status-card {
+  flex: 2;
 }

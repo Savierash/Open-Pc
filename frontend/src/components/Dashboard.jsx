@@ -7,24 +7,23 @@ import PcDisplayLogo from '../assets/PcDisplayHorizontal.png';
 import ClipboardLogo from '../assets/ClipboardCheck.png';
 import GearLogo from '../assets/GearFill.png';
 import OctagonLogo from '../assets/XOctagonFill.png';
-import PersonLogo from '../assets/PersonCircle.png';
+import StackLogo from '../assets/Stack.png';
+import PersonLogo from '../assets/Person.png';
 
 const Dashboard = () => {
-  const [activeLink, setActiveLink] = useState('/dashboard'); // Default to Dashboard as active
+  const [activeLink, setActiveLink] = useState(window.location.pathname);
 
   useEffect(() => {
-    // Set initial active link based on current URL path
     setActiveLink(window.location.pathname);
   }, []);
 
   const handleNavClick = (path) => {
     setActiveLink(path);
-    window.location.href = path; // Navigate to the path
+    window.location.href = path;
   };
 
   return (
     <div className="dashboard">
-      {/* Top Navigation Bar */}
       <header className="top-bar-dashboard">
         <div className="logo">
           <img src={ComputerLogo1} alt="PC LOGO" className="computer-logo" />
@@ -63,47 +62,103 @@ const Dashboard = () => {
             Services
           </a>
         </nav>
-         <img src={PersonLogo} alt="Person LOGO" className="person-icon" />
+        <div className="nav-actions">
+          <img 
+            src={PersonLogo} 
+            alt="Profile Icon" 
+            className="profile-icon-dashboard"
+          />
+        </div>
       </header>
 
-      {/* Main Layout */}
       <div className="main-layout">
-        {/* Sidebar */}
         <aside className="sidebar">
           <ul className="sidebar-menu">
-            <li className={activeLink === '/dashboard' ? 'active' : ''}>
-              <img src={HouseLogo} alt="Home Icon" className="menu-icon" />
-              <span onClick={() => handleNavClick('/dashboard')}>Dashboard</span>
+            <li>
+              <a 
+                href="/dashboard" 
+                className={`sidebar-link ${activeLink === '/dashboard' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/dashboard');
+                }}
+              >
+                <img src={HouseLogo} alt="Home Icon" className="menu-icon" />
+                <span>Dashboard</span>
+              </a>
             </li>
-            <li className={activeLink === '/analytics' ? 'active' : ''}>
-              <img src={GraphLogo} alt="Graph Icon" className="menu-icon" />
-              <span onClick={() => handleNavClick('/analytics')}>Analytics</span>
+            <li>
+              <a 
+                href="/inventory" 
+                className={`sidebar-link ${activeLink === '/inventory' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/inventory');
+                }}
+              >
+                <img src={StackLogo} alt="Inventory Icon" className="menu-icon" />
+                <span>Inventory</span>
+              </a>
             </li>
-            <li className={activeLink === '/total-units' ? 'active' : ''}>
-              <img src={PcDisplayLogo} alt="PC Display Icon" className="menu-icon" />
-              <span onClick={() => handleNavClick('/total-units')}>Total Units</span>
+            <li>
+              <a 
+                href="/total-units" 
+                className={`sidebar-link ${activeLink === '/total-units' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/total-units');
+                }}
+              >
+                <img src={PcDisplayLogo} alt="PC Display Icon" className="menu-icon" />
+                <span>Total Units</span>
+              </a>
             </li>
-            <li className={activeLink === '/functional' ? 'active' : ''}>
-              <img src={ClipboardLogo} alt="Clipboard Icon" className="menu-icon" />
-              <span onClick={() => handleNavClick('/functional')}>Functional</span>
+            <li>
+              <a 
+                href="/functional" 
+                className={`sidebar-link ${activeLink === '/functional' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/functional');
+                }}
+              >
+                <img src={ClipboardLogo} alt="Clipboard Icon" className="menu-icon" />
+                <span>Functional</span>
+              </a>
             </li>
-            <li className={activeLink === '/maintenance' ? 'active' : ''}>
-              <img src={GearLogo} alt="Gear Icon" className="menu-icon" />
-              <span onClick={() => handleNavClick('/maintenance')}>Maintenance</span>
+            <li>
+              <a 
+                href="/maintenance" 
+                className={`sidebar-link ${activeLink === '/maintenance' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/maintenance');
+                }}
+              >
+                <img src={GearLogo} alt="Gear Icon" className="menu-icon" />
+                <span>Maintenance</span>
+              </a>
             </li>
-            <li className={activeLink === '/out-of-order' ? 'active' : ''}>
-              <img src={OctagonLogo} alt="Octagon Icon" className="menu-icon" />
-              <span onClick={() => handleNavClick('/out-of-order')}>Out of Order</span>
+            <li>
+              <a 
+                href="/out-of-order" 
+                className={`sidebar-link ${activeLink === '/out-of-order' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/out-of-order');
+                }}
+              >
+                <img src={OctagonLogo} alt="Octagon Icon" className="menu-icon" />
+                <span>Out of Order</span>
+              </a>
             </li>
           </ul>
         </aside>
 
-        {/* Main Content */}
         <main className="main-content">
-          <div className="content-placeholder">
-            {/* Dashboard Cards */}
+          <div className="dashboard-main-content">
+            
             <div className="dashboard-cards">
-              {/* Total Units Card */}
               <div className="card total-units">
                 <div className="card-header">
                   <img src={PcDisplayLogo} alt="PC Display Icon" className="card-icon" />
@@ -114,7 +169,6 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* Functional Card */}
               <div className="card functional">
                 <div className="card-header">
                   <img src={ClipboardLogo} alt="Clipboard Icon" className="card-icon" />
@@ -128,7 +182,6 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* Out of Order Card */}
               <div className="card out-of-order">
                 <div className="card-header">
                   <img src={OctagonLogo} alt="Octagon Icon" className="card-icon" />
@@ -137,6 +190,15 @@ const Dashboard = () => {
                 <div className="card-body">
                   <p className="stat-number">30</p>
                 </div>
+              </div>
+            </div>
+            
+            <div className="dashboard-bottom-row">
+              <div className="recent-activity-card">
+                <h3>Recent Activity</h3>
+              </div>
+              <div className="system-status-card">
+                <h3>System Status</h3>
               </div>
             </div>
           </div>

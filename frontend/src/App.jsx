@@ -6,6 +6,11 @@ import Services from './components/Services';
 import Login from './components/Login.jsx';
 import Signup from './components/Signup.jsx';
 import About from './components/About.jsx';
+import Inventory from './components/Inventory.jsx';
+import TotalUnits from './components/TotalUnits.jsx';
+import Functional from './components/Functional.jsx';
+import Maintenance from './components/Maintenance.jsx';
+import OutOfOrder from './components/OutOfOrder.jsx';
 
 /*STYLES*/
 import './styles/Homepage.css';
@@ -16,18 +21,21 @@ import './styles/Signup.css';
 import './styles/About.css';
 
 
-
 function App() {
   return (
     <Router>
-      {/* Routes */}
-        <Routes>
+      <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/services" element={<Services />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/about" element={<About />} />
+          <Route path="/inventory" element={<Inventory />} />
+          <Route path="/total-units" element={<TotalUnits />} />
+          <Route path="/functional" element={<Functional />} />
+          <Route path="/maintenance" element={<Maintenance />} />
+          <Route path="/out-of-order" element={<OutOfOrder />} />
         </Routes>
     </Router>
   );
