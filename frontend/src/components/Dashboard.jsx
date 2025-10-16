@@ -7,6 +7,7 @@ import PcDisplayLogo from '../assets/PcDisplayHorizontal.png';
 import ClipboardLogo from '../assets/ClipboardCheck.png';
 import GearLogo from '../assets/GearFill.png';
 import OctagonLogo from '../assets/XOctagonFill.png';
+import PersonLogo from '../assets/PersonCircle.png';
 
 const Dashboard = () => {
   const [activeLink, setActiveLink] = useState('/dashboard'); // Default to Dashboard as active
@@ -62,10 +63,7 @@ const Dashboard = () => {
             Services
           </a>
         </nav>
-        <div className="nav-actions">
-          <button className="btn-login" onClick={() => window.location.href = '/login'}>Login</button>
-          <button className="btn-signup" onClick={() => window.location.href = '/signup'}>Sign Up</button>
-        </div>
+         <img src={PersonLogo} alt="Person LOGO" className="person-icon" />
       </header>
 
       {/* Main Layout */}
@@ -73,29 +71,29 @@ const Dashboard = () => {
         {/* Sidebar */}
         <aside className="sidebar">
           <ul className="sidebar-menu">
-            <li>
+            <li className={activeLink === '/dashboard' ? 'active' : ''}>
               <img src={HouseLogo} alt="Home Icon" className="menu-icon" />
-              <span>Dashboard</span>
+              <span onClick={() => handleNavClick('/dashboard')}>Dashboard</span>
             </li>
-            <li>
+            <li className={activeLink === '/analytics' ? 'active' : ''}>
               <img src={GraphLogo} alt="Graph Icon" className="menu-icon" />
-              <span>Analytics</span>
+              <span onClick={() => handleNavClick('/analytics')}>Analytics</span>
             </li>
-            <li>
+            <li className={activeLink === '/total-units' ? 'active' : ''}>
               <img src={PcDisplayLogo} alt="PC Display Icon" className="menu-icon" />
-              <span>Total Units</span>
+              <span onClick={() => handleNavClick('/total-units')}>Total Units</span>
             </li>
-            <li>
+            <li className={activeLink === '/functional' ? 'active' : ''}>
               <img src={ClipboardLogo} alt="Clipboard Icon" className="menu-icon" />
-              <span>Functional</span>
+              <span onClick={() => handleNavClick('/functional')}>Functional</span>
             </li>
-            <li>
+            <li className={activeLink === '/maintenance' ? 'active' : ''}>
               <img src={GearLogo} alt="Gear Icon" className="menu-icon" />
-              <span>Maintenance</span>
+              <span onClick={() => handleNavClick('/maintenance')}>Maintenance</span>
             </li>
-            <li>
+            <li className={activeLink === '/out-of-order' ? 'active' : ''}>
               <img src={OctagonLogo} alt="Octagon Icon" className="menu-icon" />
-              <span>Out of Order</span>
+              <span onClick={() => handleNavClick('/out-of-order')}>Out of Order</span>
             </li>
           </ul>
         </aside>

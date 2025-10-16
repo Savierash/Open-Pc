@@ -56,26 +56,6 @@ const Homepage = () => {
           >
             Services
           </a>
-          <a 
-            href="/faq" 
-            className={`nav-link-homepage ${activeLink === '/faq' ? 'active' : ''}`}
-            onClick={(e) => {
-              e.preventDefault();
-              handleNavClick('/faq');
-            }}
-          >
-            FAQs
-          </a>
-          <a 
-            href="/dashboard" 
-            className={`nav-link-homepage ${activeLink === '/dashboard' ? 'active' : ''}`}
-            onClick={(e) => {
-              e.preventDefault();
-              handleNavClick('/dashboard');
-            }}
-          >
-            Dashboard
-          </a>
         </nav>
         <div className="nav-actions">
           <button className="btn-login" onClick={() => window.location.href = '/login'}>Login</button>
