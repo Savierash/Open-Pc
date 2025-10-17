@@ -6,10 +6,9 @@ import ShieldLogo from '../assets/ShieldLockFill.png';
 import ArchiveLogo from '../assets/ArchiveFill.png';
 
 const Services = () => {
-  const [activeLink, setActiveLink] = useState('/services'); // Default to Services as active
+  const [activeLink, setActiveLink] = useState('/services');
 
   useEffect(() => {
-    // Set initial active link based on current URL path
     setActiveLink(window.location.pathname);
   }, []);
 
@@ -20,45 +19,46 @@ const Services = () => {
 
   return (
     <div className="services">
-      {/* Top Navigation Bar */}
       <header className="top-bar-services">
-        <div className="logo">
-          <img src={ComputerLogo1} alt="PC LOGO" className="computer-logo" />
-          <span className="logo-text">OpenPC</span>
-          <span className="logo-line">|</span>
+        <div className="logo-and-nav">
+          <div className="logo">
+            <img src={ComputerLogo1} alt="PC LOGO" className="computer-logo" />
+            <span className="logo-text">OpenPC</span>
+            <span className="logo-line">|</span>
+          </div>
+          <nav className="nav-links-services">
+            <a 
+              href="/" 
+              className={`nav-link-services ${activeLink === '/' ? 'active' : ''}`}
+              onClick={(e) => {
+                e.preventDefault();
+                handleNavClick('/');
+              }}
+            >
+              Home
+            </a>
+            <a 
+              href="/about" 
+              className={`nav-link-services ${activeLink === '/about' ? 'active' : ''}`}
+              onClick={(e) => {
+                e.preventDefault();
+                handleNavClick('/about');
+              }}
+            >
+              About
+            </a>
+            <a 
+              href="/services" 
+              className={`nav-link-services ${activeLink === '/services' ? 'active' : ''}`}
+              onClick={(e) => {
+                e.preventDefault();
+                handleNavClick('/services');
+              }}
+            >
+              Services
+            </a>
+          </nav>
         </div>
-        <nav className="nav-links-services">
-          <a 
-            href="/" 
-            className={`nav-link-services ${activeLink === '/' ? 'active' : ''}`}
-            onClick={(e) => {
-              e.preventDefault();
-              handleNavClick('/');
-            }}
-          >
-            Home
-          </a>
-          <a 
-            href="/about" 
-            className={`nav-link-services ${activeLink === '/about' ? 'active' : ''}`}
-            onClick={(e) => {
-              e.preventDefault();
-              handleNavClick('/about');
-            }}
-          >
-            About
-          </a>
-          <a 
-            href="/services" 
-            className={`nav-link-services ${activeLink === '/services' ? 'active' : ''}`}
-            onClick={(e) => {
-              e.preventDefault();
-              handleNavClick('/services');
-            }}
-          >
-            Services
-          </a>
-        </nav>
         <div className="nav-actions">
           <button className="btn-login" onClick={() => window.location.href = '/login'}>Login</button>
           <button className="btn-signup" onClick={() => window.location.href = '/signup'}>Sign Up</button>

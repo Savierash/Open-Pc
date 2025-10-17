@@ -81,36 +81,34 @@ const Login = () => {
   return (
     <div className="login">
       <header className="top-bar-login">
-        <div className="logo" onClick={() => handleNavClick('/')}>
-          <img src={ComputerLogo1} alt="PC LOGO" className="computer-logo" />
-          <span className="logo-text">OpenPC</span>
-          <span className="logo-line">|</span>
+        <div className="logo-and-nav">
+          <div className="logo" onClick={() => handleNavClick('/')}>
+            <img src={ComputerLogo1} alt="PC LOGO" className="computer-logo" />
+            <span className="logo-text">OpenPC</span>
+            <span className="logo-line">|</span>
+          </div>
+
+          <nav className="nav-links-login">
+            <a
+              className={`nav-link-login ${activeLink === '/' ? 'active' : ''}`}
+              onClick={() => handleNavClick('/')}
+            >
+              Home
+            </a>
+            <a
+              className={`nav-link-login ${activeLink === '/about' ? 'active' : ''}`}
+              onClick={() => handleNavClick('/about')}
+            >
+              About
+            </a>
+            <a
+              className={`nav-link-login ${activeLink === '/services' ? 'active' : ''}`}
+              onClick={() => handleNavClick('/services')}
+            >
+              Services
+            </a>
+          </nav>
         </div>
-
-        <nav className="nav-links-login">
-          <button
-            type="button"
-            className={`nav-link-login ${activeLink === '/' ? 'active' : ''}`}
-            onClick={() => handleNavClick('/')}
-          >
-            Home
-          </button>
-          <button
-            type="button"
-            className={`nav-link-login ${activeLink === '/about' ? 'active' : ''}`}
-            onClick={() => handleNavClick('/about')}
-          >
-            About
-          </button>
-          <button
-            type="button"
-            className={`nav-link-login ${activeLink === '/services' ? 'active' : ''}`}
-            onClick={() => handleNavClick('/services')}
-          >
-            Services
-          </button>
-        </nav>
-
         <div className="nav-actions">
           <button className="btn-signup" onClick={() => handleNavClick('/signup')}>
             Sign Up

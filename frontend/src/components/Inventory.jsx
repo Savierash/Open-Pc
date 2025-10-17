@@ -26,43 +26,45 @@ const Inventory = () => {
   return (
     <div className="dashboard">
       <header className="top-bar-dashboard">
-        <div className="logo">
-          <img src={ComputerLogo1} alt="PC LOGO" className="computer-logo" />
-          <span className="logo-text">OpenPC</span>
-          <span className="logo-line">|</span>
+        <div className="logo-and-nav">
+          <div className="logo">
+            <img src={ComputerLogo1} alt="PC LOGO" className="computer-logo" />
+            <span className="logo-text">OpenPC</span>
+            <span className="logo-line">|</span>
+          </div>
+          <nav className="nav-links-dashboard">
+            <a 
+              href="/" 
+              className={`nav-link-dashboard ${activeLink === '/' ? 'active' : ''}`}
+              onClick={(e) => {
+                e.preventDefault();
+                handleNavClick('/');
+              }}
+            >
+              Home
+            </a>
+            <a 
+              href="/about" 
+              className={`nav-link-dashboard ${activeLink === '/about' ? 'active' : ''}`}
+              onClick={(e) => {
+                e.preventDefault();
+                handleNavClick('/about');
+              }}
+            >
+              About
+            </a>
+            <a 
+              href="/services" 
+              className={`nav-link-dashboard ${activeLink === '/services' ? 'active' : ''}`}
+              onClick={(e) => {
+                e.preventDefault();
+                handleNavClick('/services');
+              }}
+            >
+              Services
+            </a>
+          </nav>
         </div>
-        <nav className="nav-links-dashboard">
-          <a 
-            href="/" 
-            className={`nav-link-dashboard ${activeLink === '/' ? 'active' : ''}`}
-            onClick={(e) => {
-              e.preventDefault();
-              handleNavClick('/');
-            }}
-          >
-            Home
-          </a>
-          <a 
-            href="/about" 
-            className={`nav-link-dashboard ${activeLink === '/about' ? 'active' : ''}`}
-            onClick={(e) => {
-              e.preventDefault();
-              handleNavClick('/about');
-            }}
-          >
-            About
-          </a>
-          <a 
-            href="/services" 
-            className={`nav-link-dashboard ${activeLink === '/services' ? 'active' : ''}`}
-            onClick={(e) => {
-              e.preventDefault();
-              handleNavClick('/services');
-            }}
-          >
-            Services
-          </a>
-        </nav>
         <div className="nav-actions">
           <img 
             src={PersonLogo} 

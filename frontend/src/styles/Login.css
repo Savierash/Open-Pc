@@ -25,9 +25,16 @@
   top: 0;
   z-index: 10;
   border-radius: 20px;
-  margin: 10px;
+  margin: 10px auto;
   width: calc(100% - 20px);
+  max-width: 1200px;
   box-sizing: border-box;
+}
+
+.logo-and-nav {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
 }
 
 .logo {
@@ -37,6 +44,7 @@
   font-size: 1.5rem;
   font-weight: bold;
   gap: 10px;
+  margin-right: 1rem;
 }
 
 .computer-logo {
@@ -61,7 +69,7 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .nav-link-login {
@@ -69,11 +77,17 @@
 }
 
 .nav-links-login a {
+  display: flex;
   color: #fff;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.3s;
   position: relative;
+  padding: 5px 10px;
+  border-radius: 5px;
+  background-color: transparent;
+  appearance: none;
+  border: none;
 }
 
 .nav-links-login a:hover,
@@ -87,6 +101,7 @@
 .nav-actions {
   display: flex;
   gap: 10px;
+  margin-left: auto;
 }
 
 .btn-signup {

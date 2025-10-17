@@ -15,7 +15,7 @@
 
 .top-bar-signup {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   padding: 10px 1rem;
   background: rgba(0, 0, 0, 0.5);
@@ -25,9 +25,16 @@
   top: 0;
   z-index: 10;
   border-radius: 20px;
-  margin: 10px;
+  margin: 10px auto;
   width: calc(100% - 20px);
+  max-width: 1200px;
   box-sizing: border-box;
+}
+
+.logo-and-nav {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
 }
 
 .logo {
@@ -37,6 +44,7 @@
   font-size: 1.5rem;
   font-weight: bold;
   gap: 10px;
+  margin-right: 1rem;
 }
 
 .computer-logo {
@@ -61,7 +69,7 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .nav-link-signup {
@@ -87,6 +95,7 @@
 .nav-actions {
   display: flex;
   gap: 10px;
+  margin-left: auto;
 }
 
 .btn-login {
