@@ -26,7 +26,7 @@ const Login = () => {
   }, [location.pathname]);
 
   const handleNavClick = (path) => {
-    // use React Router navigation to avoid full reloads
+    // use React Router ion to avoid full reloads
     navigate(path);
   };
 

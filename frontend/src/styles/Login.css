@@ -77,12 +77,13 @@
   position: relative;
 }
 
-.nav-links-login a:hover,
-.nav-links-login a.active {
+.nav-links-login :hover,
+.nav-links-login .active {
   background-color: #8a2be2;  
   color: #fff;  
   padding: 5px;
-  border-radius: 5px;             
+  border-radius: 5px;
+  border: none;             
 }
 
 .nav-actions {
