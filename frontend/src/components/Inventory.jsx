@@ -96,50 +96,8 @@ const Inventory = () => {
             </a>
           </nav>
         </div>
-<<<<<<< HEAD
-        <nav className="nav-links-dashboard">
-          <a
-            href="/"
-            className={`nav-link-dashboard ${activeLink === '/' ? 'active' : ''}`}
-            onClick={(e) => {
-              e.preventDefault();
-              handleNavClick('/');
-            }}
-          >
-            Home
-          </a>
-          <a
-            href="/about"
-            className={`nav-link-dashboard ${activeLink === '/about' ? 'active' : ''}`}
-            onClick={(e) => {
-              e.preventDefault();
-              handleNavClick('/about');
-            }}
-          >
-            About
-          </a>
-          <a
-            href="/services"
-            className={`nav-link-dashboard ${activeLink === '/services' ? 'active' : ''}`}
-            onClick={(e) => {
-              e.preventDefault();
-              handleNavClick('/services');
-            }}
-          >
-            Services
-          </a>
-        </nav>
-=======
->>>>>>> 28788c26715d6b4043bb6e38c4b59400a834c357
-        <div className="nav-actions">
-          <img
-            src={PersonLogo}
-            alt="Profile Icon"
-            className="profile-icon-dashboard"
-          />
-        </div>
       </header>
-
+      
       <div className="main-layout">
         <aside className="sidebar">
           <ul className="sidebar-menu">
