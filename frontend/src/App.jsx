@@ -1,10 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Homepage from './components/Homepage';  
-import Dashboard from './components/Dashboard'; 
+import Dashboard from './pages/Dashboard.jsx'; 
 import Services from './components/Services';
-import Login from './components/Login.jsx';
-import Signup from './components/Signup.jsx';
+import Login from './pages/login.jsx';
+import Signup from './pages/signup.jsx';
 import About from './components/About.jsx';
 import Inventory from './components/Inventory.jsx';
 import TotalUnits from './components/TotalUnits.jsx';
