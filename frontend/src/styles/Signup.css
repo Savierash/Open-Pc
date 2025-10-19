@@ -15,8 +15,12 @@
 
 .top-bar-signup {
   display: flex;
+<<<<<<< HEAD
   width: 90%;
   justify-content: space-between;
+=======
+  justify-content: flex-start;
+>>>>>>> 28788c26715d6b4043bb6e38c4b59400a834c357
   align-items: center;
   padding: 10px 1rem;
   background: rgba(0, 0, 0, 0.5);
@@ -27,8 +31,20 @@
   left: 70px;
   z-index: 10;
   border-radius: 20px;
+<<<<<<< HEAD
   margin: 10px;
+=======
+  margin: 10px auto;
+  width: calc(100% - 20px);
+  max-width: 1200px;
+>>>>>>> 28788c26715d6b4043bb6e38c4b59400a834c357
   box-sizing: border-box;
+}
+
+.logo-and-nav {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
 }
 
 .logo {
@@ -38,6 +54,7 @@
   font-size: 1.5rem;
   font-weight: bold;
   gap: 10px;
+  margin-right: 1rem;
 }
 
 .computer-logo {
@@ -62,7 +79,7 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .nav-link-signup {
@@ -88,6 +105,7 @@
 .nav-actions {
   display: flex;
   gap: 10px;
+  margin-left: auto;
 }
 
 .btn-login {

@@ -1,12 +1,16 @@
-// src/pages/Signup.jsx (updated)
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/Signup.css';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import ComputerLogo1 from '../assets/LOGO1.png';
 import PersonLogo from '../assets/Person.png';
 import LockLogo from '../assets/Lock.png';
 
+<<<<<<< HEAD:frontend/src/pages/signup.jsx
 const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+=======
+const apiBase = import.meta.env.VITE_APP_API_URL || 'http://localhost:5000';
+>>>>>>> 28788c26715d6b4043bb6e38c4b59400a834c357:frontend/src/components/signup.jsx
 
 const Signup = () => {
   const [email, setEmail] = useState('');
@@ -17,9 +21,12 @@ const Signup = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const navigate = useNavigate();
+  const location = useLocation();
+
   useEffect(() => {
-    setActiveLink(window.location.pathname);
-  }, []);
+    setActiveLink(location.pathname);
+  }, [location.pathname]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,7 +46,7 @@ const Signup = () => {
       const { token, user } = res.data;
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
-      window.location.href = '/'; // or /dashboard
+      window.location.href = '/';
     } catch (err) {
       console.error(err);
       const msg = err.response?.data?.message || 'Signup failed';
@@ -50,25 +57,41 @@ const Signup = () => {
   };
 
   const handleNavClick = (path) => {
-    setActiveLink(path);
-    window.location.href = path;
+    navigate(path);
   };
 
   return (
     <div className="signup">
       <header className="top-bar-signup">
-        <div className="logo">
-          <img src={ComputerLogo1} alt="PC LOGO" className="computer-logo" />
-          <span className="logo-text">OpenPC</span>
-          <span className="logo-line">|</span>
+        <div className="logo-and-nav">
+          <div className="logo">
+            <img src={ComputerLogo1} alt="PC LOGO" className="computer-logo" />
+            <span className="logo-text">OpenPC</span>
+            <span className="logo-line">|</span>
+          </div>
+          <nav className="nav-links-signup">
+            <a
+              className={`nav-link-signup ${activeLink === '/' ? 'active' : ''}`}
+              onClick={() => handleNavClick('/')}
+            >
+              Home
+            </a>
+            <a
+              className={`nav-link-signup ${activeLink === '/about' ? 'active' : ''}`}
+              onClick={() => handleNavClick('/about')}
+            >
+              About
+            </a>
+            <a
+              className={`nav-link-signup ${activeLink === '/services' ? 'active' : ''}`}
+              onClick={() => handleNavClick('/services')}
+            >
+              Services
+            </a>
+          </nav>
         </div>
-        <nav className="nav-links-signup">
-          <a href="/" className={`nav-link-signup ${activeLink === '/' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/'); }}>Home</a>
-          <a href="/about" className={`nav-link-signup ${activeLink === '/about' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/about'); }}>About</a>
-          <a href="/services" className={`nav-link-signup ${activeLink === '/services' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/services'); }}>Services</a>
-        </nav>
         <div className="nav-actions">
-          <button className="btn-login" onClick={() => window.location.href = '/login'}>
+          <button className="btn-login" onClick={() => handleNavClick('/login')}>
             Login
           </button>
         </div>
