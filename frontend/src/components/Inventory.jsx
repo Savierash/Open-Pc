@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import '../styles/Dashboard.css';
 import ComputerLogo1 from '../assets/LOGO1.png';
 import HouseLogo from '../assets/HouseFill.png';
@@ -11,15 +12,23 @@ import StackLogo from '../assets/Stack.png';
 import ComputerLabImage from '../assets/BACKGROUND 2.png';
 import PersonLogo from '../assets/Person.png';
 
-const Inventory = () => {
-  // nav active link
-  const [activeLink, setActiveLink] = useState(window.location.pathname);
+// ✅ Use Vite env style
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
 
-  // labs state (initial example labs)
-  const [labs, setLabs] = useState(["ITS 300", "PTC 201"]);
+
+
+
+const Inventory = () => {
+  const [activeLink, setActiveLink] = useState(window.location.pathname);
+  const [labs, setLabs] = useState([]); // array of { _id, name }
+  const [loading, setLoading] = useState(false);
+  const [adding, setAdding] = useState(false);
 
   useEffect(() => {
     setActiveLink(window.location.pathname);
+    // fetch on mount
+    fetchLabs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleNavClick = (path) => {
@@ -27,29 +36,61 @@ const Inventory = () => {
     window.location.href = path;
   };
 
-  // Add a new lab (uses prompt for quick implementation)
-  const addLab = () => {
-    const newLabName = window.prompt("Enter new lab name:");
-    if (newLabName && newLabName.trim() !== "") {
-      const trimmed = newLabName.trim();
-      // avoid exact duplicates
-      if (labs.includes(trimmed)) {
-        window.alert("This lab already exists.");
-        return;
-      }
-      setLabs((prev) => [...prev, trimmed]);
+  const fetchLabs = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`${API_BASE}/labs`);
+      setLabs(res.data); // expect array of labs
+    } catch (err) {
+      console.error('Failed to fetch labs', err);
+      window.alert('Failed to load labs. See console for details.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Add a new lab (prompt for quick implementation)
+  const addLab = async () => {
+    const newLabName = window.prompt('Enter new lab name:');
+    if (!newLabName) return;
+    const trimmed = newLabName.trim();
+    if (trimmed === '') return window.alert('Lab name cannot be empty.');
+
+    // avoid exact duplicates locally
+    if (labs.some(l => l.name.toLowerCase() === trimmed.toLowerCase())) {
+      return window.alert('This lab already exists.');
+    }
+
+    setAdding(true);
+    try {
+      const res = await axios.post(`${API_BASE}/labs`, { name: trimmed });
+      // res.data should be the created lab { _id, name }
+      setLabs(prev => [...prev, res.data]);
+    } catch (err) {
+      console.error('Failed to add lab', err);
+      const message = err?.response?.data?.message || 'Failed to add lab';
+      window.alert(message);
+    } finally {
+      setAdding(false);
     }
   };
 
   // Remove a lab by index (with confirmation)
-  const removeLab = (index) => {
-    const labName = labs[index];
-    const confirmed = window.confirm(`Remove lab "${labName}"?`);
+  const removeLab = async (index) => {
+    const lab = labs[index];
+    if (!lab) return;
+    const confirmed = window.confirm(`Remove lab "${lab.name}"?`);
     if (!confirmed) return;
-    setLabs((prev) => prev.filter((_, i) => i !== index));
+
+    try {
+      await axios.delete(`${API_BASE}/labs/${lab._id}`);
+      setLabs(prev => prev.filter((_, i) => i !== index));
+    } catch (err) {
+      console.error('Failed to delete lab', err);
+      window.alert('Failed to delete lab. See console for details.');
+    }
   };
 
-  // Optional: double-click handler is already used in JSX; kept for clarity
   const handleLabDoubleClick = (index) => {
     removeLab(index);
   };
@@ -67,30 +108,21 @@ const Inventory = () => {
             <a 
               href="/" 
               className={`nav-link-dashboard ${activeLink === '/' ? 'active' : ''}`}
-              onClick={(e) => {
-                e.preventDefault();
-                handleNavClick('/');
-              }}
+              onClick={(e) => { e.preventDefault(); handleNavClick('/'); }}
             >
               Home
             </a>
             <a 
               href="/about" 
               className={`nav-link-dashboard ${activeLink === '/about' ? 'active' : ''}`}
-              onClick={(e) => {
-                e.preventDefault();
-                handleNavClick('/about');
-              }}
+              onClick={(e) => { e.preventDefault(); handleNavClick('/about'); }}
             >
               About
             </a>
             <a 
               href="/services" 
               className={`nav-link-dashboard ${activeLink === '/services' ? 'active' : ''}`}
-              onClick={(e) => {
-                e.preventDefault();
-                handleNavClick('/services');
-              }}
+              onClick={(e) => { e.preventDefault(); handleNavClick('/services'); }}
             >
               Services
             </a>
@@ -102,8 +134,8 @@ const Inventory = () => {
         <aside className="sidebar">
           <ul className="sidebar-menu">
             <li>
-              <a
-                href="/dashboard"
+              <a 
+                href="/dashboard" 
                 className={`sidebar-link ${activeLink === '/dashboard' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
@@ -115,8 +147,8 @@ const Inventory = () => {
               </a>
             </li>
             <li>
-              <a
-                href="/inventory"
+              <a 
+                href="/inventory" 
                 className={`sidebar-link ${activeLink === '/inventory' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
@@ -128,8 +160,8 @@ const Inventory = () => {
               </a>
             </li>
             <li>
-              <a
-                href="/total-units"
+              <a 
+                href="/total-units" 
                 className={`sidebar-link ${activeLink === '/total-units' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
@@ -141,8 +173,8 @@ const Inventory = () => {
               </a>
             </li>
             <li>
-              <a
-                href="/functional"
+              <a 
+                href="/functional" 
                 className={`sidebar-link ${activeLink === '/functional' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
@@ -154,8 +186,8 @@ const Inventory = () => {
               </a>
             </li>
             <li>
-              <a
-                href="/maintenance"
+              <a 
+                href="/maintenance" 
                 className={`sidebar-link ${activeLink === '/maintenance' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
@@ -167,8 +199,8 @@ const Inventory = () => {
               </a>
             </li>
             <li>
-              <a
-                href="/out-of-order"
+              <a 
+                href="/out-of-order" 
                 className={`sidebar-link ${activeLink === '/out-of-order' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
@@ -184,26 +216,37 @@ const Inventory = () => {
 
         <main className="main-content">
           <div className="inventory-content">
-            <button className="add-lab-button" onClick={addLab}>
-              ADD LAB
+            <button
+              className="add-lab-button"
+              onClick={addLab}
+              disabled={adding}
+              title="Add new lab"
+            >
+              {adding ? 'ADDING...' : 'ADD LAB'}
             </button>
 
             <div className="lab-cards-container">
-              {labs.map((lab, index) => (
-                <div
-                  key={index}
-                  className="lab-card"
-                  onDoubleClick={() => handleLabDoubleClick(index)}
-                  title="Double-click to delete"
-                >
-                  <span className="lab-card-text">{lab}</span>
-                </div>
-              ))}
+              {loading ? (
+                <div>Loading labs...</div>
+              ) : (
+                <>
+                  {labs.map((lab, index) => (
+                    <div
+                      key={lab._id}
+                      className="lab-card"
+                      onDoubleClick={() => handleLabDoubleClick(index)}
+                      title="Double-click to delete"
+                    >
+                      <span className="lab-card-text">{lab.name}</span>
+                    </div>
+                  ))}
 
-              {/* + card to quickly add */}
-              <div className="add-lab-card" onClick={addLab} title="Add lab">
-                <span className="add-lab-plus">+</span>
-              </div>
+                  {/* + card to quickly add */}
+                  <div className="add-lab-card" onClick={addLab} title="Add lab">
+                    <span className="add-lab-plus">+</span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </main>
