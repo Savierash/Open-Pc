@@ -12,12 +12,17 @@ import Functional from './components/Functional.jsx';
 import Maintenance from './components/Maintenance.jsx';
 import OutOfOrder from './components/OutOfOrder.jsx';
 
+
 /*STYLES*/
 import './styles/Homepage.css';
 import './styles/Dashboard.css';  
 import './styles/Services.css';
 import './styles/Login.css';
 import './styles/Signup.css';
+import './styles/OTP.css';
+import './styles/ForgotPasswordOTP.css';
+import './styles/ResetPassword.css';
+import './styles/ForgotPassword.css';
 import './styles/About.css';
 
 
@@ -30,6 +35,10 @@ function App() {
           <Route path="/services" element={<Services />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/otp" element={<OTP />} />
+          <Route path="/forgot-password-otp" element={<ForgotPasswordOTP />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/about" element={<About />} />
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/total-units" element={<TotalUnits />} />
