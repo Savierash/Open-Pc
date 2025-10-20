@@ -62,6 +62,16 @@ const TotalUnits = () => {
             >
               Services
             </a>
+            <a 
+              href="/dashboard" 
+              className={`nav-link-dashboard active`}
+              onClick={(e) => {
+                e.preventDefault();
+                handleNavClick('/dashboard');
+              }}
+            >
+              Dashboard
+            </a>
           </nav>
         </div>
         <div className="nav-actions">
@@ -158,16 +168,32 @@ const TotalUnits = () => {
         </aside>
 
         <main className="main-content">
-          <div className="blank-cards-layout">
-            <div className="blank-cards-grid">
-              <div className="small-blank-card"></div>
-              <div className="small-blank-card"></div>
-              <div className="small-blank-card"></div>
-              <div className="small-blank-card"></div>
-              <div className="small-blank-card"></div>
-              <div className="small-blank-card"></div>
+          <div className="two-column-layout">
+            <div className="labs-container">
+              <div className="lab-list">
+                <div className="lab-card-new active">ITS 300</div>
+                <div className="lab-card-new">PTC 201</div>
+                {/* Add more lab cards as needed */}
+              </div>
             </div>
-            <div className="large-blank-card"></div>
+            <div className="pcs-container">
+              <button className="add-unit-button">Add Unit</button>
+              <div className="pc-grid">
+                <div className="pc-card">
+                  <img src={PcDisplayLogo} alt="PC Icon" />
+                  <span>IT-PC-01</span>
+                </div>
+                <div className="pc-card"></div>
+                <div className="pc-card"></div>
+                <div className="pc-card"></div>
+                <div className="pc-card"></div>
+                <div className="pc-card"></div>
+                <div className="pc-card"></div>
+                <div className="pc-card"></div>
+                <div className="pc-card"></div>
+                <div className="add-pc-card">+</div>
+              </div>
+            </div>
           </div>
         </main>
       </div>

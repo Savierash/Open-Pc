@@ -63,6 +63,16 @@ const Inventory = () => {
             >
               Services
             </a>
+            <a 
+              href="/dashboard" 
+              className={`nav-link-dashboard active`}
+              onClick={(e) => {
+                e.preventDefault();
+                handleNavClick('/dashboard');
+              }}
+            >
+              Dashboard
+            </a>
           </nav>
         </div>
         <div className="nav-actions">
