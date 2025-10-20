@@ -11,6 +11,10 @@ import TotalUnits from './components/TotalUnits.jsx';
 import Functional from './components/Functional.jsx';
 import Maintenance from './components/Maintenance.jsx';
 import OutOfOrder from './components/OutOfOrder.jsx';
+import OTP from './components/OTP.jsx';
+import ForgotPasswordOTP from './components/ForgotPasswordOTP.jsx';
+import ResetPassword from './components/ResetPassword.jsx';
+import ForgotPassword from './components/ForgotPassword.jsx';
 
 
 /*STYLES*/
