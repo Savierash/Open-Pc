@@ -1,12 +1,20 @@
+// src/pages/Signup.jsx
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import '../styles/Signup.css';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import ComputerLogo1 from '../assets/LOGO1.png';
 import PersonLogo from '../assets/Person.png';
 import LockLogo from '../assets/Lock.png';
+import axios from 'axios';
 
-const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+// create an axios instance
+const api = axios.create({
+  baseURL: API_BASE,
+  timeout: 10000,
+  // withCredentials: true, // enable if backend uses cookies
+});
 
 const Signup = () => {
   const [email, setEmail] = useState('');
@@ -33,20 +41,26 @@ const Signup = () => {
     }
     setLoading(true);
     try {
-      const res = await axios.post(`${apiBase}/api/auth/register`, {
+      const res = await api.post('/api/auth/register', {
         email,
         username,
         password,
-        confirmPassword
+        confirmPassword,
       });
       const { token, user } = res.data;
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
-      window.location.href = '/';
+      // navigate instead of hard reload if you want SPA behavior:
+      navigate('/dashboard', { replace: true });
+      // or use window.location.href = '/';
     } catch (err) {
-      console.error(err);
-      const msg = err.response?.data?.message || 'Signup failed';
-      setError(msg);
+      console.error('Signup error', err);
+      // Detailed logging for network vs server errors:
+      if (!err.response) {
+        setError(`Network error: ${err.message}`);
+      } else {
+        setError(err.response?.data?.message || 'Signup failed');
+      }
     } finally {
       setLoading(false);
     }

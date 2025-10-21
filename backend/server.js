@@ -1,45 +1,49 @@
-// server.js
+// backend/server.js
 require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const connectDB = require('./config/db'); // ensure this file exists
-const authRoutes = require('./routes/auth'); // ensure this file exists
-const labsRoutes = require('./routes/labs'); // ensure this file exists
-const app = express();
 
-const PORT = process.env.PORT || 5000;
-
-// Middlewares
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
-app.use(express.json());
-
-// Simple health check route (helpful while debugging)
-app.get('/health', (req, res) => res.json({ ok: true, time: Date.now() }));
-
-// Routes (register after middlewares)
-app.use('/api/auth', authRoutes);
-app.use('/api/labs', labsRoutes);
-
-// test route
-app.get('/', (req, res) => res.send('API is running'));
-
-// Global error handler (should catch async errors forwarded by next(err))
-app.use((err, req, res, next) => {
-  console.error('Unhandled error:', err);
-  res.status(500).json({ message: 'Server error' });
+process.on('uncaughtException', (err) => {
+  console.error('UNCAUGHT EXCEPTION', err && err.stack ? err.stack : err);
 });
 
-// Connect DB then start server
-const start = async () => {
-  try {
-    await connectDB();
-    app.listen(PORT, () => {
-      console.log(`Server listening on port ${PORT}`);
-    });
-  } catch (err) {
-    console.error('Failed to start server:', err);
-    process.exit(1); // ensures nodemon shows the crash
-  }
-};
+process.on('unhandledRejection', (reason, p) => {
+  console.error('UNHANDLED REJECTION', reason && reason.stack ? reason.stack : reason);
+});
 
-start();
+const express = require('express');
+const cors = require('cors');
+const mongoose = require('mongoose');
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/openpc';
+
+app.use(express.json());
+app.use(cors());
+
+app.get('/', (req, res) => res.send('API up'));
+
+// wrap requires so missing-module errors are obvious
+try {
+  app.use('/api/auth', require('./routes/auth'));
+} catch (err) {
+  console.error('Failed to mount routes/auth:', err && err.stack ? err.stack : err);
+}
+
+// Try to connect to Mongo, but do not crash the app silently
+mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => {
+    console.log('Mongo connected');
+    startServer();
+  })
+  .catch((err) => {
+    console.error('Mongo connection error (will still try to start server):', err && err.stack ? err.stack : err);
+    // If you prefer to stop when DB unavailable, uncomment:
+    // process.exit(1);
+    startServer();
+  });
+
+function startServer() {
+  app.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}`);
+  });
+}

@@ -1,9 +1,9 @@
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
-const port = 3000;
+const port = 5000;
 
-DB_URL = 'mongodb://localhost:27017/';
+DB_URL = 'mongodb://localhost:5000/';
 
 mongoose.connect(DB_URL);
 const db = mongoose.connection;
