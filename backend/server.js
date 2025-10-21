@@ -10,34 +10,46 @@ process.on('unhandledRejection', (reason, p) => {
 });
 
 const express = require('express');
-const cors = require('cors');
+const cors = require('cors'); 
 const mongoose = require('mongoose');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/openpc';
+const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
 
+// === Middleware ===
 app.use(express.json());
-app.use(cors());
 
+// Configure CORS properly BEFORE routes
+app.use(cors({
+  origin: CLIENT_ORIGIN,   // must be an explicit origin when using credentials
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
+
+// Optional test route
 app.get('/', (req, res) => res.send('API up'));
 
-// wrap requires so missing-module errors are obvious
+// === Routes (mount after middleware) ===
 try {
   app.use('/api/auth', require('./routes/auth'));
 } catch (err) {
   console.error('Failed to mount routes/auth:', err && err.stack ? err.stack : err);
 }
 
-// Try to connect to Mongo, but do not crash the app silently
-mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+// === Connect to MongoDB and start server ===
+// Note: modern mongoose driver doesn't need useNewUrlParser/useUnifiedTopology options
+mongoose.connect(MONGO_URI)
   .then(() => {
     console.log('Mongo connected');
     startServer();
   })
   .catch((err) => {
     console.error('Mongo connection error (will still try to start server):', err && err.stack ? err.stack : err);
-    // If you prefer to stop when DB unavailable, uncomment:
+    // If you'd rather stop the process on DB failure, uncomment:
     // process.exit(1);
     startServer();
   });

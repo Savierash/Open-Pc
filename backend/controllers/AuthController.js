@@ -46,3 +46,32 @@ exports.login = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+
+//login controller 
+exports.login = async (req, res) => {
+  try {
+    const { usernameOrEmail, password } = req.body;
+    const user = await User.findOne({
+      $or: [{ email: usernameOrEmail }, { username: usernameOrEmail }],
+    });
+
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+
+    // ✅ Add this here:
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: false, // set true in production with HTTPS
+      sameSite: 'lax', // or 'none' + secure true if cross-site
+    });
+
+    res.json({ user }); // optional: or res.json({ token, user }) if you still use localStorage
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
