@@ -2,6 +2,7 @@
 require('dotenv').config();
 const labsRouter = require('./routes/labs');
 const unitsRouter = require('./routes/units'); 
+const dashboardRouter = require('./routes/dashboard');
 
 process.on('uncaughtException', (err) => {
   console.error('UNCAUGHT EXCEPTION', err && err.stack ? err.stack : err);
@@ -48,6 +49,14 @@ try {
 } catch (err) {
   console.error('Failed to mount routes/auth:', err && err.stack ? err.stack : err);
 }
+
+//for dashboard route
+app.use('/api/dashboard', dashboardRouter);
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+  next();
+});
+
 
 // api routes for labs and units
 app.use('/api/lab', labsRouter);
