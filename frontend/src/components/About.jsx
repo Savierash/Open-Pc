@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import '../styles/About.css';
 import ComputerLogo from '../assets/LOGO.png';
 import ComputerLogo1 from '../assets/LOGO1.png';
+import SideDesign from '../assets/side_design.png';
+import MissionLogo from '../assets/mission_logo.png';
+import VisionLogo from '../assets/vision_logo.png';
+import ValueLogo from '../assets/value_logo.png';
 
 function About() {
   const [activeLink, setActiveLink] = useState('/about');
@@ -63,45 +67,64 @@ function About() {
         </div>
       </header>
       <main className="main-container-about">
-        <section className="about-section">
-          <div className="about-header-box">
-            <div className="about-header">
-              <h1 className="about-title">
-                OpenPC
-                <span className="about-logo-wrapper">
-                  <img src={ComputerLogo} alt="Computer Logo" className="computer-logo-about" />
-                </span>
-              </h1>
+        <section className="hero-section-about">
+          <div className="hero-content-about">
+            <img src={SideDesign} alt="OpenPC Dashboard" className="hero-image-about" />
+            <div className="hero-text-about">
+              <h1 className="hero-title-about">OpenPC</h1>
+              <p className="hero-description-about">
+                A web-based computer monitoring and management system designed to assist computer laboratory
+                auditors in efficiently tracking and maintaining computer units. Our platform provides a
+                smarter, faster, and more reliable way to monitor the operational status of each computer
+                within a lab environment. We aim to eliminate manual record keeping and provide real-time
+                visibility of computer conditions whether a unit is functional, requires maintenance, or is out of order.
+              </p>
             </div>
-            <p className="about-description">
-              A web-based computer monitoring and management system designed to assist computer laboratory auditors in efficiently tracking and maintaining computer units. Our platform provides a smarter, faster, and more reliable way to monitor the operational status of each computer within a lab environment.
-              We aim to eliminate manual record keeping and provide real-time visibility of computer conditions — whether a unit is functional, requires maintenance, or is out of order.
+          </div>
+        </section>
+        <section className="what-we-do-section-about">
+          <h2 className="what-we-do-title-about">What we do</h2>
+          <p className="what-we-do-description-about">
+            OpenPC One solves the challenges of manual, fragmented computer monitoring with a centralized platform
+            for recording, updating, and reporting computer conditions.
+          </p>
+        </section>
+        <section className="mission-vision-values-section-about">
+          <div className="card-about mission">
+            <img src={MissionLogo} alt="Mission Logo" className="card-icon-about" />
+            <h2 className="card-title-about">Mission</h2>
+            <p className="card-description-about">
+              Our mission is to revolutionize computer laboratory management by providing an intelligent,
+              user-friendly, and fully integrated system designed to optimize every aspect of operations.
+              Through advanced monitoring capabilities, real-time status reporting, and automated maintenance
+              tracking, we aim to enhance accuracy, minimize downtime, and ensure timely issue resolution.
             </p>
           </div>
-          <div className="cards-container-about">
-            <div className="card-about">
-              <h2 className="card-title-about">Our Mission</h2>
-              <p className="card-description-about">
-                Ensure secure access for every user. The system provides role-based login for auditors,
-                technicians, and administrators, granting each role specific permissions and functionalities
-                to maintain data integrity and accountability.
-              </p>
-            </div>
-            <div className="card-about">
-              <h2 className="card-title-about">Our Vision</h2>
-              <p className="card-description-about">
-                Provides a centralized and real-time overview of all computer units within the laboratory.
-                Through this service, auditors can easily identify the operational status of each workstation,
-                whether it is functional, under maintenance, or out of order.
-              </p>
-            </div>
-            <div className="card-about">
-              <h2 className="card-title-about">Core Values</h2>
-              <p className="card-description-about">
-                Serves as a digital inventory database, storing essential information such as computer ID,
-                laboratory location, hardware specifications, operating system, and current status of each unit.
-              </p>
-            </div>
+          <div className="card-about vision">
+            <img src={VisionLogo} alt="Vision Logo" className="card-icon-about" />
+            <h2 className="card-title-about">Vision</h2>
+            <p className="card-description-about">
+              We envision a future where every computer laboratory operates seamlessly through the
+              integration of intelligent automation, real-time monitoring, and comprehensive digital
+              management systems. This tool will not only enhance operational efficiency and minimize
+              downtime but also promote transparency, accountability, and informed decision-making.
+            </p>
+          </div>
+          <div className="card-about values">
+            <img src={ValueLogo} alt="Values Logo" className="card-icon-about" />
+            <h2 className="card-title-about">Values</h2>
+            <p className="card-description-about">
+              Innovation: We strive to develop creative, driven technology solutions.
+            </p>
+            <p className="card-description-about">
+              Efficiency: We value accuracy, speed, and simplicity in every function.
+            </p>
+            <p className="card-description-about">
+              Integrity: We ensure secure and transparent data handling.
+            </p>
+            <p className="card-description-about">
+              Collaboration: We believe great solutions come from teamwork and shared goals.
+            </p>
           </div>
         </section>
       </main>
