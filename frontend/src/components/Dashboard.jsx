@@ -10,7 +10,7 @@ import OctagonLogo from '../assets/XOctagonFill.png';
 import StackLogo from '../assets/Stack.png';
 import PersonLogo from '../assets/Person.png';
 
-const OutOfOrder = () => {
+const Dashboard = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
 
   useEffect(() => {
@@ -181,30 +181,49 @@ const OutOfOrder = () => {
         </aside>
 
         <main className="main-content">
-          <div className="two-column-layout">
-            <div className="labs-container">
-              <div className="lab-list">
-                <div className="lab-card-new active">ITS 300</div>
-                <div className="lab-card-new">PTC 201</div>
-                {/* Add more lab cards as needed */}
+          <div className="dashboard-main-content">
+            
+            <div className="dashboard-cards">
+              <div className="card total-units">
+                <div className="card-header">
+                  <img src={PcDisplayLogo} alt="PC Display Icon" className="card-icon" />
+                  <h3>Total Units</h3>
+                </div>
+                <div className="card-body">
+                  <p className="stat-number">150</p>
+                </div>
+              </div>
+
+              <div className="card functional">
+                <div className="card-header">
+                  <img src={ClipboardLogo} alt="Clipboard Icon" className="card-icon" />
+                  <h3>Functional</h3>
+                </div>
+                <div className="card-body">
+                  <p className="stat-number">120 / 150</p>
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: '80%' }}></div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="card out-of-order">
+                <div className="card-header">
+                  <img src={OctagonLogo} alt="Octagon Icon" className="card-icon" />
+                  <h3>Out of Order</h3>
+                </div>
+                <div className="card-body">
+                  <p className="stat-number">30</p>
+                </div>
               </div>
             </div>
-            <div className="pcs-container">
-              <button className="add-unit-button">Add Unit</button>
-              <div className="pc-grid">
-                <div className="pc-card">
-                  <img src={PcDisplayLogo} alt="PC Icon" />
-                  <span>IT-PC-01</span>
-                </div>
-                <div className="pc-card"></div>
-                <div className="pc-card"></div>
-                <div className="pc-card"></div>
-                <div className="pc-card"></div>
-                <div className="pc-card"></div>
-                <div className="pc-card"></div>
-                <div className="pc-card"></div>
-                <div className="pc-card"></div>
-                <div className="add-pc-card">+</div>
+            
+            <div className="dashboard-bottom-row">
+              <div className="recent-activity-card">
+                <h3>Recent Activity</h3>
+              </div>
+              <div className="system-status-card">
+                <h3>System Status</h3>
               </div>
             </div>
           </div>
@@ -214,4 +233,4 @@ const OutOfOrder = () => {
   );
 };
 
-export default OutOfOrder;
+export default Dashboard;

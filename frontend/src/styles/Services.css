@@ -11,6 +11,143 @@
   min-height: 100vh;
   background: linear-gradient(135deg, #0a0a0a 0%, #5d1c00 50%, #331000 100%);
   color: white;
+  position: relative;
+}
+
+.services-hero {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  z-index: 0;
+}
+
+.services-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Dark overlay */
+}
+
+.services-hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 800px;
+  padding: 1rem;
+  margin-top: 160px; /* Adjusted to account for fixed header (100px base + 60px header) */
+}
+
+.services-hero-title {
+  font-size: 6.5rem; /* Made more massive */
+  font-weight: bold;
+  margin-bottom: 3rem; /* Adjusted spacing */
+  color: white; /* Set to plain white */
+}
+
+.services-hero-description {
+  font-size: 1.3rem; /* Adjusted font size */
+  line-height: 1.8; /* Adjusted line height */
+  margin-bottom: 4rem; /* Increased margin */
+  opacity: 0.9;
+}
+
+.btn-get-started {
+  background: linear-gradient(135deg, #8a2be2, #a020f0);
+  color: #fff;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.btn-get-started:hover {
+  opacity: 0.9;
+}
+
+.services-main-content {
+  padding: 4rem 2rem;
+  max-width: 1200px; /* Keep max-width to control overall content width */
+  margin: 0 auto; /* Center the main content */
+  margin-top: 100vh; /* Push content down by viewport height */
+}
+
+.services-text-section {
+  display: flex;
+  flex-direction: column; /* Stacks blocks vertically */
+  gap: 4rem;
+}
+
+.services-text-block-left {
+  max-width: 600px; /* Adjust as needed */
+  margin-left: 0; /* Align to the left */
+  margin-right: auto; /* Push to the left */
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #e0e0e0;
+}
+
+.services-text-block-right {
+  max-width: 600px; /* Same width as left block */
+  margin-left: auto; /* Push to the right */
+  margin-right: 0; /* Align to the right */
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #e0e0e0;
+}
+
+.service-cards-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  padding: 4rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  margin-top: 4rem; /* Space after the text blocks */
+}
+
+.service-card {
+  border-radius: 1rem;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.service-card:hover {
+  /* transform: translateY(-5px); */ /* Removed transform */
+}
+
+.service-icon {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 1.5rem;
+  color: #8a2be2; /* Example color, adjust as needed */
+}
+
+.service-card-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #fff;
+}
+
+.service-card-description {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #e0e0e0;
 }
 
 .top-bar-services {

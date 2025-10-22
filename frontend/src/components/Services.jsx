@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/Services.css';
 import ComputerLogo1 from '../assets/LOGO1.png';
-import StackLogo from '../assets/Stack.png';
-import ShieldLogo from '../assets/ShieldLockFill.png';
-import ArchiveLogo from '../assets/ArchiveFill.png';
+import ServicesBackground from '../assets/services_background.png';
+import UserManagementIcon from '../assets/icon_1.png';
+import ComputerStatusIcon from '../assets/icon_2.png';
+import InventoryIcon from '../assets/icon_3.png';
+import MaintenanceIcon from '../assets/icon_4.png';
+import ReportGenerationIcon from '../assets/icon_5.png';
+import DashboardOverviewIcon from '../assets/icon_6.png';
 
 const Services = () => {
   const [activeLink, setActiveLink] = useState('/services');
@@ -64,51 +68,103 @@ const Services = () => {
           <button className="btn-signup" onClick={() => window.location.href = '/signup'}>Sign Up</button>
         </div>
       </header>
-      <main className="main">
-        <section className="services-section">
-          <div className="services-header-box">
-            <div className="services-header">
-              <img src={StackLogo} alt="Stack Logo" className="stack-logo" />
-              <h1 className="services-title">Our Services</h1>
-            </div>
-            <p className="services-description">
-              At OpenPC, we provide a smarter and more efficient way to manage computer laboratories.
-              Our web-based system is designed to assist auditors, administrators, and IT staff in monitoring,
-              maintaining, and organizing computer units – all in one centralized platform.
+      <div className="services-hero" style={{ backgroundImage: `url(${ServicesBackground})` }}>
+        <div className="services-hero-content">
+          <h1 className="services-hero-title">Our Services</h1>
+          <p className="services-hero-description">
+            At OpenPC One, we provide a smarter and more efficient way to manage computer laboratories.
+            Our web-based system is designed to assist auditors, administrators, and IT staff in monitoring,
+            maintaining, and organizing computer units all in one centralized platform.
+          </p>
+          <button className="btn-get-started">Get Started</button>
+        </div>
+      </div>
+      <main className="services-main-content">
+        <section className="services-text-section">
+          <div className="services-text-block-left">
+            <p>
+              OpenPC One offers a robust suite of services designed for highly efficient computer laboratory
+              monitoring and management, beginning with Centralized Inventory Management to organize, store,
+              and update the detailed records of every computer unit, including specifications, location, and assigned
+              laboratory. This core system feeds into the Real-Time Status Tracking feature, which allows auditors to
+              immediately mark units as either Functional, Under Maintenance, or Out of Order during audits, ensuring
+              the operational status is always current and accurate. All this operational data is instantly
+              reflected in the Dashboard Overview, which provides a visual summary of the laboratory's condition,
+              highlighting total computers, working units, and defective units for quick decision-making.
             </p>
           </div>
-          <div className="cards-container">
-            <div className="card-service">
-              <div className="card-header">
-                <img src={ShieldLogo} alt="Shield Logo" className="shield-logo" />
-                <h2 className="card-title">User Management Service</h2>
-              </div>
-              <p className="card-description">
-                Ensure secure access for every user. The system provides role-based login for auditors,
-                technicians, and administrators, granting each role specific permissions and functionalities
-                to maintain data integrity and accountability.
-              </p>
-            </div>
-            <div className="card-service">
-              <div className="card-header">
-                <h2 className="card-title">Computer Status Monitoring Service</h2>
-              </div>
-              <p className="card-description">
-                 Provides a centralized and real-time overview of all computer units within the laboratory. Through this service, auditors can easily identify the operational status of each workstation, whether it is functional, under maintenance, or out of order.
-              </p>
-            </div>
-            <div className="card-service">
-              <div className="card-header">
-                <img src={ArchiveLogo} alt="Archive Logo" className="archive-logo" />
-                <h2 className="card-title">Inventory Management Service</h2>
-              </div>
-              <p className="card-description">
-                Serves as a digital inventory database, storing essential information such as the computer ID, laboratory location, hardware specifications, operating system, and current status of each unit.
-              </p>
-            </div>
+          <div className="services-text-block-right">
+            <p>
+              To maintain transparency and accountability, the system employs Activity Logging, which records
+              every operation, the user who updated the status, the timestamp, and the specific reason for the change.
+              Furthermore, administrators can utilize the Report Generation service to produce valuable summaries
+              regarding computer availability, usage, and maintenance history for administrative reference
+              and resource planning. Finally, access to all these powerful features is secured through User
+              Authentication, which enforces a role-based access model for auditors, technicians, and administrators.
+            </p>
           </div>
         </section>
       </main>
+      <section className="service-cards-section">
+        <div className="service-card">
+          <img src={UserManagementIcon} alt="User Management Icon" className="service-icon" />
+          <h3 className="service-card-title">User Management Service</h3>
+          <p className="service-card-description">
+            Ensure secure access for every user. The system provides role-based login for auditors,
+            technicians, and administrators, granting each role specific permissions and functionalities
+            to maintain data integrity and accountability.
+          </p>
+        </div>
+
+        <div className="service-card">
+          <img src={ComputerStatusIcon} alt="Computer Status Monitoring Icon" className="service-icon" />
+          <h3 className="service-card-title">Computer Status Monitoring Service</h3>
+          <p className="service-card-description">
+            Provides a centralized and real-time overview of all computer units within
+            the laboratory. Through this service, auditors can easily identify the
+            operational status of each workstation, whether it is functional,
+            under maintenance, or out of order.
+          </p>
+        </div>
+
+        <div className="service-card">
+          <img src={InventoryIcon} alt="Inventory Management Icon" className="service-icon" />
+          <h3 className="service-card-title">Inventory Management Service</h3>
+          <p className="service-card-description">
+            Serves as a digital inventory database, storing essential
+            information such as the computer ID, laboratory location, hardware
+            specifications, operating system, and current status of each unit.
+          </p>
+        </div>
+
+        <div className="service-card">
+          <img src={MaintenanceIcon} alt="Maintenance Request Icon" className="service-icon" />
+          <h3 className="service-card-title">Maintenance Request Service</h3>
+          <p className="service-card-description">
+            Allows submission of maintenance requests whenever a computer unit
+            encounters problems, such as hardware malfunctions, software
+            errors, or connectivity issues.
+          </p>
+        </div>
+
+        <div className="service-card">
+          <img src={ReportGenerationIcon} alt="Report Generation Icon" className="service-icon" />
+          <h3 className="service-card-title">Report Generation Service</h3>
+          <p className="service-card-description">
+            This service consolidates all recorded data from monitoring and
+            maintenance modules into structured, easy-to-understand reports.
+          </p>
+        </div>
+
+        <div className="service-card">
+          <img src={DashboardOverviewIcon} alt="Dashboard Overview Icon" className="service-icon" />
+          <h3 className="service-card-title">Dashboard Overview Service</h3>
+          <p className="service-card-description">
+            Visual summary of laboratory status such as total computers, working
+            units, and defective units.
+          </p>
+        </div>
+      </section>
     </div>
   );
 };

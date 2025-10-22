@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../styles/Homepage.css';
 import ComputerLogo1 from '../assets/LOGO1.png';
 import ComputerLogo from '../assets/LOGO.png';
+import DashboardBackground from '../assets/Dashboard page 4.png';
 
 const Homepage = () => {
   const [activeLink, setActiveLink] = useState('/');
@@ -67,16 +68,22 @@ const Homepage = () => {
         <section className="hero-section">
           <div className="hero-content">
             <h1 className="hero-title0">
-              OpenPC
               <span className="hero-logo-wrapper">
                 <img src={ComputerLogo} alt="PC LOGO" className="hero-computer-logo" />
               </span>
+              OpenPC
             </h1>
             <h1 className="hero-title1">Monitor Smarter.</h1>
             <p className="hero-subtitle">Computer Monitoring and Management System.</p>
-            <button className="hero-button" onClick={() => window.location.href ='/signup'}>Get Started</button>
           </div>
         </section>
+        <button className="hero-button" onClick={() => window.location.href ='/signup'}>Get Started</button>
+        <div className="dashboard-background-overlay">
+          {/* The background image will be applied via CSS */}
+        </div>
+        <div className="dashboard-background-overlay-right">
+          {/* The background image for the right side will be applied via CSS */}
+        </div>
       </main>
     </div>
   );

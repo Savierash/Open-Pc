@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import '../styles/Dashboard.css'; 
+import '../styles/Dashboard.css';
 import ComputerLogo1 from '../assets/LOGO1.png';
+import PersonLogo from '../assets/Person.png';
 import HouseLogo from '../assets/HouseFill.png';
 import GraphLogo from '../assets/GraphUp.png';
 import PcDisplayLogo from '../assets/PcDisplayHorizontal.png';
@@ -8,9 +9,8 @@ import ClipboardLogo from '../assets/ClipboardCheck.png';
 import GearLogo from '../assets/GearFill.png';
 import OctagonLogo from '../assets/XOctagonFill.png';
 import StackLogo from '../assets/Stack.png';
-import PersonLogo from '../assets/Person.png';
 
-const OutOfOrder = () => {
+const ReportsAuditor = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
 
   useEffect(() => {
@@ -64,7 +64,7 @@ const OutOfOrder = () => {
             </a>
             <a 
               href="/dashboard" 
-              className={`nav-link-dashboard active`}
+              className={`nav-link-dashboard ${activeLink === '/dashboard' || activeLink === '/reports-auditor' ? 'active' : ''}`}
               onClick={(e) => {
                 e.preventDefault();
                 handleNavClick('/dashboard');
@@ -72,6 +72,7 @@ const OutOfOrder = () => {
             >
               Dashboard
             </a>
+             
           </nav>
         </div>
         <div className="nav-actions">
@@ -173,7 +174,7 @@ const OutOfOrder = () => {
                   handleNavClick('/reports-auditor');
                 }}
               >
-                <img src={ClipboardLogo} alt="Reports Icon" className="menu-icon" />
+                <img src={ClipboardLogo} alt="Reports Auditor Icon" className="menu-icon" />
                 <span>Reports</span>
               </a>
             </li>
@@ -181,37 +182,11 @@ const OutOfOrder = () => {
         </aside>
 
         <main className="main-content">
-          <div className="two-column-layout">
-            <div className="labs-container">
-              <div className="lab-list">
-                <div className="lab-card-new active">ITS 300</div>
-                <div className="lab-card-new">PTC 201</div>
-                {/* Add more lab cards as needed */}
-              </div>
-            </div>
-            <div className="pcs-container">
-              <button className="add-unit-button">Add Unit</button>
-              <div className="pc-grid">
-                <div className="pc-card">
-                  <img src={PcDisplayLogo} alt="PC Icon" />
-                  <span>IT-PC-01</span>
-                </div>
-                <div className="pc-card"></div>
-                <div className="pc-card"></div>
-                <div className="pc-card"></div>
-                <div className="pc-card"></div>
-                <div className="pc-card"></div>
-                <div className="pc-card"></div>
-                <div className="pc-card"></div>
-                <div className="pc-card"></div>
-                <div className="add-pc-card">+</div>
-              </div>
-            </div>
-          </div>
+          
         </main>
       </div>
     </div>
   );
 };
 
-export default OutOfOrder;
+export default ReportsAuditor;

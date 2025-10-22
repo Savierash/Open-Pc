@@ -28,6 +28,7 @@ import './styles/ForgotPasswordOTP.css';
 import './styles/ResetPassword.css';
 import './styles/ForgotPassword.css';
 import './styles/About.css';
+import './styles/Reports.css';
 
 
 function App() {
@@ -49,6 +50,8 @@ function App() {
           <Route path="/functional" element={<Functional />} />
           <Route path="/maintenance" element={<Maintenance />} />
           <Route path="/out-of-order" element={<OutOfOrder />} />
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/reports-auditor" element={<ReportsAuditor />} />
         </Routes>
     </Router>
   );
