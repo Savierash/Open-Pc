@@ -68,9 +68,6 @@
   gap: 1.5rem;
 }
 
-.nav-link-homepage {
-}
-
 .nav-links-homepage a {
   color: #fff;
   text-decoration: none;
@@ -126,12 +123,16 @@
 .content {
   flex: 1;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: flex-start; /* Changed from center to flex-start */
   align-items: center;
+  position: relative;
 }
 
 .hero-section {
   text-align: center;
+  margin-bottom: 20px;
+  padding-top: 50px; /* Adjusted back to 50px as flex-start will move it up significantly */
 }
 
 .hero-content {
@@ -140,13 +141,15 @@
   align-items: center;
   justify-content: center;
   padding: 2rem;
+  z-index: 2;
+  position: relative;
 }
 
 .hero-title0 {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 4rem;
+  font-size: 7rem; /* Increased from 4rem for a more massive look */
   font-weight: 800;
   color: #fff;
   margin-bottom: 0.5rem;
@@ -158,9 +161,10 @@
 }
 
 .hero-title0 .hero-computer-logo {
-  margin-left: 10px;
-  width: 100px;
-  height: 100px;
+  margin-right: 20px; /* Changed from margin-left and increased value */
+  margin-left: 0; /* Ensure no left margin */
+  width: 120px; /* Increased size */
+  height: 120px; /* Increased size */
 }
 
 .hero-title1 {
@@ -180,12 +184,13 @@
 }
 
 .hero-button {
-  padding: 12px 24px;
+  margin-top: 0;
+  padding: 15px 30px;
   background: #8a2be2;
   color: white;
   border: none;
-  border-radius: 20px;
-  font-size: 1rem;
+  border-radius: 5px;
+  font-size: 1.2rem;
   cursor: pointer;
   transition: background 0.3s, color 0.3s;
 }
@@ -200,3 +205,36 @@
   align-items: center;
   gap: 2rem;
 }
+
+.dashboard-background-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  overflow: hidden;
+  background-image: url('../assets/Dashboard page 4.png');
+  background-size: auto 80%; 
+  background-position: -100% center; 
+  background-repeat: no-repeat;
+}
+
+.dashboard-image {
+  display: none;
+}
+
+.dashboard-background-overlay-right {
+  position: absolute;
+  top: 0;
+  right: 0; 
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  overflow: hidden;
+  background-image: url('../assets/Dashboard page 4.png'); 
+  background-size: auto 80%; 
+  background-position: 200% center; 
+  background-repeat: no-repeat;
+}
+
