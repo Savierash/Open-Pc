@@ -16,6 +16,7 @@ import Functional from './components/Functional.jsx';
 import Maintenance from './components/Maintenance.jsx';
 import OutOfOrder from './components/OutOfOrder.jsx';
 import Reports from './components/Reports.jsx';
+import ReportsAuditor from './components/ReportsAuditor.jsx';
 
 /*STYLES*/
 import './styles/Homepage.css';
@@ -51,6 +52,7 @@ function App() {
           <Route path="/maintenance" element={<Maintenance />} />
           <Route path="/out-of-order" element={<OutOfOrder />} />
           <Route path="/reports" element={<Reports />} />
+          <Route path="/reports-auditor" element={<ReportsAuditor />} />
         </Routes>
     </Router>
   );

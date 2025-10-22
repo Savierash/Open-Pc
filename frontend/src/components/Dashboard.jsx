@@ -164,6 +164,19 @@ const Dashboard = () => {
                 <span>Out of Order</span>
               </a>
             </li>
+            <li>
+              <a 
+                href="/reports-auditor" 
+                className={`sidebar-link ${activeLink === '/reports-auditor' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/reports-auditor');
+                }}
+              >
+                <img src={ClipboardLogo} alt="Reports Icon" className="menu-icon" />
+                <span>Reports</span>
+              </a>
+            </li>
           </ul>
         </aside>
 
