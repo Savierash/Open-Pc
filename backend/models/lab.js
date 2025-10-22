@@ -1,3 +1,4 @@
+// backend/models/lab.js
 const mongoose = require('mongoose');
 
 const LabSchema = new mongoose.Schema({
