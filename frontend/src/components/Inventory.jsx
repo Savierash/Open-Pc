@@ -12,10 +12,9 @@ import StackLogo from '../assets/Stack.png';
 import ComputerLabImage from '../assets/BACKGROUND 2.png';
 import PersonLogo from '../assets/Person.png';
 
-// ✅ Use Vite env style
+// Use Vite env style
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
-
-
+console.log('Inventory: API_BASE =', API_BASE); 
 
 
 const Inventory = () => {
@@ -36,44 +35,43 @@ const Inventory = () => {
     window.location.href = path;
   };
 
-  const fetchLabs = async () => {
-    setLoading(true);
-    try {
-      const res = await axios.get(`${API_BASE}/labs`);
-      setLabs(res.data); // expect array of labs
-    } catch (err) {
-      console.error('Failed to fetch labs', err);
-      window.alert('Failed to load labs. See console for details.');
-    } finally {
-      setLoading(false);
-    }
-  };
+ const fetchLabs = async () => {
+  setLoading(true);
+  try {
+    const res = await axios.get(`${API_BASE}/lab`);
+    setLabs(res.data);
+  } catch (err) {
+    console.error('Failed to fetch labs', err);
+    console.error('err.response:', err?.response?.data ?? err?.message);
+    window.alert('Failed to load labs. See console for details.');
+  } finally {
+    setLoading(false);
+  }
+};
 
-  // Add a new lab (prompt for quick implementation)
-  const addLab = async () => {
-    const newLabName = window.prompt('Enter new lab name:');
-    if (!newLabName) return;
-    const trimmed = newLabName.trim();
-    if (trimmed === '') return window.alert('Lab name cannot be empty.');
+const addLab = async () => {
+  const newLabName = window.prompt('Enter new lab name:');
+  if (!newLabName) return;
+  const trimmed = newLabName.trim();
+  if (trimmed === '') return window.alert('Lab name cannot be empty.');
 
-    // avoid exact duplicates locally
-    if (labs.some(l => l.name.toLowerCase() === trimmed.toLowerCase())) {
-      return window.alert('This lab already exists.');
-    }
+  if (labs.some(l => l.name.toLowerCase() === trimmed.toLowerCase())) {
+    return window.alert('This lab already exists.');
+  }
 
-    setAdding(true);
-    try {
-      const res = await axios.post(`${API_BASE}/labs`, { name: trimmed });
-      // res.data should be the created lab { _id, name }
-      setLabs(prev => [...prev, res.data]);
-    } catch (err) {
-      console.error('Failed to add lab', err);
-      const message = err?.response?.data?.message || 'Failed to add lab';
-      window.alert(message);
-    } finally {
-      setAdding(false);
-    }
-  };
+  setAdding(true);
+  try {
+    const res = await axios.post(`${API_BASE}/lab`, { name: trimmed });
+    setLabs(prev => [...prev, res.data]);
+  } catch (err) {
+    console.error('Failed to add lab', err);
+    console.error('err.response:', err?.response?.data ?? err?.message);
+    const message = err?.response?.data?.message || 'Failed to add lab';
+    window.alert(message);
+  } finally {
+    setAdding(false);
+  }
+};
 
   // Remove a lab by index (with confirmation)
   const removeLab = async (index) => {
@@ -83,7 +81,7 @@ const Inventory = () => {
     if (!confirmed) return;
 
     try {
-      await axios.delete(`${API_BASE}/labs/${lab._id}`);
+      await axios.delete(`${API_BASE}/lab/${lab._id}`);
       setLabs(prev => prev.filter((_, i) => i !== index));
     } catch (err) {
       console.error('Failed to delete lab', err);

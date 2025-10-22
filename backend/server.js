@@ -1,5 +1,6 @@
 // backend/server.js
 require('dotenv').config();
+const labsRouter = require('./routes/lab');
 
 process.on('uncaughtException', (err) => {
   console.error('UNCAUGHT EXCEPTION', err && err.stack ? err.stack : err);
@@ -40,6 +41,15 @@ try {
   console.error('Failed to mount routes/auth:', err && err.stack ? err.stack : err);
 }
 
+// api routes for labs
+app.use('/api/lab', labsRouter);
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+  next();
+});
+
+
+
 // === Connect to MongoDB and start server ===
 // Note: modern mongoose driver doesn't need useNewUrlParser/useUnifiedTopology options
 mongoose.connect(MONGO_URI)
@@ -59,3 +69,5 @@ function startServer() {
     console.log(`Server listening on port ${PORT}`);
   });
 }
+
+
