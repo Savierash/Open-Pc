@@ -10,6 +10,7 @@ import GearLogo from '../assets/GearFill.png';
 import OctagonLogo from '../assets/XOctagonFill.png';
 import StackLogo from '../assets/Stack.png';
 import PersonLogo from '../assets/Person.png';
+import ToolsLogo from '../assets/tools_logo.png'; // Import Tools Logo
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
 

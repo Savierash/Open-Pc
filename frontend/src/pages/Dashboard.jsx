@@ -136,8 +136,8 @@ const Dashboard = () => {
             <li><a href="/functional" className={`sidebar-link ${activeLink === '/functional' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/functional');}}><img src={ClipboardLogo} alt="Clipboard Icon" className="menu-icon" /><span>Functional</span></a></li>
             <li><a href="/maintenance" className={`sidebar-link ${activeLink === '/maintenance' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/maintenance');}}><img src={GearLogo} alt="Gear Icon" className="menu-icon" /><span>Maintenance</span></a></li>
             <li><a href="/out-of-order" className={`sidebar-link ${activeLink === '/out-of-order' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/out-of-order');}}><img src={OctagonLogo} alt="Octagon Icon" className="menu-icon" /><span>Out of Order</span></a></li>
-            <li><a href="/reports-auditor" className={`sidebar-link ${activeLink === '/reports-auditor' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/reports-auditor');}}><img src={ClipboardLogo} alt="Reports Icon" className="menu-icon" /><span>Reports</span></a>
-            </li>
+            <li><a href="/reports-auditor" className={`sidebar-link ${activeLink === '/reports-auditor' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/reports-auditor');}}><img src={ClipboardLogo} alt="Reports Icon" className="menu-icon" /><span>Reports</span></a></li>
+            <li><a href="/technicians" className={`sidebar-link ${activeLink === '/technicians' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/technicians');}}><img src={ToolsLogo} alt="Technicians Icon" className="menu-icon" /><span>Technicians</span></a></li>
           </ul>
         </aside>
 

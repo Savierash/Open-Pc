@@ -11,6 +11,7 @@ import OctagonLogo from '../assets/XOctagonFill.png';
 import StackLogo from '../assets/Stack.png';
 import ComputerLabImage from '../assets/BACKGROUND 2.png';
 import PersonLogo from '../assets/Person.png';
+import ToolsLogo from '../assets/tools_logo.png'; // Import Tools Logo
 
 // Use Vite env style
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
@@ -230,6 +231,19 @@ const addLab = async () => {
               >
                 <img src={ClipboardLogo} alt="Reports Icon" className="menu-icon" />
                 <span>Reports</span>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/technicians" 
+                className={`sidebar-link ${activeLink === '/technicians' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/technicians');
+                }}
+              >
+                <img src={ToolsLogo} alt="Technicians Icon" className="menu-icon" />
+                <span>Technicians</span>
               </a>
             </li>
           </ul>

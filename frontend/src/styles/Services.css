@@ -35,7 +35,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5); /* Dark overlay */
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 .services-hero-content {
@@ -43,20 +43,20 @@
   z-index: 1;
   max-width: 800px;
   padding: 1rem;
-  margin-top: 160px; /* Adjusted to account for fixed header (100px base + 60px header) */
+  margin-top: 160px;
 }
 
 .services-hero-title {
-  font-size: 6.5rem; /* Made more massive */
+  font-size: 6.5rem;
   font-weight: bold;
-  margin-bottom: 3rem; /* Adjusted spacing */
-  color: white; /* Set to plain white */
+  margin-bottom: 3rem;
+  color: white;
 }
 
 .services-hero-description {
-  font-size: 1.3rem; /* Adjusted font size */
-  line-height: 1.8; /* Adjusted line height */
-  margin-bottom: 4rem; /* Increased margin */
+  font-size: 1.3rem;
+  line-height: 1.8;
+  margin-bottom: 4rem;
   opacity: 0.9;
 } 
 
@@ -82,30 +82,30 @@
 
 .services-main-content {
   padding: 4rem 2rem;
-  max-width: 1200px; /* Keep max-width to control overall content width */
-  margin: 0 auto; /* Center the main content */
-  margin-top: 100vh; /* Push content down by viewport height */
+  max-width: 1200px;
+  margin: 0 auto;
+  margin-top: 100vh;
 }
 
 .services-text-section {
   display: flex;
-  flex-direction: column; /* Stacks blocks vertically */
+  flex-direction: column;
   gap: 4rem;
 }
 
 .services-text-block-left {
-  max-width: 600px; /* Adjust as needed */
-  margin-left: 0; /* Align to the left */
-  margin-right: auto; /* Push to the left */
+  max-width: 600px;
+  margin-left: 0;
+  margin-right: auto;
   font-size: 1.1rem;
   line-height: 1.8;
   color: #e0e0e0;
 }
 
 .services-text-block-right {
-  max-width: 600px; /* Same width as left block */
-  margin-left: auto; /* Push to the right */
-  margin-right: 0; /* Align to the right */
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: 0;
   font-size: 1.1rem;
   line-height: 1.8;
   color: #e0e0e0;
@@ -118,7 +118,7 @@
   padding: 4rem 2rem;
   max-width: 1200px;
   margin: 0 auto;
-  margin-top: 4rem; /* Space after the text blocks */
+  margin-top: 4rem;
 }
 
 .service-card {
@@ -138,7 +138,7 @@
   width: 60px;
   height: 60px;
   margin-bottom: 1.5rem;
-  color: #8a2be2; /* Example color, adjust as needed */
+  color: #8a2be2;
 }
 
 .service-card-title {
@@ -220,15 +220,15 @@
 
 .nav-links-services a:hover,
 .nav-links-services a.active {
-  background-color: #8a2be2;  
-  color: #fff;  
+  background-color: #8a2be2;
+  color: #fff;
   padding: 5px;
-  border-radius: 5px;             
+  border-radius: 5px;
 }
 
 .nav-actions {
   display: flex;
-  gap: 1rem;
+  gap: 10px;
   margin-left: auto;
 }
 
@@ -367,7 +367,6 @@
   gap: 2rem;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .top-bar-services {
     flex-direction: column;

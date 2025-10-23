@@ -9,6 +9,7 @@ import GearLogo from '../assets/GearFill.png';
 import OctagonLogo from '../assets/XOctagonFill.png';
 import StackLogo from '../assets/Stack.png';
 import PersonLogo from '../assets/Person.png';
+import ToolsLogo from '../assets/tools_logo.png'; // Import Tools Logo
 
 const Maintenance = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
@@ -175,6 +176,19 @@ const Maintenance = () => {
               >
                 <img src={ClipboardLogo} alt="Reports Icon" className="menu-icon" />
                 <span>Reports</span>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/technicians" 
+                className={`sidebar-link ${activeLink === '/technicians' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/technicians');
+                }}
+              >
+                <img src={ToolsLogo} alt="Technicians Icon" className="menu-icon" />
+                <span>Technicians</span>
               </a>
             </li>
           </ul>
