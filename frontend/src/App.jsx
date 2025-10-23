@@ -15,6 +15,8 @@ import OTP from './components/OTP.jsx';
 import ForgotPasswordOTP from './components/ForgotPasswordOTP.jsx';
 import ResetPassword from './components/ResetPassword.jsx';
 import ForgotPassword from './components/ForgotPassword.jsx';
+import Reports from './components/Reports.jsx'
+import ReportsAuditor from './components/ReportsAuditor.jsx'
 
 
 /*STYLES*/

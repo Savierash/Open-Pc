@@ -76,7 +76,7 @@ const Services = () => {
             Our web-based system is designed to assist auditors, administrators, and IT staff in monitoring,
             maintaining, and organizing computer units all in one centralized platform.
           </p>
-          <button className="btn-get-started">Get Started</button>
+          <button className="btn-get-started" onClick={() => window.location.href ='/signup'}>Get Started</button>
         </div>
       </div>
       <main className="services-main-content">

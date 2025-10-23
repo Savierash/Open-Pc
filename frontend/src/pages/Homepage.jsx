@@ -60,7 +60,7 @@ const Homepage = () => {
         </div>
         <div className="nav-actions">
           <button className="btn-login" onClick={() => window.location.href = '/login'}>Login</button>
-          <button className="btn-signup" onClick={() => window.location.href = '/signup'}>Sign Up</button>
+          <button className="btn-signup" onClick={() => window.location.href = '/signup'}>Sign up</button>
         </div>
       </header>
 
@@ -73,16 +73,18 @@ const Homepage = () => {
               </span>
               OpenPC
             </h1>
-            <h1 className="hero-title1">Monitor Smarter.</h1>
-            <p className="hero-subtitle">Computer Monitoring and Management System.</p>
+            <h1 className="hero-title1">Monitoring Smart.</h1>
+            <p className="hero-subtitle"> Computer Monitoring and Management System.</p>
           </div>
         </section>
-        <button className="hero-button" onClick={() => window.location.href ='/signup'}>Get Started</button>
         <div className="dashboard-background-overlay">
-          {/* The background image will be applied via CSS */}
         </div>
         <div className="dashboard-background-overlay-right">
-          {/* The background image for the right side will be applied via CSS */}
+        </div>
+        <button className="hero-button" onClick={() => window.location.href ='/signup'}>Get Started</button>
+        <div className="dashboard-background-overlay">
+        </div>
+        <div className="dashboard-background-overlay-right">
         </div>
       </main>
     </div>
