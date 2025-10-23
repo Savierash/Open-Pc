@@ -17,6 +17,7 @@ import Maintenance from './components/Maintenance.jsx';
 import OutOfOrder from './components/OutOfOrder.jsx';
 import Reports from './components/Reports.jsx';
 import ReportsAuditor from './components/ReportsAuditor.jsx';
+import Role from './components/Role.jsx'; // Import Role component
 
 /*STYLES*/
 import './styles/Homepage.css';
@@ -30,6 +31,7 @@ import './styles/ResetPassword.css';
 import './styles/ForgotPassword.css';
 import './styles/About.css';
 import './styles/Reports.css';
+import './styles/Role.css'; // Import Role styles
 
 
 function App() {
@@ -53,6 +55,7 @@ function App() {
           <Route path="/out-of-order" element={<OutOfOrder />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/reports-auditor" element={<ReportsAuditor />} />
+          <Route path="/role" element={<Role />} /> {/* Add Role route */}
         </Routes>
     </Router>
   );

@@ -15,7 +15,7 @@ body {
   background-attachment: fixed;
   min-height: 100vh;
   color: white;
-  padding-top: 0; 
+  padding-top: 0;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -24,7 +24,7 @@ body {
 
 .top-bar {
   display: flex;
-  width: calc(100% - 40px); 
+  width: calc(100% - 40px);
   max-width: 1200px;
   justify-content: space-between;
   align-items: center;
@@ -32,11 +32,11 @@ body {
   background: rgba(0, 0, 0, 0.5);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
-  position: sticky; 
+  position: sticky;
   top: 0;
   z-index: 10;
   border-radius: 20px;
-  margin: 10px auto; 
+  margin: 10px auto;
   box-sizing: border-box;
 }
 
@@ -123,16 +123,20 @@ body {
   max-width: unset;
   margin: 0;
   flex: 1;
-  height: 100%;
+  width: unset;
+  min-width: unset;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .left-column, .right-column, .middle-column {
   flex: 1;
   width: unset;
-  min-width: unset; 
+  min-width: unset;
   display: flex;
   flex-direction: column;
-  gap: 20px; 
+  gap: 20px;
 }
 
 .card {
@@ -143,8 +147,8 @@ body {
   backdrop-filter: blur(8px);
   height: 100%;
   transition: none;
-  display: flex; 
-  flex-direction: column; 
+  display: flex;
+  flex-direction: column;
 }
 
 .card:hover {
@@ -156,13 +160,13 @@ body {
 .card h3 {
   margin-top: 0;
   color: white;
-  font-size: 1.25rem; 
+  font-size: 1.25rem;
   margin-bottom: 12px;
 }
 
 .card label {
   display: block;
-  margin-top: 10px; 
+  margin-top: 10px;
   margin-bottom: 5px;
   font-weight: normal;
   color: #e0e0e0;
@@ -174,11 +178,11 @@ body {
   padding: 10px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 5px;
-  background-color: rgba(0, 0, 0, 0.2); /* Darker background */
+  background-color: rgba(0, 0, 0, 0.2);
   color: white;
   margin-bottom: 10px;
-  font-size: 0.95rem; 
-  resize: none; /* Disable user resizing */
+  font-size: 0.95rem;
+  resize: none;
 }
 
 .card input[type="text"]::placeholder,
@@ -189,7 +193,7 @@ body {
 .location-buttons {
   display: flex;
   gap: 10px;
-  margin-top: 10px; 
+  margin-top: 10px;
 }
 
 .location-buttons button {
@@ -206,7 +210,7 @@ body {
 
 .location-buttons button:hover {
   background-color: #7b25d0;
-  transform: none; 
+  transform: none;
 }
 
 .location-cards-container {
@@ -223,24 +227,24 @@ body {
   font-size: 1rem;
   font-weight: bold;
   color: white;
-  cursor: pointer; /* Change cursor to pointer for interactivity */
-  transition: background-color 0.3s ease, transform 0.2s ease; /* Add transition for hover effect */
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .location-card:hover {
-  background-color: rgba(138, 43, 226, 0.2); /* Subtle hover effect */
-  transform: translateY(-3px); /* Add a subtle lift effect on hover */
-  box-shadow: 0 5px 15px rgba(138, 43, 226, 0.2); /* Add a subtle shadow on hover */
+  background-color: rgba(138, 43, 226, 0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(138, 43, 226, 0.2);
 }
 
 .send-report-button-wrapper {
   display: flex;
-  justify-content: center; /* Center the button horizontally */
-  width: 100%; /* Ensure wrapper takes full width to center its content */
-  margin-top: 15px; /* Adjust top margin as needed */
+  justify-content: center;
+  width: 100%;
+  margin-top: 15px;
 }
 
 .send-report-btn {
@@ -250,7 +254,7 @@ body {
   padding: 8px 20px;
   border-radius: 5px;
   cursor: pointer;
-  margin: 0; /* Remove specific margins from the button itself */
+  margin: 0;
   width: fit-content;
   transition: background-color 0.3s ease;
   font-size: 0.9rem;
@@ -259,7 +263,7 @@ body {
 
 .send-report-btn:hover {
   background-color: #7b25d0;
-  transform: none; 
+  transform: none;
 }
 
 .card textarea {
@@ -267,12 +271,12 @@ body {
   padding: 10px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 5px;
-  background-color: rgba(0, 0, 0, 0.2); 
+  background-color: rgba(0, 0, 0, 0.2);
   color: white;
   margin-bottom: 10px;
-  font-size: 0.95rem; 
-  resize: none; 
-  scrollbar-width: thin; 
+  font-size: 0.95rem;
+  resize: none;
+  scrollbar-width: thin;
   scrollbar-color: white rgba(0, 0, 0, 0.2);
 }
 

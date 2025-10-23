@@ -218,7 +218,6 @@
   text-decoration: underline;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .top-bar-login {
     flex-direction: column;

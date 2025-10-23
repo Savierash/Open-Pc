@@ -1,11 +1,4 @@
-* {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-.reset-password {
+.role-page {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -14,7 +7,7 @@
   color: white;
 }
 
-.top-bar-reset-password {
+.top-bar-role {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -64,7 +57,7 @@
   margin-left: 5px;
 }
 
-.nav-links-reset-password {
+.nav-links-role {
   display: flex;
   align-items: center;
   list-style: none;
@@ -73,11 +66,11 @@
   gap: 1.5rem;
 }
 
-.nav-link-reset-password {
+.nav-link-role {
   margin-left: 0;
 }
 
-.nav-links-reset-password a {
+.nav-links-role a {
   color: #fff;
   text-decoration: none;
   font-weight: 500;
@@ -85,8 +78,8 @@
   position: relative;
 }
 
-.nav-links-reset-password a:hover,
-.nav-links-reset-password a.active {
+.nav-links-role a:hover,
+.nav-links-role a.active {
   background-color: #8a2be2;
   color: #fff;
   padding: 5px;
@@ -99,90 +92,49 @@
   margin-left: auto;
 }
 
-.btn-login {
-  padding: 8px 16px;
-  border: 1px solid #fff;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s;
-  background: transparent;
-  color: #fff;
-}
-
-.btn-login:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.main {
+.main-role {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  padding: 2rem;
+  padding: 1rem 2rem;
 }
 
-.welcome-title {
-  font-size: 2rem;
-  margin-bottom: 2rem;
+.welcome-title-role {
+  font-size: 3rem;
+  margin-bottom: 3rem;
+  margin-top: 8rem;
   color: white;
   text-align: center;
 }
 
-.reset-password-container {
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px);
-  padding: 3rem 2rem;
-  border-radius: 15px;
-  width: 1000px;
-  max-width: 500px;
-  text-align: center;
-  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.1);
-}
-
-.reset-password-form {
+.role-selection-container {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  gap: 3rem;
+  margin-bottom: 3rem;
 }
 
-.input-wrapper {
-  position: relative;
+.role-image {
+  width: 250px;
+  height: 250px;
+  margin-bottom: 0;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.input {
-  width: 100%;
-  padding: 1rem 1rem 1rem 3rem;
-  background: rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  color: white;
-  font-size: 1rem;
-  box-sizing: border-box;
-  background-color: #0a0a0a;
+.role-image:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 40px rgba(139, 92, 246, 0.3);
 }
 
-.input:focus {
-  outline: none;
-  border-color: #8b5cf6;
+.role-text {
+  font-size: 1.2rem;
+  font-weight: bold;
 }
 
-.input::placeholder {
-  color: #888;
-}
-
-.input-icon {
-  position: absolute;
-  left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 20px;
-  height: 20px;
-  opacity: 0.5;
-}
-
-.change-password-button {
+.create-account-button-role {
   width: 300px;
   background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
   border: none;
@@ -195,24 +147,34 @@
   transition: transform 0.2s;
   margin: 0 auto;
   display: block;
+  margin-top: 2rem;
 }
 
-.change-password-button:hover {
+.create-account-button-role:hover {
   transform: scale(1.02);
 }
 
 @media (max-width: 768px) {
-  .top-bar-reset-password {
+  .top-bar-role {
     flex-direction: column;
     gap: 1rem;
     padding: 1rem;
   }
 
-  .nav-links-reset-password {
+  .nav-links-role {
     gap: 1rem;
   }
 
-  .change-password-button {
+  .role-selection-container {
+    flex-direction: column;
+  }
+
+  .role-image {
+    width: 200px;
+    height: 200px;
+  }
+
+  .create-account-button-role {
     width: 250px;
   }
 }

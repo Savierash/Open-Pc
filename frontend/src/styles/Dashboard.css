@@ -89,8 +89,8 @@
 
 .nav-link-dashboard {
   margin-left: 0;
-  padding: 0.5rem 1rem; /* Add padding here for better click area */
-  border-radius: 5px; /* Add border-radius for consistent look */
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
 }
 
 .nav-links-dashboard a {
@@ -108,13 +108,13 @@
 }
 
 .nav-links-dashboard a.active {
-  background-color: #8a2be2; /* Active link has purple background */
+  background-color: #8a2be2;
   color: #fff;  
 }
 
 .nav-links-dashboard a:not(.active) {
-  background-color: transparent; /* Inactive links have transparent background */
-  color: #fff; /* Ensure text remains white for inactive links */
+  background-color: transparent;
+  color: #fff;
 }
 
 .nav-actions {
@@ -270,7 +270,7 @@
   gap: 2rem;
   width: 100%;
   max-width: 1200px;
-  justify-content: center; /* Center the grid items horizontally */
+  justify-content: center;
 }
 
 .card {
@@ -492,7 +492,7 @@
   width: 100%;
   height: 100%;
   padding: 2rem;
-  overflow: hidden; /* Ensure content does not overflow */
+  overflow: hidden;
 }
 
 .labs-container,
@@ -501,27 +501,27 @@
   display: flex;
   flex-direction: column;
   color: white;
-  overflow-y: auto; /* Enable scrolling for content overflow */
+  overflow-y: auto;
 }
 
 .labs-container {
-  flex: 1; /* Takes 1 part of the available space */
-  min-width: 250px; /* Minimum width for the labs container */
-  background: transparent; /* Ensure labs-container background is transparent */
-  -webkit-backdrop-filter: none; /* Remove backdrop filter for full transparency */
-  backdrop-filter: none; /* Remove backdrop filter for full transparency */
-  border: none; /* Ensure no border on the labs container */
-  padding: 1rem 0; /* Add top and bottom padding to prevent clipping on hover */
+  flex: 1;
+  min-width: 250px;
+  background: transparent;
+  -webkit-backdrop-filter: none; 
+  backdrop-filter: none; 
+  border: none; 
+  padding: 1rem 0; 
 }
 
 .pcs-container {
-  flex: 2; /* Takes 2 parts of the available space */
-  min-width: 450px; /* Minimum width for the PCs container */
-  background: rgba(0, 0, 0, 0.2); /* Made less opaque */
-  -webkit-backdrop-filter: none; /* Remove backdrop filter for full transparency */
-  backdrop-filter: none; /* Remove backdrop filter for full transparency */
-  border: 1px solid rgba(255, 255, 255, 0.1); /* Keep border for pcs container */
-  padding: 1.5rem; /* Keep padding for pcs container */
+  flex: 2; 
+  min-width: 450px; 
+  background: rgba(0, 0, 0, 0.2); 
+  -webkit-backdrop-filter: none; 
+  backdrop-filter: none; 
+  border: 1px solid rgba(255, 255, 255, 0.1); 
+  padding: 1.5rem; 
 }
 
 .labs-container h2 {
@@ -533,12 +533,12 @@
 
 .lab-list {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* Display 2 labs per row */
+  grid-template-columns: repeat(2, 1fr); 
   gap: 1rem;
 }
 
 .lab-card-new {
-  background: rgba(0, 0, 0, 0.4); /* Darker background for the cards */
+  background: rgba(0, 0, 0, 0.4); 
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   border-radius: 12px;
@@ -549,14 +549,14 @@
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  min-height: 100px; /* Ensure cards have a minimum height */
-  display: flex; /* Use flex to center content vertically */
+  min-height: 100px; 
+  display: flex; 
   align-items: center;
   justify-content: center;
 }
 
 .lab-card-new:hover {
-  background-color: rgba(138, 43, 226, 0.2); /* Light purple on hover */
+  background-color: rgba(138, 43, 226, 0.2); 
   transform: translateY(-5px);
   box-shadow: 0 10px 25px rgba(138, 43, 226, 0.2);
 }
@@ -577,7 +577,7 @@
   font-weight: 500;
   margin-bottom: 1.5rem;
   transition: background-color 0.3s ease;
-  align-self: flex-start; /* Align button to the start within the column */
+  align-self: flex-start; 
 }
 
 .add-unit-button:hover {
@@ -635,7 +635,6 @@
   color: #8a2be2;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .two-column-layout {
     flex-direction: column;
@@ -656,7 +655,7 @@
   }
 
   .add-unit-button {
-    align-self: stretch; /* Make button full width */
+    align-self: stretch; 
     margin-bottom: 1rem;
   }
 
@@ -721,7 +720,7 @@
   width: 100%;
   height: 100%;
   padding: 2rem;
-  align-items: center; /* Center content horizontally within the column */
+  align-items: center; 
 }
 
 .dashboard-bottom-row {
@@ -761,8 +760,8 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding-right: 20px; /* Add some padding to the right for spacing */
-  overflow-y: auto; /* Enable scrolling for labs container */
+  padding-right: 20px; 
+  overflow-y: auto; 
 }
 
 .lab-card-new {
@@ -784,7 +783,7 @@
 }
 
 .lab-card-new:hover {
-  background-color: rgba(138, 43, 226, 0.2); /* Slightly purple background for active/hover */
+  background-color: rgba(138, 43, 226, 0.2); 
   transform: translateY(-3px);
   box-shadow: 0 0 15px rgba(138, 43, 226, 0.5);
 }
@@ -803,7 +802,7 @@
   .lab-cards-wrapper {
     width: 100%;
     padding-right: 0;
-    flex-direction: row; /* Horizontal scroll for labs on small screens */
+    flex-direction: row; 
     overflow-x: auto;
     gap: 10px;
   }
@@ -828,7 +827,7 @@
   }
 
   .add-unit-button {
-    align-self: stretch; /* Make button full width */
+    align-self: stretch; 
     margin-bottom: 1rem;
   }
 
