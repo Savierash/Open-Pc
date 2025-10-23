@@ -58,23 +58,26 @@
   line-height: 1.8; /* Adjusted line height */
   margin-bottom: 4rem; /* Increased margin */
   opacity: 0.9;
-}
+} 
 
 .btn-get-started {
-  background: linear-gradient(135deg, #8a2be2, #a020f0);
-  color: #fff;
-  padding: 1rem 2rem;
+  margin-top: 0;
+  padding: 15px 30px;
+  background: #8a2be2;
+  color: white;
   border: none;
-  border-radius: 0.5rem;
-  font-size: 1.1rem;
-  font-weight: bold;
+  border-radius: 5px;
+  font-size: 1.2rem;
   cursor: pointer;
-  transition: opacity 0.3s ease;
+  transition: background 0.3s, color 0.3s;
+  z-index: 2;
 }
 
 .btn-get-started:hover {
   opacity: 0.9;
   transform: scale(1.05);
+  background: #ede9fe;
+  color: #8a2be2;
 }
 
 .services-main-content {
