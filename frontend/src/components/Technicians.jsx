@@ -65,7 +65,7 @@ const Technicians = () => {
             </a>
             <a 
               href="/dashboard" 
-              className={`nav-link-dashboard ${activeLink === '/dashboard' ? 'active' : ''}`}
+              className={`nav-link-dashboard active`}
               onClick={(e) => {
                 e.preventDefault();
                 handleNavClick('/dashboard');
