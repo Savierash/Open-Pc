@@ -11,6 +11,7 @@ import GearLogo from "../assets/GearFill.png";
 import OctagonLogo from "../assets/XOctagonFill.png";
 import StackLogo from "../assets/Stack.png";
 import PersonLogo from "../assets/Person.png";
+import ToolsLogo from "../assets/tools_logo.png";
 import {
   ResponsiveContainer,
   LineChart,
