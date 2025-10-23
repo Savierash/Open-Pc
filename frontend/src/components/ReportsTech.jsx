@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import '../styles/Reports.css';
+import '../styles/ReportsTech.css';
 import ComputerLogo1 from '../assets/LOGO1.png';
 import PersonLogo from '../assets/Person.png';
 
-const Reports = () => {
+const ReportsTech = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
 
   useEffect(() => {
@@ -56,11 +56,11 @@ const Reports = () => {
               Services
             </a>
             <a 
-              href="/reports" 
-              className={`nav-link ${activeLink === '/reports' ? 'active' : ''}`}
+              href="/reports-tech" 
+              className={`nav-link ${activeLink === '/reports-tech' ? 'active' : ''}`}
               onClick={(e) => {
                 e.preventDefault();
-                handleNavClick('/reports');
+                handleNavClick('/reports-tech');
               }}
             >
               Reports
@@ -105,11 +105,14 @@ const Reports = () => {
         </div>
 
         <div className="right-column">
-          <div className="card empty-card-2"></div>
+          <div className="card report-details">
+            <h3>Report Details</h3>
+            <input type="text" placeholder=""/>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default Reports;
+export default ReportsTech;

@@ -15,9 +15,10 @@ import TotalUnits from './components/TotalUnits.jsx';
 import Functional from './components/Functional.jsx';
 import Maintenance from './components/Maintenance.jsx';
 import OutOfOrder from './components/OutOfOrder.jsx';
-import Reports from './components/Reports.jsx';
+import ReportsTech from './components/ReportsTech.jsx';
 import ReportsAuditor from './components/ReportsAuditor.jsx';
 import Role from './components/Role.jsx'; // Import Role component
+import Technicians from './components/Technicians.jsx'; // Import Technicians component
 
 /*STYLES*/
 import './styles/Homepage.css';
@@ -30,9 +31,8 @@ import './styles/ForgotPasswordOTP.css';
 import './styles/ResetPassword.css';
 import './styles/ForgotPassword.css';
 import './styles/About.css';
-import './styles/Reports.css';
+import './styles/ReportsTech.css';
 import './styles/Role.css'; // Import Role styles
-
 
 function App() {
   return (
@@ -53,9 +53,10 @@ function App() {
           <Route path="/functional" element={<Functional />} />
           <Route path="/maintenance" element={<Maintenance />} />
           <Route path="/out-of-order" element={<OutOfOrder />} />
-          <Route path="/reports" element={<Reports />} />
+          <Route path="/reports-tech" element={<ReportsTech />} />
           <Route path="/reports-auditor" element={<ReportsAuditor />} />
           <Route path="/role" element={<Role />} /> {/* Add Role route */}
+          <Route path="/technicians" element={<Technicians />} /> {/* Add Technicians route */}
         </Routes>
     </Router>
   );

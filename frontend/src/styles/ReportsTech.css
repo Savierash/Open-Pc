@@ -125,9 +125,7 @@ body {
   flex: 1;
   width: unset;
   min-width: unset;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  /* Removed flex-direction: column; and gap: 20px; to allow three columns */
 }
 
 .left-column, .right-column, .middle-column {
@@ -140,7 +138,7 @@ body {
 }
 
 .card {
-  background-color: rgba(0, 0, 0, 0.15);
+  background-color: rgba(0, 0, 0, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 10px;
   padding: 25px;
@@ -152,7 +150,7 @@ body {
 }
 
 .card:hover {
-  background-color: rgba(0, 0, 0, 0.15);
+  background-color: rgba(0, 0, 0, 0.4);
   box-shadow: none;
   transform: none;
 }
