@@ -1,14 +1,13 @@
-// backend/models/users.js
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   username: { type: String, required: true },
   password: { type: String, required: true },
-
-  // added for OTP functionality
-  otp: { type: String, default: null },
-  otpExpires: { type: Date, default: null },
+  otp: { type: String },
+  otpExpires: { type: Date },
 }, { timestamps: true });
 
-module.exports = mongoose.model('User', UserSchema);
+const User = mongoose.models.User || mongoose.model('User', UserSchema);
+
+module.exports = User;

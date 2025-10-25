@@ -102,21 +102,6 @@ const Dashboard = () => {
             <span className="logo-line">|</span>
           </div>
           <nav className="nav-links-dashboard">
-            <a href="/" className={`nav-link-dashboard ${activeLink === "/" ? "active" : ""}`}>
-              Home
-            </a>
-            <a
-              href="/about"
-              className={`nav-link-dashboard ${activeLink === "/about" ? "active" : ""}`}
-            >
-              About
-            </a>
-            <a
-              href="/services"
-              className={`nav-link-dashboard ${activeLink === "/services" ? "active" : ""}`}
-            >
-              Services
-            </a>
             <a href="/dashboard" className={`nav-link-dashboard active`}>
               Dashboard
             </a>

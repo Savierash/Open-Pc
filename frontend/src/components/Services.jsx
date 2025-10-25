@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/Services.css';
 import ComputerLogo1 from '../assets/LOGO1.png';
 import ServicesBackground from '../assets/services_background.png';
@@ -16,9 +17,11 @@ const Services = () => {
     setActiveLink(window.location.pathname);
   }, []);
 
+  const navigate = useNavigate();
+
   const handleNavClick = (path) => {
     setActiveLink(path);
-    window.location.href = path; 
+    navigate(path);
   };
 
   return (
@@ -64,8 +67,8 @@ const Services = () => {
           </nav>
         </div>
         <div className="nav-actions">
-          <button className="btn-login" onClick={() => window.location.href = '/login'}>Login</button>
-          <button className="btn-signup" onClick={() => window.location.href = '/signup'}>Sign Up</button>
+          <button className="btn-login" onClick={() => navigate('/login')}>Login</button>
+          <button className="btn-signup" onClick={() => navigate('/signup')}>Sign Up</button>
         </div>
       </header>
       <div className="services-hero" style={{ backgroundImage: `url(${ServicesBackground})` }}>
@@ -76,7 +79,7 @@ const Services = () => {
             Our web-based system is designed to assist auditors, administrators, and IT staff in monitoring,
             maintaining, and organizing computer units all in one centralized platform.
           </p>
-          <button className="btn-get-started" onClick={() => window.location.href ='/signup'}>Get Started</button>
+          <button className="btn-get-started" onClick={() => navigate('/signup')}>Get Started</button>
         </div>
       </div>
       <main className="services-main-content">

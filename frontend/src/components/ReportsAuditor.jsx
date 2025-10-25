@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/Dashboard.css';
 import ComputerLogo1 from '../assets/LOGO1.png';
 import PersonLogo from '../assets/Person.png';
@@ -18,9 +19,11 @@ const ReportsAuditor = () => {
     setActiveLink(window.location.pathname);
   }, []);
 
+  const navigate = useNavigate();
+
   const handleNavClick = (path) => {
     setActiveLink(path);
-    window.location.href = path;
+    navigate(path);
   };
 
   return (
@@ -34,36 +37,6 @@ const ReportsAuditor = () => {
           </div>
           <nav className="nav-links-dashboard">
             <a 
-              href="/" 
-              className={`nav-link-dashboard ${activeLink === '/' ? 'active' : ''}`}
-              onClick={(e) => {
-                e.preventDefault();
-                handleNavClick('/');
-              }}
-            >
-              Home
-            </a>
-            <a 
-              href="/about" 
-              className={`nav-link-dashboard ${activeLink === '/about' ? 'active' : ''}`}
-              onClick={(e) => {
-                e.preventDefault();
-                handleNavClick('/about');
-              }}
-            >
-              About
-            </a>
-            <a 
-              href="/services" 
-              className={`nav-link-dashboard ${activeLink === '/services' ? 'active' : ''}`}
-              onClick={(e) => {
-                e.preventDefault();
-                handleNavClick('/services');
-              }}
-            >
-              Services
-            </a>
-            <a 
               href="/dashboard" 
               className={`nav-link-dashboard ${activeLink === '/dashboard' || activeLink === '/reports-auditor' ? 'active' : ''}`}
               onClick={(e) => {
@@ -73,7 +46,6 @@ const ReportsAuditor = () => {
             >
               Dashboard
             </a>
-             
           </nav>
         </div>
         <div className="nav-actions">

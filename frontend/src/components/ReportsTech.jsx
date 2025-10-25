@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/ReportsTech.css';
 import ComputerLogo1 from '../assets/LOGO1.png';
 import PersonLogo from '../assets/Person.png';
@@ -10,9 +11,11 @@ const ReportsTech = () => {
     setActiveLink(window.location.pathname);
   }, []);
 
+  const navigate = useNavigate();
+
   const handleNavClick = (path) => {
     setActiveLink(path);
-    window.location.href = path;
+    navigate(path);
   };
 
   return (

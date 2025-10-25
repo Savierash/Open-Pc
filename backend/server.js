@@ -1,9 +1,10 @@
 // backend/server.js
 require('dotenv').config();
-const forgetPasswordRouter = require('./routes/forgetpassword');
 const labsRouter = require('./routes/labs');
 const unitsRouter = require('./routes/units'); 
 const dashboardRouter = require('./routes/dashboard');
+// route file is `forgetPassword.js` (file contains forgot-password handlers)
+const forgetPasswordRouter = require('./routes/forgetPassword');
 
 process.on('uncaughtException', (err) => {
   console.error('UNCAUGHT EXCEPTION', err && err.stack ? err.stack : err);
@@ -47,7 +48,8 @@ app.get('/', (req, res) => res.send('API up'));
 // === Routes (mount after middleware) ===
 try {
   app.use('/api/auth', require('./routes/auth'));
-   app.use('/api/forgot-password', forgotPasswordRouter);
+  // mount forgot-password routes at a consistent, lowercase path
+  app.use('/api/forgot-password', forgetPasswordRouter);
 } catch (err) {
   console.error('Failed to mount routes/auth:', err && err.stack ? err.stack : err);
 }
@@ -71,8 +73,6 @@ app.get('/api/lab/:labId/units', async (req, res, next) => {
 });
 
 
-// === Connect to MongoDB and start server ===
-// Note: modern mongoose driver doesn't need useNewUrlParser/useUnifiedTopology options
 mongoose.connect(MONGO_URI)
   .then(() => {
     console.log('Mongo connected');
@@ -80,8 +80,6 @@ mongoose.connect(MONGO_URI)
   })
   .catch((err) => {
     console.error('Mongo connection error (will still try to start server):', err && err.stack ? err.stack : err);
-    // If you'd rather stop the process on DB failure, uncomment:
-    // process.exit(1);
     startServer();
   });
 

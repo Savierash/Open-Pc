@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/Homepage.css';
 import ComputerLogo1 from '../assets/LOGO1.png';
 import ComputerLogo from '../assets/LOGO.png';
@@ -11,9 +12,12 @@ const Homepage = () => {
     setActiveLink(window.location.pathname);
   }, []);
 
+  const navigate = useNavigate();
+
   const handleNavClick = (path) => {
     setActiveLink(path);
-    window.location.href = path;
+    // use SPA navigation to avoid full page reload
+    navigate(path);
   };
 
   return (
@@ -59,8 +63,8 @@ const Homepage = () => {
           </nav>
         </div>
         <div className="nav-actions">
-          <button className="btn-login" onClick={() => window.location.href = '/login'}>Login</button>
-          <button className="btn-signup" onClick={() => window.location.href = '/signup'}>Sign up</button>
+          <button className="btn-login" onClick={() => navigate('/login')}>Login</button>
+          <button className="btn-signup" onClick={() => navigate('/signup')}>Sign up</button>
         </div>
       </header>
 
@@ -81,7 +85,7 @@ const Homepage = () => {
         </div>
         <div className="dashboard-background-overlay-right">
         </div>
-        <button className="hero-button" onClick={() => window.location.href ='/signup'}>Get Started</button>
+  <button className="hero-button" onClick={() => navigate('/signup')}>Get Started</button>
         <div className="dashboard-background-overlay">
         </div>
         <div className="dashboard-background-overlay-right">
