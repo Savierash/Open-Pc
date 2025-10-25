@@ -1,5 +1,6 @@
 // backend/server.js
 require('dotenv').config();
+const forgetPasswordRouter = require('./routes/forgetpassword');
 const labsRouter = require('./routes/labs');
 const unitsRouter = require('./routes/units'); 
 const dashboardRouter = require('./routes/dashboard');
@@ -46,6 +47,7 @@ app.get('/', (req, res) => res.send('API up'));
 // === Routes (mount after middleware) ===
 try {
   app.use('/api/auth', require('./routes/auth'));
+   app.use('/api/forgot-password', forgotPasswordRouter);
 } catch (err) {
   console.error('Failed to mount routes/auth:', err && err.stack ? err.stack : err);
 }
