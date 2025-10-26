@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/Dashboard.css';
 import ComputerLogo1 from '../assets/LOGO1.png';
@@ -31,9 +32,11 @@ const Inventory = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const navigate = useNavigate();
+
   const handleNavClick = (path) => {
     setActiveLink(path);
-    window.location.href = path;
+    navigate(path);
   };
 
  const fetchLabs = async () => {
@@ -104,27 +107,6 @@ const addLab = async () => {
             <span className="logo-line">|</span>
           </div>
           <nav className="nav-links-dashboard">
-            <a 
-              href="/" 
-              className={`nav-link-dashboard ${activeLink === '/' ? 'active' : ''}`}
-              onClick={(e) => { e.preventDefault(); handleNavClick('/'); }}
-            >
-              Home
-            </a>
-            <a 
-              href="/about" 
-              className={`nav-link-dashboard ${activeLink === '/about' ? 'active' : ''}`}
-              onClick={(e) => { e.preventDefault(); handleNavClick('/about'); }}
-            >
-              About
-            </a>
-            <a 
-              href="/services" 
-              className={`nav-link-dashboard ${activeLink === '/services' ? 'active' : ''}`}
-              onClick={(e) => { e.preventDefault(); handleNavClick('/services'); }}
-            >
-              Services
-            </a>
             <a 
               href="/dashboard" 
               className={`nav-link-dashboard active`}

@@ -12,6 +12,7 @@ const ResetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPasswords, setShowPasswords] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -100,30 +101,37 @@ const ResetPassword = () => {
 
         <div className="reset-password-container">
           <form onSubmit={handleSubmit} className="reset-password-form">
-            <div className="input-wrapper">
+            <div className="input-wrapper" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <input
-                type="password"
+                type={showPasswords ? 'text' : 'password'}
                 id="new-password"
                 placeholder="New Password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 className="input"
                 required
+                style={{ flex: 1 }}
               />
-              <img src={LockLogo} alt="Lock icon" className="input-icon" />
-            </div>
-
-            <div className="input-wrapper">
-              <input
-                type="password"
-                id="confirm-password"
-                placeholder="Confirm Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="input"
-                required
-              />
-              <img src={LockLogo} alt="Lock icon" className="input-icon" />
+              <button
+                type="button"
+                aria-label={showPasswords ? 'Hide passwords' : 'Show passwords'}
+                onClick={() => setShowPasswords((s) => !s)}
+                style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
+              >
+                {showPasswords ? (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 3L21 21" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M10.58 10.58C10.2 10.95 10 11.44 10 12C10 13.66 11.34 15 13 15c.56 0 1.05-.2 1.42-.58" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M14.12 14.12C15.06 13.18 15.6 12.13 15.6 12c0-2.21-1.79-4-4-4-.13 0-1.18.54-2.12 1.48" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M2.5 12C3.9 7.5 7.7 4 12 4c1.39 0 2.71.26 3.95.74" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="12" cy="12" r="3" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </button>
             </div>
 
             {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}

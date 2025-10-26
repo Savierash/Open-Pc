@@ -1,5 +1,6 @@
 // src/pages/TotalUnits.jsx
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/Dashboard.css';
 import ComputerLogo1 from '../assets/LOGO1.png';
@@ -34,9 +35,11 @@ const TotalUnits = () => {
 }, [selectedLabId]);
 
 
+  const navigate = useNavigate();
+
   const handleNavClick = (path) => {
     setActiveLink(path);
-    window.location.href = path;
+    navigate(path);
   };
 
   async function fetchLabs() {
@@ -118,9 +121,6 @@ const TotalUnits = () => {
             <span className="logo-line">|</span>
           </div>
           <nav className="nav-links-dashboard">
-            <a href="/" className={`nav-link-dashboard ${activeLink === '/' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/'); }}>Home</a>
-            <a href="/about" className={`nav-link-dashboard ${activeLink === '/about' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/about'); }}>About</a>
-            <a href="/services" className={`nav-link-dashboard ${activeLink === '/services' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/services'); }}>Services</a>
             <a href="/dashboard" className="nav-link-dashboard active" onClick={(e) => { e.preventDefault(); handleNavClick('/dashboard'); }}>Dashboard</a>
           </nav>
         </div>

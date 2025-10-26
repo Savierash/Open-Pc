@@ -22,22 +22,28 @@ const ForgotPassword = () => {
   }, [location.pathname]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    try {
-      // Here you would typically send the email to your backend to initiate password reset
-      console.log('Forgot password request submitted for email:', email);
-      // Simulate a successful request
-      navigate('/forgot-password-otp'); // Redirect to Forgot Password OTP page after successful request (placeholder)
-    } catch (err) {
-      console.error(err);
-      const msg = err.response?.data?.message || 'Password reset request failed';
-      setError(msg);
-    } finally {
-      setLoading(false);
-    }
-  };
+  e.preventDefault();
+  setError('');
+  setLoading(true);
+
+  try {
+    // Send request to backend to send OTP
+    const response = await axios.post(`${apiBase}/api/forgot-password/send-otp`, { email });
+
+    console.log(response.data.message);
+    alert('✅ OTP has been sent to your email.');
+
+    // Navigate to the OTP page (you can pass email to verify later)
+    navigate('/forgot-password-otp', { state: { email } });
+  } catch (err) {
+    console.error(err);
+    const msg = err.response?.data?.message || 'Password reset request failed';
+    setError(msg);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleNavClick = (path) => {
     navigate(path);

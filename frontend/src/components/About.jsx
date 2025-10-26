@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/About.css';
 import ComputerLogo from '../assets/LOGO.png';
 import ComputerLogo1 from '../assets/LOGO1.png';
@@ -14,9 +15,11 @@ function About() {
     setActiveLink(window.location.pathname);
   }, []);
 
+  const navigate = useNavigate();
+
   const handleNavClick = (path) => {
     setActiveLink(path);
-    window.location.href = path; 
+    navigate(path);
   };
 
   return (
@@ -62,8 +65,8 @@ function About() {
           </nav>
         </div>
         <div className="auth-buttons">
-          <button className="btn-login" onClick={() => window.location.href = '/login'}>Login</button>
-          <button className="btn-signup" onClick={() => window.location.href = '/signup'}>Sign Up</button>
+          <button className="btn-login" onClick={() => navigate('/login')}>Login</button>
+          <button className="btn-signup" onClick={() => navigate('/signup')}>Sign Up</button>
         </div>
       </header>
       <main className="main-container-about">
