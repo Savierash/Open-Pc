@@ -140,13 +140,20 @@ const TotalUnits = () => {
         </aside>
 
         <main className="main-content">
-          <div className="two-column-layout">
-            <div className="labs-container">
-              <div className="lab-list">
+          <div className="page-header-container">
+            <button className="back-button" onClick={() => navigate('/dashboard')}>BACK</button>
+            <h2 className="page-title" style={{ marginLeft: 'auto' }}>Total Units</h2>
+            {/* Removed placeholder div */}
+          </div>
+
+          <div className="new-layout-content">
+            <div className="horizontal-card">
+              <h3>Laboratories</h3>
+              <div className="lab-filter-grid">
                 {loadingLabs ? <div>Loading labs...</div> : labs.map(l => (
                   <div
                     key={l._id}
-                    className={`lab-card-new ${selectedLabId === l._id ? 'active' : ''}`}
+                    className={`lab-filter-card ${selectedLabId === l._id ? 'active' : ''}`}
                     onClick={() => setSelectedLabId(l._id)}
                     title="Click to select lab"
                   >
@@ -156,24 +163,20 @@ const TotalUnits = () => {
               </div>
             </div>
 
-            <div className="pcs-container">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <button className="add-unit-button" onClick={handleAddUnit} disabled={!selectedLabId}>Add Unit</button>
-                <div>{loadingUnits ? 'Loading units...' : `${units.length} units`}</div>
-              </div>
+            <div className="horizontal-card">
+              <h3>Unit Counts</h3>
+              {labs.map(l => (
+                <div key={l._id} className="unit-summary-item">
+                  <span><img src={PcDisplayLogo} alt="PC Icon" className="menu-icon" /> {l.name}</span>
+                  <span className="count">{l.unitCount}</span>
+                </div>
+              ))}
+              <p className="total-units-text" style={{ marginTop: 'auto' }}>Total Units: {labs.reduce((acc, l) => acc + (l.unitCount || 0), 0)}</p>
+            </div>
 
-              <div className="pc-grid">
-                {units.map(u => (
-                  <div key={u._id} className="pc-card" style={{ position: 'relative' }}>
-                    <img src={PcDisplayLogo} alt="PC Icon" />
-                    <span>{u.name}</span>
-                    <button onClick={() => handleDeleteUnit(u._id)} style={{ position: 'absolute', top: 6, right: 6 }}>✕</button>
-                  </div>
-                ))}
-
-                {!units.length && <div style={{ padding: 12, color: '#666' }}>No units for this lab yet.</div>}
-                <div className="add-pc-card" onClick={handleAddUnit}>+</div>
-              </div>
+            <div className="horizontal-card" style={{ flex: '2' }}>
+              <h3>TOTAL UNITS</h3>
+              
             </div>
           </div>
         </main>

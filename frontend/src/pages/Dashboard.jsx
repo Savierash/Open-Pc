@@ -92,6 +92,11 @@ const Dashboard = () => {
     </div>
   );
 
+  const handleNavClick = (path) => {
+    setActiveLink(path);
+    window.location.href = path;
+  };
+
   return (
     <div className="dashboard">
       <header className="top-bar-dashboard">
@@ -121,7 +126,6 @@ const Dashboard = () => {
             <li><a href="/total-units" className={`sidebar-link ${activeLink === '/total-units' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/total-units'); }}><img src={PcDisplayLogo} className="menu-icon" alt="Units" /><span>Total Units</span></a></li>
             <li><a href="/functional" className={`sidebar-link ${activeLink === '/functional' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/functional');}}><img src={ClipboardLogo} alt="Clipboard Icon" className="menu-icon" /><span>Functional</span></a></li>
             <li><a href="/maintenance" className={`sidebar-link ${activeLink === '/maintenance' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/maintenance');}}><img src={GearLogo} alt="Gear Icon" className="menu-icon" /><span>Maintenance</span></a></li>
-            <li><a href="/out-of-order" className={`sidebar-link ${activeLink === '/out-of-order' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/out-of-order');}}><img src={OctagonLogo} alt="Octagon Icon" className="menu-icon" /><span>Out of Order</span></a></li>
             <li><a href="/reports-auditor" className={`sidebar-link ${activeLink === '/reports-auditor' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/reports-auditor');}}><img src={ClipboardLogo} alt="Reports Icon" className="menu-icon" /><span>Reports</span></a></li>
             <li><a href="/technicians" className={`sidebar-link ${activeLink === '/technicians' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/technicians');}}><img src={ToolsLogo} alt="Technicians Icon" className="menu-icon" /><span>Technicians</span></a></li>
           </ul>
@@ -131,7 +135,7 @@ const Dashboard = () => {
         <main className="main-content">
           <div className="dashboard-main-content">
             <div className="dashboard-cards">
-              <div className="card total-units">
+              <div className="card total-units clickable-card" onClick={() => handleNavClick('/total-units')}>
                 <div className="card-header">
                   <img src={PcDisplayLogo} alt="PC Display Icon" className="card-icon" />
                   <h3>Total Units</h3>
@@ -141,7 +145,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="card functional">
+              <div className="card functional clickable-card" onClick={() => handleNavClick('/functional')}>
                 <div className="card-header">
                   <img src={ClipboardLogo} alt="Clipboard Icon" className="card-icon" />
                   <h3>Functional</h3>
@@ -156,13 +160,13 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="card out-of-order">
+              <div className="card maintenance clickable-card" onClick={() => handleNavClick('/maintenance')}>
                 <div className="card-header">
-                  <img src={OctagonLogo} alt="Octagon Icon" className="card-icon" />
-                  <h3>Out of Order</h3>
+                  <img src={GearLogo} alt="Gear Icon" className="card-icon" />
+                  <h3>Maintenance</h3>
                 </div>
                 <div className="card-body">
-                  <p className="stat-number">{loading ? "..." : counts.outOfOrder}</p>
+                  <p className="stat-number">{loading ? "..." : counts.maintenance}</p>
                 </div>
               </div>
             </div>

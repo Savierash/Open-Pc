@@ -243,15 +243,16 @@
 .main-content {
   flex: 1;
   display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
+  flex-direction: column;
+  /* Removed align-items: center as containers will manage their own alignment */
   position: relative;
   z-index: 3;
   border-radius: 20px;
   margin-left: 10px;
   background: rgba(0, 0, 0, 0.5);
-  -webkit-backdrop-filter: blur(10px); 
-  backdrop-filter: blur(10px); 
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  padding: 20px; /* Add padding to the main content area */
 }
 
 .content-placeholder {
@@ -280,14 +281,20 @@
   border-radius: 12px;
   padding: 1.5rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
   overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(138, 43, 226, 0.2);
+.clickable-card {
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.clickable-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 30px rgba(138, 43, 226, 0.4);
+  border-color: #8a2be2;
 }
 
 .card-header {
@@ -849,7 +856,6 @@
   }
 }
 
-/* status chart card styling */
 .status-chart-card {
   background: linear-gradient(180deg, #07090f 0%, #06121a 100%);
   color: #fff;
@@ -860,6 +866,164 @@
   overflow: hidden;
 }
 
-/* tweaks for charts */
 .status-chart-card .recharts-cartesian-axis-tick-value { fill: rgba(255,255,255,0.65); }
 .recharts-default-tooltip { background: rgba(0,0,0,0.8) !important; color: #fff !important; }
+
+.page-header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 10px 20px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.back-button {
+  background-color: #8a2be2;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+  background-color: #9b48f9;
+}
+
+.page-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+.new-layout-content {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  padding: 0;
+  flex-grow: 1;
+  margin-top: 20px;
+}
+
+.left-panel, .right-panel {
+  display: none;
+}
+
+.horizontal-card {
+  background: rgba(0, 0, 0, 0.2);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.5rem;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 200px;
+}
+
+.card-panel {
+  background: rgba(0, 0, 0, 0.2);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.5rem;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-panel.laboratories {
+  min-height: 200px;
+}
+
+.card-panel.unit-counts {
+  flex-grow: 1;
+}
+
+.card-panel.total-units-display {
+  min-height: 100px;
+}
+
+.card-panel.donut-chart {
+  flex-grow: 1;
+}
+
+.card-panel h3 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.lab-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+}
+
+.lab-filter-card {
+  background: rgba(138, 43, 226, 0.2);
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.lab-filter-card:hover {
+  background-color: rgba(138, 43, 226, 0.4);
+}
+
+.unit-summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.unit-summary-item:last-child {
+  border-bottom: none;
+}
+
+.unit-summary-item span {
+  font-size: 1rem;
+}
+
+.unit-summary-item .count {
+  background-color: rgba(138, 43, 226, 0.6);
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.total-units-text {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  padding-top: 1rem;
+}
+
+/* Responsive adjustments for new layout */
+@media (max-width: 768px) {
+  .new-layout-content {
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .left-panel,
+  .right-panel {
+    width: 100%;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+}

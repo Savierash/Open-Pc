@@ -10,7 +10,7 @@ import GearLogo from '../assets/GearFill.png';
 import OctagonLogo from '../assets/XOctagonFill.png';
 import StackLogo from '../assets/Stack.png';
 import PersonLogo from '../assets/Person.png';
-import ToolsLogo from '../assets/tools_logo.png'; // Import Tools Logo
+import ToolsLogo from '../assets/tools_logo.png';
 
 const Functional = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
@@ -168,31 +168,47 @@ const Functional = () => {
         </aside>
 
         <main className="main-content">
-          <div className="two-column-layout">
-            <div className="labs-container">
-              <div className="lab-list">
-                <div className="lab-card-new active">ITS 300</div>
-                <div className="lab-card-new">PTC 201</div>
-                {/* Add more lab cards as needed */}
+          <div className="page-header-container">
+            <button className="back-button" onClick={() => navigate('/dashboard')}>BACK</button>
+            <h2 className="page-title" style={{ marginLeft: 'auto' }}>Functional Units</h2>
+            {/* Removed placeholder div */}
+          </div>
+
+          <div className="new-layout-content">
+            <div className="horizontal-card">
+              <h3>Laboratories</h3>
+              {/* Placeholder for laboratories content */}
+              <div className="lab-filter-grid">
+                <div className="lab-filter-card active">ITS 300</div>
+                <div className="lab-filter-card">PTC 201</div>
+                <div className="lab-filter-card">MACLAB</div>
               </div>
             </div>
-            <div className="pcs-container">
-              <button className="add-unit-button">Add Unit</button>
-              <div className="pc-grid">
-                <div className="pc-card">
-                  <img src={PcDisplayLogo} alt="PC Icon" />
-                  <span>IT-PC-01</span>
-                </div>
-                <div className="pc-card"></div>
-                <div className="pc-card"></div>
-                <div className="pc-card"></div>
-                <div className="pc-card"></div>
-                <div className="pc-card"></div>
-                <div className="pc-card"></div>
-                <div className="pc-card"></div>
-                <div className="pc-card"></div>
-                <div className="add-pc-card">+</div>
+
+            <div className="horizontal-card">
+              <h3>Unit Counts</h3>
+              {/* Placeholder for unit counts content */}
+              <div className="unit-summary-item">
+                <img src={PcDisplayLogo} alt="PC Display Icon" className="menu-icon" />
+                <span>ITS 300</span>
+                <span className="count">55</span>
               </div>
+              <div className="unit-summary-item">
+                <img src={PcDisplayLogo} alt="PC Display Icon" className="menu-icon" />
+                <span>PTC 201</span>
+                <span className="count">43</span>
+              </div>
+              <div className="unit-summary-item">
+                <img src={PcDisplayLogo} alt="PC Display Icon" className="menu-icon" />
+                <span>MCLAB</span>
+                <span className="count">30</span>
+              </div>
+              <p className="total-units-text" style={{ marginTop: 'auto' }}>Total Units: 128</p>
+            </div>
+
+            <div className="horizontal-card" style={{ flex: '2' }}>
+              <h3>TOTAL UNITS</h3>
+
             </div>
           </div>
         </main>
