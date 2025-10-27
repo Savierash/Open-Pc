@@ -44,7 +44,9 @@ const Signup = () => {
     }
     setLoading(true);
     try {
+      const username = `${firstName.trim()} ${lastName.trim()}`.trim();
       const res = await api.post('/api/auth/register', {
+        username,
         firstName,
         lastName,
         phoneNumber,
