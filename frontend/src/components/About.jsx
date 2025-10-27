@@ -66,7 +66,7 @@ function About() {
         </div>
         <div className="auth-buttons">
           <button className="btn-login" onClick={() => navigate('/login')}>Login</button>
-          <button className="btn-signup" onClick={() => navigate('/signup')}>Sign Up</button>
+          <button className="btn-signup" onClick={() => navigate('/role')}>Sign Up</button>
         </div>
       </header>
       <main className="main-container-about">

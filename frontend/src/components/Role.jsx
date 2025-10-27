@@ -70,7 +70,7 @@ const Role = () => {
   // NEW: Create Account behavior — if a role selected, pass role in query param
   const handleCreateAccount = () => {
     if (selectedRoleKey) {
-      navigate(`/register?role=${encodeURIComponent(selectedRoleKey)}`);
+      navigate(`/signup?role=${encodeURIComponent(selectedRoleKey)}`);
     } else {
       // fallback
       navigate('/signup');

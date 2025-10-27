@@ -64,7 +64,7 @@ const Homepage = () => {
         </div>
         <div className="nav-actions">
           <button className="btn-login" onClick={() => navigate('/login')}>Login</button>
-          <button className="btn-signup" onClick={() => navigate('/signup')}>Sign up</button>
+          <button className="btn-signup" onClick={() => navigate('/role')}>Sign up</button>
         </div>
       </header>
 
@@ -85,7 +85,7 @@ const Homepage = () => {
         </div>
         <div className="dashboard-background-overlay-right">
         </div>
-  <button className="hero-button" onClick={() => navigate('/signup')}>Get Started</button>
+  <button className="hero-button" onClick={() => navigate('/role')}>Get Started</button>
         <div className="dashboard-background-overlay">
         </div>
         <div className="dashboard-background-overlay-right">
