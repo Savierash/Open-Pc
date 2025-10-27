@@ -170,6 +170,8 @@
   position: relative;
   z-index: 2;
   padding: 10px;
+  overflow: hidden; /* Prevent scrolling of the main layout */
+  min-height: calc(100vh - 70px); /* Explicitly set height based on viewport height minus top-bar height */
 }
 
 .sidebar {
@@ -244,7 +246,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  /* Removed align-items: center as containers will manage their own alignment */
+  align-items: center;
   position: relative;
   z-index: 3;
   border-radius: 20px;
@@ -252,7 +254,8 @@
   background: rgba(0, 0, 0, 0.5);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
-  padding: 20px; /* Add padding to the main content area */
+  padding: 20px;
+  overflow: auto;
 }
 
 .content-placeholder {
@@ -1026,4 +1029,344 @@
   .page-title {
     font-size: 1.5rem;
   }
+}
+
+.technicians-page-content {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  height: 100%; /* Set explicit height */
+  padding: 0; /* Removed padding to make panels flush with parent */
+  margin: 0; /* Removed horizontal margin as main-content now has it */
+  flex-grow: 1; /* Allows it to take remaining vertical space */
+}
+
+.technicians-search-panel {
+  flex: 2; /* Made search panel bigger */
+  background: rgba(0, 0, 0, 0.3); /* Changed to match sidebar */
+  backdrop-filter: blur(10px); /* Reintroduced backdrop-filter */
+  border-radius: 12px; /* Reintroduced border-radius */
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Reintroduced border */
+  padding: 20px; /* Reintroduced padding */
+  display: flex; /* Added flex to manage internal scrolling */
+  flex-direction: column; /* Added flex-direction */
+  overflow-y: auto; /* Make the search panel scrollable */
+}
+
+.technicians-info-panel {
+  flex: 1; /* Made info panel smaller */
+  background: rgba(0, 0, 0, 0.3); /* Changed to match sidebar */
+  backdrop-filter: blur(10px); /* Reintroduced backdrop-filter */
+  border-radius: 12px; /* Reintroduced border-radius */
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Reintroduced border */
+  padding: 20px; /* Reintroduced padding */
+  display: flex; /* Added flex to manage internal scrolling */
+  flex-direction: column; /* Added flex-direction */
+  overflow-y: auto; /* Changed to auto to allow scrolling */
+}
+
+.search-bar-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-shrink: 0; /* Prevent shrinking search bar */
+}
+
+.search-bar-container h2 {
+  font-size: 1.5rem;
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+.search-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 15px 10px 40px; /* Adjust padding for icon */
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 1rem;
+}
+
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  filter: invert(1);
+}
+
+.technicians-list {
+  flex-grow: 1;
+  overflow-y: auto; /* Keep scroll for the list itself */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.technician-list-item {
+  display: flex;
+  justify-content: space-between; /* Added to push items to opposite ends */
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.technician-list-item:hover {
+  background-color: rgba(138, 43, 226, 0.2);
+}
+
+.technician-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+  filter: invert(1);
+}
+
+.technician-name-and-id {
+  display: flex;
+  flex-grow: 1; /* Allows it to take up available space */
+  justify-content: space-between; /* Pushes name and ID to opposite ends */
+  align-items: center;
+}
+
+.technician-list-item span {
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+.technician-id {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  /* margin-left: auto; Removed as space-between handles it */
+}
+
+.technicians-info-panel {
+  flex: 2;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.technicians-info-panel h2 {
+  font-size: 1.5rem;
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+.technician-detail-card {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  flex-shrink: 0; /* Prevent shrinking detail card */
+}
+
+.technician-profile-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.profile-detail-icon {
+  width: 60px;
+  height: 60px;
+  filter: invert(1);
+}
+
+.technician-profile-header h3 {
+  font-size: 1.8rem;
+  color: #fff;
+  margin: 0;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.detail-row-name {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.input-with-icon-wrapper {
+  position: relative;
+  flex-grow: 1;
+  width: 50%; /* Set width to 50% */
+  flex-grow: 0; /* Override flex-grow from parent */
+}
+
+.detail-label {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  /* width: 100px; Remove fixed width for labels */
+  flex-shrink: 0;
+}
+
+.contact-email-label {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #fff;
+  margin-top: 15px; /* Add some space above */
+}
+
+.detail-input {
+  width: 100%; /* Ensure input takes full width of its wrapper */
+  padding: 8px 12px;
+  padding-right: 50px; /* Increased padding to make more space for the icon */
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 1rem;
+}
+
+.detail-input[readOnly] {
+  opacity: 0.8;
+  cursor: default;
+}
+
+.copy-icon {
+  position: absolute; /* Position the icon absolutely */
+  right: 8px; /* Adjusted right position */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px; /* Adjusted width */
+  height: 24px; /* Adjusted height */
+  background-color: rgba(255, 255, 255, 0.1); /* Reintroduced background */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* Reintroduced border */
+  border-radius: 4px; /* Reintroduced border-radius */
+  display: flex; /* Reintroduced flex properties for centering */
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-left: 0;
+  filter: invert(1);
+}
+
+/* Responsive adjustments for technicians page */
+@media (max-width: 768px) {
+  .technicians-page-content {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .technicians-search-panel,
+  .technicians-info-panel {
+    width: 100%;
+  }
+
+  .search-input {
+    padding: 8px 12px 8px 35px;
+  }
+
+  .search-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .technician-profile-header h3 {
+    font-size: 1.5rem;
+  }
+
+  .profile-detail-icon {
+    width: 50px;
+    height: 50px;
+  }
+
+  .detail-row label {
+    width: 80px;
+  }
+}
+
+.search-bar-container-top {
+  display: flex;
+  justify-content: flex-start; /* Changed to flex-start */
+  align-items: center;
+  width: 100%;
+  padding: 10px 20px; /* Reintroduced horizontal padding */
+  background: rgba(0, 0, 0, 0.3); /* Changed to match sidebar */
+  border-radius: 12px; /* Reintroduced border-radius */
+  margin-bottom: 0; /* Removed margin-bottom as gap handles it */
+  flex-shrink: 0; /* Prevent shrinking */
+}
+
+.search-bar-container-top h2.page-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #fff;
+  margin-left: auto; /* Push technicians title to the right */
+}
+
+.search-bar-container-top .search-text {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #fff;
+  margin-right: 10px; /* Reduced space between text and search bar */
+}
+
+.search-bar-container-top .search-input-wrapper {
+  flex-grow: 0; /* Remove flex-grow */
+  max-width: 400px; /* Keep a reasonable max-width */
+  width: 100%; /* Ensure it takes full width within its flex context */
+}
+
+@media (max-width: 768px) {
+  .search-bar-container-top {
+    flex-direction: row; /* Changed to row for mobile */
+    align-items: center;
+    padding: 10px; /* Keep some padding for mobile */
+  }
+
+  .search-bar-container-top h2.page-title,
+  .search-bar-container-top .search-text {
+    margin-bottom: 0; /* Changed to 0 */
+    margin-right: 10px; /* Keep some margin for mobile */
+  }
+
+  .search-bar-container-top .search-input-wrapper {
+    width: 100%;
+    max-width: unset;
+  }
+}
+
+.technicians-page-main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Gap between top search bar and bottom panels */
+  position: relative;
+  z-index: 3;
+  margin-left: 20px;
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  padding: 0 20px; /* Added horizontal padding */
+  overflow: hidden;
 }
