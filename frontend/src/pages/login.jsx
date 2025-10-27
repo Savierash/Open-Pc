@@ -1,4 +1,3 @@
-// src/pages/Login.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
@@ -40,13 +39,8 @@ const Login = () => {
     setError('');
     setLoading(true);
 
-    const res = await api.post('/api/auth/login', {
-  usernameOrEmail,
-  password,
-});
-
     try {
-      // Use the api instance created above; DO NOT send withCredentials unless configured
+      // Use the api instance created above
       const res = await api.post('/api/auth/login', {
         usernameOrEmail,
         password,
@@ -118,7 +112,8 @@ const Login = () => {
               <img src={PersonLogo} alt="User icon" className="input-icon" />
             </div>
 
-            <div className="input-wrapper" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {/* password input with toggle placed inside the input */}
+            <div className="input-wrapper" style={{ position: 'relative' }}>
               <input
                 type={showPassword ? 'text' : 'password'}
                 id="password"
@@ -127,13 +122,25 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 className="input"
                 required
-                style={{ flex: 1 }}
+                style={{ paddingRight: 40 }} // space for the toggle
               />
               <button
                 type="button"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
                 onClick={() => setShowPassword((s) => !s)}
-                style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
+                style={{
+                  position: 'absolute',
+                  right: 8,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
               >
                 {showPassword ? (
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -149,6 +156,7 @@ const Login = () => {
                   </svg>
                 )}
               </button>
+              <img src={LockLogo} alt="Password icon" className="input-icon" />
             </div>
 
             {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}

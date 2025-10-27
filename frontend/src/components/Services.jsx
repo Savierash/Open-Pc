@@ -68,7 +68,7 @@ const Services = () => {
         </div>
         <div className="nav-actions">
           <button className="btn-login" onClick={() => navigate('/login')}>Login</button>
-          <button className="btn-signup" onClick={() => navigate('/signup')}>Sign Up</button>
+          <button className="btn-signup" onClick={() => navigate('/role')}>Sign Up</button>
         </div>
       </header>
       <div className="services-hero" style={{ backgroundImage: `url(${ServicesBackground})` }}>
@@ -79,7 +79,7 @@ const Services = () => {
             Our web-based system is designed to assist auditors, administrators, and IT staff in monitoring,
             maintaining, and organizing computer units all in one centralized platform.
           </p>
-          <button className="btn-get-started" onClick={() => navigate('/signup')}>Get Started</button>
+          <button className="btn-get-started" onClick={() => navigate('/role')}>Get Started</button>
         </div>
       </div>
       <main className="services-main-content">

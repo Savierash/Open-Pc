@@ -17,8 +17,10 @@ const api = axios.create({
 });
 
 const Signup = () => {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPasswords, setShowPasswords] = useState(false);
@@ -42,9 +44,13 @@ const Signup = () => {
     }
     setLoading(true);
     try {
+      const username = `${firstName.trim()} ${lastName.trim()}`.trim();
       const res = await api.post('/api/auth/register', {
-        email,
         username,
+        firstName,
+        lastName,
+        phoneNumber,
+        email,
         password,
         confirmPassword,
       });
@@ -113,6 +119,47 @@ const Signup = () => {
 
         <div className="signup-container">
           <form onSubmit={handleSubmit} className="signup-form">
+            <div style={{ display: 'flex', gap: '16px' }}>
+              <div className="input-wrapper" style={{ flex: 1 }}>
+                <input
+                  type="text"
+                  id="firstName"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="input"
+                  placeholder="First name"
+                  required
+                />
+                <img src={PersonLogo} alt="First Name icon" className="input-icon" />
+              </div>
+
+              <div className="input-wrapper" style={{ flex: 1 }}>
+                <input
+                  type="text"
+                  id="lastName"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="input"
+                  placeholder="Last name"
+                  required
+                />
+                <img src={PersonLogo} alt="Last Name icon" className="input-icon" />
+              </div>
+            </div>
+
+            <div className="input-wrapper">
+              <input
+                type="tel"
+                id="phoneNumber"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                className="input"
+                placeholder="Phone number"
+                required
+              />
+              <img src={PersonLogo} alt="Phone Number icon" className="input-icon" />
+            </div>
+
             <div className="input-wrapper">
               <input
                 type="email"
@@ -120,41 +167,41 @@ const Signup = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="input"
-                placeholder="Enter your email"
+                placeholder="Email Address"
                 required
               />
               <img src={PersonLogo} alt="Email icon" className="input-icon" />
             </div>
 
-            <div className="input-wrapper">
-              <input
-                type="text"
-                id="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="input"
-                placeholder="Enter your username"
-                required
-              />
-              <img src={PersonLogo} alt="Username icon" className="input-icon" />
-            </div>
-
-            <div className="input-wrapper" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            { /* Changed password input wrapper: place toggle inside input */ }
+            <div className="input-wrapper" style={{ position: 'relative' }}>
               <input
                 type={showPasswords ? 'text' : 'password'}
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="input"
-                placeholder="Enter your password"
+                placeholder="Enter password"
                 required
-                style={{ flex: 1 }}
+                style={{ paddingRight: 40 }} // space for the icon
               />
               <button
                 type="button"
                 aria-label={showPasswords ? 'Hide password' : 'Show password'}
                 onClick={() => setShowPasswords((s) => !s)}
-                style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
+                style={{
+                  position: 'absolute',
+                  right: 8,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
               >
                 {showPasswords ? (
                   // eye-off
@@ -172,22 +219,57 @@ const Signup = () => {
                   </svg>
                 )}
               </button>
+              <img src={LockLogo} alt="Password icon" className="input-icon" />
             </div>
 
-            <div className="input-wrapper" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div className="input-wrapper" style={{ position: 'relative' }}>
               <input
                 type={showPasswords ? 'text' : 'password'}
                 id="confirm-password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="input"
-                placeholder="Confirm your password"
+                placeholder="Confirm password"
                 required
-                style={{ flex: 1 }}
+                style={{ paddingRight: 40 }} // space for the icon
               />
+              <button
+                type="button"
+                aria-label={showPasswords ? 'Hide password' : 'Show password'}
+                onClick={() => setShowPasswords((s) => !s)}
+                style={{
+                  position: 'absolute',
+                  right: 8,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {showPasswords ? (
+                  // eye-off
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 3L21 21" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M10.58 10.58C10.2 10.95 10 11.44 10 12C10 13.66 11.34 15 13 15c.56 0 1.05-.2 1.42-.58" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M14.12 14.12C15.06 13.18 15.6 12.13 15.6 12c0-2.21-1.79-4-4-4-.13 0-1.18.54-2.12 1.48" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M2.5 12C3.9 7.5 7.7 4 12 4c1.39 0 2.71.26 3.95.74" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                ) : (
+                  // eye
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="12" cy="12" r="3" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </button>
               <img src={LockLogo} alt="Confirm Password icon" className="input-icon" />
             </div>
-
+            
             {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
 
             <button type="submit" className="signup-button" disabled={loading}>

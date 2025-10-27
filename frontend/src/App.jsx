@@ -59,9 +59,8 @@ function App() {
           <Route path="/out-of-order" element={<OutOfOrder />} />
           <Route path="/reports-tech" element={<ReportsTech />} />
           <Route path="/reports-auditor" element={<ReportsAuditor />} />
-          <Route path="/role" element={<Role />} /> {/* Add Role route */}
-          <Route path="/technicians" element={<Technicians />} /> {/* Add Technicians route */}
-          <Route path="/auditor-profile" element={<AuditorProfile />} /> {/* Add Auditor Profile route */}
+          <Route path="/role" element={<Role />} /> 
+          <Route path="/technicians" element={<Technicians />} /> 
         </Routes>
     </Router>
   );
