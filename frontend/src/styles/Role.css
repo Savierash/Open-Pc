@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: url('../assets/BACKGROUND 1.png') no-repeat center center fixed;
+  background: linear-gradient(135deg, #0a0a0a 0%, #00023f 50%, #000033 100%);
   background-size: cover;
   color: white;
 }
