@@ -1,12 +1,12 @@
-// backend/routes/auth.js
 const express = require('express');
 const router = express.Router();
-const authController = require('../controllers/AuthController');
+const AuthController = require('../controllers/AuthController');
 
-// POST /api/auth/register
-router.post('/register', authController.register);
+// existing endpoints (keep them)
+router.post('/register', AuthController.register);
+router.post('/login', AuthController.login);
 
-// POST /api/auth/login
-router.post('/login', authController.login);
+// new: list roles for landing page
+router.get('/roles', AuthController.getRoles);
 
 module.exports = router;
