@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import Homepage from './pages/Homepage';  
 import Dashboard from './pages/Dashboard.jsx'; 
 import Services from './components/Services';
@@ -20,6 +20,7 @@ import ReportsTech from './components/ReportsTech.jsx';
 import Role from './components/Role.jsx';
 import Technicians from './components/Technicians.jsx';
 
+import DocumentPage from './pages/document.jsx';
 
 /*STYLES*/
 import './styles/Homepage.css';
@@ -41,6 +42,7 @@ function App() {
   return (
     <Router>
       <Routes>
+          <Route path="/document" element={<Navigate to="/documents" replace />} />
           <Route path="/" element={<Homepage />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/services" element={<Services />} />
@@ -60,6 +62,7 @@ function App() {
           <Route path="/reports-auditor" element={<ReportsAuditor />} />
           <Route path="/role" element={<Role />} /> 
           <Route path="/technicians" element={<Technicians />} /> 
+          <Route path="/documents" element={<DocumentPage />} />
         </Routes>
     </Router>
   );
