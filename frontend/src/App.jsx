@@ -19,6 +19,7 @@ import ReportsAuditor from './components/ReportsAuditor.jsx'
 import ReportsTech from './components/ReportsTech.jsx';
 import Role from './components/Role.jsx';
 import Technicians from './components/Technicians.jsx';
+import AuditorProfile from './components/AuditorProfile.jsx'; // Import the new AuditorProfile component
 
 
 /*STYLES*/
@@ -34,7 +35,7 @@ import './styles/ForgotPassword.css';
 import './styles/About.css';
 import './styles/ReportsTech.css';
 import './styles/Role.css'; 
-
+import './styles/AuditorProfile.css'; // Import the new AuditorProfile stylesheet
 
 
 function App() {
@@ -60,6 +61,7 @@ function App() {
           <Route path="/reports-auditor" element={<ReportsAuditor />} />
           <Route path="/role" element={<Role />} /> {/* Add Role route */}
           <Route path="/technicians" element={<Technicians />} /> {/* Add Technicians route */}
+          <Route path="/auditor-profile" element={<AuditorProfile />} /> {/* Add Auditor Profile route */}
         </Routes>
     </Router>
   );

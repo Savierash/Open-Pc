@@ -12,6 +12,7 @@ import OctagonLogo from "../assets/XOctagonFill.png";
 import StackLogo from "../assets/Stack.png";
 import PersonLogo from "../assets/Person.png";
 import ToolsLogo from "../assets/tools_logo.png";
+import AccountSettingLogo from "../assets/GearFill.png"; // Re-using GearFill for Account Setting
 import {
   ResponsiveContainer,
   LineChart,
@@ -123,11 +124,9 @@ const Dashboard = () => {
           <ul className="sidebar-menu">
             <li><a href="/dashboard" className={`sidebar-link ${activeLink === "/dashboard" ? "active" : ""}`}><img src={HouseLogo} className="menu-icon" alt="Home" /><span>Dashboard</span></a></li>
             <li><a href="/inventory" className={`sidebar-link ${activeLink === "/inventory" ? "active" : ""}`}><img src={StackLogo} className="menu-icon" alt="Inventory" /><span>Inventory</span></a></li>
-            <li><a href="/total-units" className={`sidebar-link ${activeLink === '/total-units' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/total-units'); }}><img src={PcDisplayLogo} className="menu-icon" alt="Units" /><span>Total Units</span></a></li>
-            <li><a href="/functional" className={`sidebar-link ${activeLink === '/functional' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/functional');}}><img src={ClipboardLogo} alt="Clipboard Icon" className="menu-icon" /><span>Functional</span></a></li>
-            <li><a href="/maintenance" className={`sidebar-link ${activeLink === '/maintenance' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/maintenance');}}><img src={GearLogo} alt="Gear Icon" className="menu-icon" /><span>Maintenance</span></a></li>
             <li><a href="/reports-auditor" className={`sidebar-link ${activeLink === '/reports-auditor' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/reports-auditor');}}><img src={ClipboardLogo} alt="Reports Icon" className="menu-icon" /><span>Reports</span></a></li>
             <li><a href="/technicians" className={`sidebar-link ${activeLink === '/technicians' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/technicians');}}><img src={ToolsLogo} alt="Technicians Icon" className="menu-icon" /><span>Technicians</span></a></li>
+            <li><a href="/auditor-profile" className={`sidebar-link ${activeLink === '/auditor-profile' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/auditor-profile');}}><img src={AccountSettingLogo} alt="Account Setting Icon" className="menu-icon" /><span>Account Setting</span></a></li>
           </ul>
         </aside>
 
