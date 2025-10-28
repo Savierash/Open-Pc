@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Dashboard.css'; // Import dashboard styles
 import '../styles/ReportsTech.css';
@@ -36,6 +38,36 @@ const ReportsTech = () => {
       ...prevIssues,
       [issueName]: !prevIssues[issueName]
     }));
+  };
+
+  const { user } = useAuth();
+  const [reports, setReports] = useState([]);
+  const [creating, setCreating] = useState(false);
+  const [selectedReport, setSelectedReport] = useState(null);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await api.get('/reports');
+        setReports(res.data || []);
+      } catch (err) {
+        console.error('Failed to load reports', err);
+      }
+    };
+    load();
+  }, []);
+
+  const createReport = async () => {
+    setCreating(true);
+    try {
+      const payload = { title: 'New report', description: 'Created from UI' };
+      const res = await api.post('/reports', payload);
+      setReports((s) => [res.data, ...s]);
+    } catch (err) {
+      console.error('Create report failed', err);
+    } finally {
+      setCreating(false);
+    }
   };
 
   return (
@@ -102,14 +134,16 @@ const ReportsTech = () => {
                 </div>
               </div>
               <div className="report-cards-grid">
-                <div className="report-card">
-                  <span>ITS300-PC-002</span>
-                  <span className="status-tag out-of-order">Out Of Order</span>
-                </div>
-                <div className="report-card">
-                  <span>ITS300-PC-010</span>
-                  <span className="status-tag out-of-order">Out Of Order</span>
-                </div>
+                {reports.length === 0 ? (
+                  <div className="report-card">No reports yet</div>
+                ) : (
+                  reports.map((r) => (
+                    <div key={r._id || r.id} className="report-card" onClick={() => setSelectedReport(r)}>
+                      <span>{r.title}</span>
+                      <span className={`status-tag ${r.status === 'closed' ? 'functional' : r.status === 'in_progress' ? 'maintenance' : 'out-of-order'}`}>{r.status}</span>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 
@@ -117,8 +151,37 @@ const ReportsTech = () => {
             <div className="reports-tech-info-panel">
               <h2 className="panel-title">REPORTS</h2>
               <div className="report-detail-card-header">
-                <span>ITS300-PC-002</span>
-                <span className="status-tag out-of-order">Out Of Order</span>
+                <span>{selectedReport?.title || 'Select a report'}</span>
+                <span className={`status-tag ${selectedReport?.status === 'closed' ? 'functional' : selectedReport?.status === 'in_progress' ? 'maintenance' : 'out-of-order'}`}>{selectedReport?.status || 'unknown'}</span>
+              </div>
+              {selectedReport && (
+                <div style={{ marginTop: 8 }}>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    {(user?.role === 'technician' || user?.role === 'admin') && (
+                      <button onClick={async () => {
+                        try {
+                          const res = await api.put(`/reports/${selectedReport._id}`, { status: selectedReport.status === 'open' ? 'in_progress' : 'closed' });
+                          // update local list
+                          setReports((s) => s.map((x) => x._id === res.data._id ? res.data : x));
+                          setSelectedReport(res.data);
+                        } catch (err) { console.error('Update report failed', err); }
+                      }} className="add-lab-button-reports">{selectedReport.status === 'open' ? 'Start Progress' : 'Close Report'}</button>
+                    )}
+                    {user?.role === 'admin' && (
+                      <button onClick={async () => {
+                        if (!confirm('Delete report?')) return;
+                        try {
+                          await api.delete(`/reports/${selectedReport._id}`);
+                          setReports((s) => s.filter((x) => x._id !== selectedReport._id));
+                          setSelectedReport(null);
+                        } catch (err) { console.error('Delete report failed', err); }
+                      }} style={{ background: '#c0392b', color: '#fff' }}>Delete</button>
+                    )}
+                  </div>
+                </div>
+              )}
+              <div style={{ marginTop: 12 }}>
+                <button className="add-lab-button-reports" onClick={createReport} disabled={creating}>{creating ? 'Creating...' : 'Create Report'}</button>
               </div>
               <div className="info-item-reports">
                 <span>Technician ID: 01593</span>

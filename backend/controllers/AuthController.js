@@ -11,7 +11,7 @@ const User = require('../models/Users');
  */
 exports.register = async (req, res) => {
   try {
-    const { email, username, password, confirmPassword, roleKey } = req.body;
+    const { email, username, password, confirmPassword, roleKey, phoneNumber } = req.body;
     if (!email || !username || !password) return res.status(400).json({ message: 'Missing fields' });
     if (password !== confirmPassword) return res.status(400).json({ message: 'Passwords do not match' });
 
@@ -33,6 +33,7 @@ exports.register = async (req, res) => {
       email,
       username,
       password: hashed,
+      phoneNumber: phoneNumber || undefined,
       role: assignedRole ? assignedRole._id : undefined,
     });
 
@@ -51,6 +52,7 @@ exports.register = async (req, res) => {
         id: user._id,
         email: user.email,
         username: user.username,
+        phoneNumber: user.phoneNumber,
         role: assignedRole ? assignedRole.key : undefined,
       },
     });
@@ -128,6 +130,43 @@ exports.getRoles = async (req, res) => {
     res.status(200).json({ success: true, roles });
   } catch (err) {
     console.error('Get Roles Error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Get profile for authenticated user
+exports.getProfile = async (req, res) => {
+  try {
+    const userId = req.user && req.user.id;
+    if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+
+    const user = await User.findById(userId).select('-password').populate('role');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    res.json({ success: true, user });
+  } catch (err) {
+    console.error('Get profile error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Update profile (phone number, username)
+exports.updateProfile = async (req, res) => {
+  try {
+    const userId = req.user && req.user.id;
+    if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+
+    const { phoneNumber, username } = req.body;
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (phoneNumber !== undefined) user.phoneNumber = phoneNumber;
+    if (username !== undefined) user.username = username;
+    await user.save();
+
+    res.json({ success: true, user: { id: user._id, email: user.email, username: user.username, phoneNumber: user.phoneNumber } });
+  } catch (err) {
+    console.error('Update profile error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };

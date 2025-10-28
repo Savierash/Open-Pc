@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import '../styles/Dashboard.css';
 import ComputerLogo1 from '../assets/LOGO1.png';
 import PersonLogo from '../assets/Person.png';
@@ -35,6 +37,21 @@ const ReportsAuditor = () => {
 
   useEffect(() => {
     setActiveLink(window.location.pathname);
+  }, []);
+
+  const { user } = useAuth();
+  const [reports, setReports] = useState([]);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await api.get('/reports');
+        setReports(res.data || []);
+      } catch (err) {
+        console.error('Failed to fetch reports', err);
+      }
+    };
+    load();
   }, []);
 
   useEffect(() => {
@@ -243,16 +260,16 @@ const ReportsAuditor = () => {
                 </div>
               </div>
               <div className="report-cards-grid-auditor">
-                {filteredPcReports.map((report) => (
-                  <div 
-                    key={report.id} 
-                    className="report-card-auditor"
-                    onClick={() => setSelectedPC(report)}
-                  >
-                    <span>{report.id}</span>
-                    <span className={`status-tag-auditor ${report.status.toLowerCase().replace(/ /g, '-')}`}>{report.status}</span>
-                  </div>
-                ))}
+                {reports.length === 0 ? (
+                  <div className="report-card-auditor">No reports</div>
+                ) : (
+                  reports.map((r) => (
+                    <div key={r._id || r.id} className="report-card-auditor" onClick={() => setSelectedPC(r)}>
+                      <span>{r.title || r._id}</span>
+                      <span className={`status-tag-auditor ${r.status ? r.status.toLowerCase().replace(/ /g, '-') : 'placeholder'}`}>{r.status || 'unknown'}</span>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 

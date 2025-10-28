@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api';
 import '../styles/Inventory.css'; // Changed from Dashboard.css
 import ComputerLogo1 from '../assets/LOGO1.png';
 import HouseLogo from '../assets/HouseFill.png';
@@ -14,9 +14,13 @@ import PersonLogo from '../assets/Person.png';
 import ToolsLogo from '../assets/tools_logo.png';
 import PcDisplayLogo from "../assets/PcDisplayHorizontal.png"; // Added for unit cards
 
+<<<<<<< Updated upstream
 // Use Vite env style
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
 console.log('Inventory: API_BASE =', API_BASE);
+=======
+// centralized api client
+>>>>>>> Stashed changes
 
 
 const Inventory = () => {
@@ -42,6 +46,7 @@ const Inventory = () => {
     navigate(path);
   };
 
+<<<<<<< Updated upstream
  const fetchLabs = async () => {
   setLoading(true);
   try {
@@ -50,6 +55,24 @@ const Inventory = () => {
     if (res.data.length > 0 && !selectedLab) {
       setSelectedLab(res.data[0]); // Select the first lab by default
       fetchUnitsByLab(res.data[0]._id); // Fetch units for the first lab
+=======
+  // ----- Labs -----
+  const fetchLabs = async () => {
+    setLoading(true);
+    try {
+  const res = await api.get('/lab');
+      setLabs(res.data || []);
+      if (res.data && res.data.length > 0 && !selectedLab) {
+        setSelectedLab(res.data[0]); // Select the first lab by default
+        fetchUnitsByLab(res.data[0]._id); // Fetch units for the first lab
+      }
+    } catch (err) {
+      console.error('Failed to fetch labs', err);
+      console.error('err.response:', err?.response?.data ?? err?.message);
+      window.alert('Failed to load labs. See console for details.');
+    } finally {
+      setLoading(false);
+>>>>>>> Stashed changes
     }
   } catch (err) {
     console.error('Failed to fetch labs', err);
@@ -70,6 +93,7 @@ const addLab = async () => {
     return window.alert('This lab already exists.');
   }
 
+<<<<<<< Updated upstream
   setAdding(true);
   try {
     const res = await axios.post(`${API_BASE}/lab`, { name: trimmed });
@@ -85,6 +109,23 @@ const addLab = async () => {
     setAdding(false);
   }
 };
+=======
+    setAdding(true);
+    try {
+  const res = await api.post('/lab', { name: trimmed });
+      setLabs(prev => [...prev, res.data]);
+      setSelectedLab(res.data); // Select newly added lab
+      setUnits([]); // Clear units for new lab
+    } catch (err) {
+      console.error('Failed to add lab', err);
+      console.error('err.response:', err?.response?.data ?? err?.message);
+      const message = err?.response?.data?.message || 'Failed to add lab';
+      window.alert(message);
+    } finally {
+      setAdding(false);
+    }
+  };
+>>>>>>> Stashed changes
 
   // Remove a lab by index (with confirmation)
   const removeLab = async (index) => {
@@ -94,7 +135,11 @@ const addLab = async () => {
     if (!confirmed) return;
 
     try {
+<<<<<<< Updated upstream
       await axios.delete(`${API_BASE}/lab/${lab._id}`);
+=======
+  await api.delete(`/lab/${lab._id}`);
+>>>>>>> Stashed changes
       const newLabs = labs.filter((_, i) => i !== index);
       setLabs(newLabs);
       if (selectedLab?._id === lab._id) {
@@ -115,10 +160,17 @@ const addLab = async () => {
   const fetchUnitsByLab = async (labId) => {
     setLoading(true);
     try {
+<<<<<<< Updated upstream
       const res = await axios.get(`${API_BASE}/unit/lab/${labId}`);
       setUnits(res.data);
       // Automatically select the first unit if units are fetched and no unit is selected
       if (res.data.length > 0 && !selectedUnit) {
+=======
+      // Prefer nested path that server handles: /api/labs/:labId/units
+  const res = await api.get(`/lab/${labId}/units`);
+      setUnits(res.data || []);
+      if (res.data && res.data.length > 0 && !selectedUnit) {
+>>>>>>> Stashed changes
         setSelectedUnit(res.data[0]);
       }
     } catch (err) {
@@ -137,7 +189,11 @@ const addLab = async () => {
     if (trimmed === '') return window.alert('Unit name cannot be empty.');
 
     try {
+<<<<<<< Updated upstream
       const res = await axios.post(`${API_BASE}/unit`, { name: trimmed, lab: selectedLab._id });
+=======
+  const res = await api.post('/units', { name: trimmed, lab: selectedLab._id });
+>>>>>>> Stashed changes
       setUnits(prev => [...prev, res.data]);
     } catch (err) {
       console.error('Failed to add unit', err);
@@ -428,6 +484,7 @@ const addLab = async () => {
                   </div>
                   <div className="inventory-set-status-section">
                     <span>SET STATUS:</span>
+<<<<<<< Updated upstream
                     <select 
                       className="inventory-status-dropdown"
                       value={selectedUnit.status}
@@ -439,6 +496,49 @@ const addLab = async () => {
                     </select>
                   </div>
                   <button className="inventory-save-button">Save</button>
+=======
+                      <select
+                        className="inventory-status-dropdown"
+                        value={selectedUnit.status || 'functional'}
+                        onChange={(e) => setSelectedUnit({ ...selectedUnit, status: e.target.value })}
+                      >
+                        <option value="functional">Functional</option>
+                        <option value="maintenance">Maintenance</option>
+                        <option value="out-of-order">Out Of Order</option>
+                      </select>
+                  </div>
+                  <button
+                    className="inventory-save-button"
+                    onClick={async () => {
+                      // Optional: implement save to backend
+                      try {
+                        const normalizeStatus = (s) => {
+                          if (!s) return 'functional';
+                          const t = String(s).toLowerCase();
+                          if (t.includes('out') && t.includes('order')) return 'out-of-order';
+                          if (t.includes('maint')) return 'maintenance';
+                          return 'functional';
+                        };
+
+                        const payload = { ...selectedUnit, status: normalizeStatus(selectedUnit.status) };
+                        // send to API (assumes PUT /units/:id exists)
+                        if (selectedUnit._id) {
+                          await api.put(`/units/${selectedUnit._id}`, payload);
+                          // update units list locally
+                          setUnits(prev => prev.map(u => (u._id === selectedUnit._id ? { ...u, ...payload } : u)));
+                          setSelectedUnit(prev => ({ ...prev, ...payload }));
+                          window.alert('Unit saved');
+                        }
+                      } catch (err) {
+                        console.error('Failed to save unit', err);
+                        console.error('err.response:', err?.response?.data ?? err?.message);
+                        window.alert('Failed to save unit. See console.');
+                      }
+                    }}
+                  >
+                    Save
+                  </button>
+>>>>>>> Stashed changes
                 </>
               ) : (
                 <div>Select a unit to view details</div>

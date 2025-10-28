@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Dashboard.css'; 
+import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import ComputerLogo1 from '../assets/LOGO1.png';
 import HouseLogo from '../assets/HouseFill.png';
 import GraphLogo from '../assets/GraphUp.png';
@@ -14,10 +16,58 @@ import ToolsLogo from '../assets/tools_logo.png'; // Import Tools Logo
 
 const OutOfOrder = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
+  const [labs, setLabs] = useState([]);
+  const [selectedLab, setSelectedLab] = useState(null);
+  const [units, setUnits] = useState([]);
+  const [loadingLabs, setLoadingLabs] = useState(false);
+  const [loadingUnits, setLoadingUnits] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     setActiveLink(window.location.pathname);
   }, []);
+
+  useEffect(() => {
+    // fetch labs on mount
+    let mounted = true;
+    async function fetchLabs() {
+      setLoadingLabs(true);
+      try {
+        const res = await api.get('/lab');
+        if (!mounted) return;
+        setLabs(res.data || []);
+        if (res.data && res.data.length) {
+          setSelectedLab(res.data[0]._id);
+        }
+      } catch (err) {
+        console.error('Failed to load labs', err);
+      } finally {
+        setLoadingLabs(false);
+      }
+    }
+    fetchLabs();
+    return () => { mounted = false; };
+  }, []);
+
+  useEffect(() => {
+    if (!selectedLab) return;
+    let mounted = true;
+    async function fetchUnits() {
+      setLoadingUnits(true);
+      try {
+        const res = await api.get(`/units?labId=${selectedLab}`);
+        if (!mounted) return;
+        setUnits(res.data || []);
+      } catch (err) {
+        console.error('Failed to load units for lab', selectedLab, err);
+        setUnits([]);
+      } finally {
+        setLoadingUnits(false);
+      }
+    }
+    fetchUnits();
+    return () => { mounted = false; };
+  }, [selectedLab]);
 
   const navigate = useNavigate();
 
@@ -171,26 +221,34 @@ const OutOfOrder = () => {
           <div className="two-column-layout">
             <div className="labs-container">
               <div className="lab-list">
-                <div className="lab-card-new active">ITS 300</div>
-                <div className="lab-card-new">PTC 201</div>
-                {/* Add more lab cards as needed */}
+                {loadingLabs && <div>Loading labs...</div>}
+                {!loadingLabs && labs.length === 0 && <div>No labs available</div>}
+                {!loadingLabs && labs.map((lab) => (
+                  <div
+                    key={lab._id}
+                    className={`lab-card-new ${selectedLab === lab._id ? 'active' : ''}`}
+                    onClick={() => setSelectedLab(lab._id)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    {lab.name}
+                  </div>
+                ))}
               </div>
             </div>
             <div className="pcs-container">
-              <button className="add-unit-button">Add Unit</button>
+              <button className="add-unit-button" onClick={() => navigate('/inventory')}>Add Unit</button>
               <div className="pc-grid">
-                <div className="pc-card">
-                  <img src={PcDisplayLogo} alt="PC Icon" />
-                  <span>IT-PC-01</span>
-                </div>
-                <div className="pc-card"></div>
-                <div className="pc-card"></div>
-                <div className="pc-card"></div>
-                <div className="pc-card"></div>
-                <div className="pc-card"></div>
-                <div className="pc-card"></div>
-                <div className="pc-card"></div>
-                <div className="pc-card"></div>
+                {loadingUnits && <div>Loading units...</div>}
+                {!loadingUnits && units.filter(u => u.status === 'out-of-order').length === 0 && (
+                  <div className="pc-card">No out-of-order units</div>
+                )}
+                {!loadingUnits && units.filter(u => u.status === 'out-of-order').map((unit) => (
+                  <div key={unit._id} className="pc-card">
+                    <img src={PcDisplayLogo} alt="PC Icon" />
+                    <span>{unit.name}</span>
+                    <div style={{ fontSize: 12, color: '#666' }}>{unit.notes || ''}</div>
+                  </div>
+                ))}
                 <div className="add-pc-card">+</div>
               </div>
             </div>

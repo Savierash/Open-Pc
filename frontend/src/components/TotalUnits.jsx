@@ -1,7 +1,7 @@
 // src/pages/TotalUnits.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api';
 import '../styles/Dashboard.css';
 import ComputerLogo1 from '../assets/LOGO1.png';
 import HouseLogo from '../assets/HouseFill.png';
@@ -13,7 +13,7 @@ import StackLogo from '../assets/Stack.png';
 import PersonLogo from '../assets/Person.png';
 import ToolsLogo from '../assets/tools_logo.png'; // Import Tools Logo
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
+// centralized api client handles base URL
 
 const TotalUnits = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
@@ -45,13 +45,26 @@ const TotalUnits = () => {
   async function fetchLabs() {
   setLoadingLabs(true);
   try {
-    // <-- FIX: use "labs" (plural), not "lab"
-    console.log('TotalUnits: API_BASE =', API_BASE);
-    const res = await axios.get(`${API_BASE}/lab`);
-    setLabs(res.data || []);
-    if (res.data && res.data.length > 0 && !selectedLabId) {
-      setSelectedLabId(res.data[0]._id);
-    }
+    const res = await api.get('/lab');
+      const baseLabs = res.data || [];
+      // fetch unit counts for each lab in parallel
+      try {
+        const counts = await Promise.all(baseLabs.map(async (l) => {
+          try {
+            const r = await api.get(`/lab/${l._id}/units`);
+            return (r.data || []).length;
+          } catch (e) {
+            return 0;
+          }
+        }));
+        const labsWithCounts = baseLabs.map((l, idx) => ({ ...l, unitCount: counts[idx] || 0 }));
+        setLabs(labsWithCounts);
+        if (labsWithCounts.length > 0 && !selectedLabId) setSelectedLabId(labsWithCounts[0]._id);
+      } catch (e) {
+        // fallback: set labs without counts
+        setLabs(baseLabs);
+        if (baseLabs.length > 0 && !selectedLabId) setSelectedLabId(baseLabs[0]._id);
+      }
   } catch (err) {
     console.error('fetchLabs err - full error:', err);
     console.error('fetchLabs err - response data:', err?.response?.data);
@@ -65,7 +78,7 @@ const TotalUnits = () => {
   async function fetchUnits(labId) {
   setLoadingUnits(true);
   try {
-    const res = await axios.get(`${API_BASE}/units`, { params: { labId } });
+    const res = await api.get('/units', { params: { labId } });
     setUnits(res.data || []);
   } catch (err) {
     console.error('fetchUnits err - full error:', err);
@@ -90,7 +103,7 @@ const TotalUnits = () => {
     const name = window.prompt('Enter unit name (e.g. IT-PC-01):');
     if (!name) return;
     try {
-      const res = await axios.post(`${API_BASE}/units`, { name: name.trim(), lab: selectedLabId });
+      const res = await api.post('/units', { name: name.trim(), lab: selectedLabId });
       setUnits(prev => [...prev, res.data]);
     } catch (err) {
       console.error('add unit err', err?.response ?? err);
@@ -103,7 +116,7 @@ const TotalUnits = () => {
     const ok = window.confirm('Delete this unit?');
     if (!ok) return;
     try {
-      await axios.delete(`${API_BASE}/units/${unitId}`);
+      await api.delete(`/units/${unitId}`);
       setUnits(prev => prev.filter(u => u._id !== unitId));
     } catch (err) {
       console.error('delete unit err', err?.response ?? err);
@@ -168,7 +181,7 @@ const TotalUnits = () => {
               {labs.map(l => (
                 <div key={l._id} className="unit-summary-item">
                   <span><img src={PcDisplayLogo} alt="PC Icon" className="menu-icon" /> {l.name}</span>
-                  <span className="count">{l.unitCount}</span>
+                  <span className="count">{l.unitCount || 0}</span>
                 </div>
               ))}
               <p className="total-units-text" style={{ marginTop: 'auto' }}>Total Units: {labs.reduce((acc, l) => acc + (l.unitCount || 0), 0)}</p>

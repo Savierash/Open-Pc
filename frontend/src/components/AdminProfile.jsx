@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useAuth } from '../context/AuthContext';
 import "../styles/AdminProfile.css";
 import PersonCircle from "../assets/PersonCircle.png";
 import Lock from "../assets/Lock.png";
@@ -12,10 +13,40 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const AdminProfile = () => {
   const navigate = useNavigate(); // Initialize useNavigate
+  const { user, fetchProfile, updateProfile, logout } = useAuth();
+  const [profile, setProfile] = useState(null);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await fetchProfile();
+        if (res && res.user) setProfile(res.user);
+      } catch (err) {
+        console.error('Failed to load profile', err);
+      }
+    };
+    load();
+  }, []);
 
   const handleLogout = () => {
-    // In a real application, you would clear user session/token here
-    navigate('/'); // Redirect to homepage
+    logout();
+    navigate('/');
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const payload = { phoneNumber: profile?.phoneNumber, username: profile?.username };
+      await updateProfile(payload);
+      // refetch
+      const res = await fetchProfile();
+      if (res && res.user) setProfile(res.user);
+    } catch (err) {
+      console.error('Save profile failed', err);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -71,7 +102,7 @@ const AdminProfile = () => {
                 <p>Dagupan USA Chicago</p>
                 <p>0918453982</p>
               </div>
-              <div className="profile-actions">
+                <div className="profile-actions">
                 <button className="delete-button">Delete</button>
                 <button className="upload-button">Upload new picture</button>
               </div>
@@ -83,14 +114,14 @@ const AdminProfile = () => {
                 <div className="form-group">
                   <label>Full name</label>
                   <div className="input-with-icon">
-                    <input type="text" value="Kresner" readOnly />
+                    <input type="text" value={profile?.username?.split(' ')[0] || ''} onChange={(e) => setProfile((p) => ({ ...p, username: `${e.target.value} ${p?.username?.split(' ')[1] || ''}` }))} />
                     <img src={Lock} alt="Lock Icon" className="input-icon" />
                   </div>
                 </div>
                 <div className="form-group">
                   <label>Last Name</label>
                   <div className="input-with-icon">
-                    <input type="text" value="Leonardo" readOnly />
+                    <input type="text" value={profile?.username?.split(' ')[1] || ''} onChange={(e) => setProfile((p) => ({ ...p, username: `${p?.username?.split(' ')[0] || ''} ${e.target.value}` }))} />
                     <img src={Lock} alt="Lock Icon" className="input-icon" />
                   </div>
                 </div>
@@ -101,21 +132,21 @@ const AdminProfile = () => {
                 <div className="form-group">
                   <label>Email</label>
                   <div className="input-with-icon">
-                    <input type="email" value="kresnerleonardo@gmail.com" readOnly />
+                    <input type="email" value={profile?.email || ''} readOnly />
                     <img src={Lock} alt="Lock Icon" className="input-icon" />
                   </div>
                 </div>
                 <div className="form-group">
                   <label>Contact No.</label>
                   <div className="input-with-icon">
-                    <input type="text" value="0918453982" readOnly />
+                    <input type="text" value={profile?.phoneNumber || ''} onChange={(e) => setProfile((p) => ({ ...p, phoneNumber: e.target.value }))} />
                     <img src={Lock} alt="Lock Icon" className="input-icon" />
                   </div>
                 </div>
                 <div className="form-group">
                   <label>Address</label>
                   <div className="input-with-icon">
-                    <input type="text" value="Dagupan USA Chicago" readOnly />
+                    <input type="text" value={profile?.address || ''} onChange={(e) => setProfile((p) => ({ ...p, address: e.target.value }))} />
                     <img src={Lock} alt="Lock Icon" className="input-icon" />
                   </div>
                 </div>
@@ -130,6 +161,7 @@ const AdminProfile = () => {
                   </div>
                 </div>
                 <button className="logout-button" onClick={handleLogout}>LOGOUT</button>
+                <button className="signup-button" style={{ marginLeft: 12 }} onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : 'Save'}</button>
               </div>
             </div>
           </div>
