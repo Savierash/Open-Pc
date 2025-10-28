@@ -19,7 +19,12 @@ import ReportsAuditor from './components/ReportsAuditor.jsx'
 import ReportsTech from './components/ReportsTech.jsx';
 import Role from './components/Role.jsx';
 import Technicians from './components/Technicians.jsx';
-import AuditorProfile from './components/AuditorProfile.jsx'; // Import the new AuditorProfile component
+import AuditorProfile from './components/AuditorProfile.jsx';
+import DashboardTechnician from './pages/DashboardTechnician.jsx';
+import DashboardAdmin from './pages/DashboardAdmin.jsx';
+import TechnicianProfile from './components/TechnicianProfile.jsx';
+import AdminProfile from './components/AdminProfile.jsx';
+import UnitStatusTechnician from './components/UnitStatusTechnician.jsx';
 
 import DocumentPage from './pages/document.jsx';
 
@@ -37,6 +42,9 @@ import './styles/About.css';
 import './styles/ReportsTech.css';
 import './styles/Role.css'; 
 import './styles/AuditorProfile.css'; // Import the new AuditorProfile stylesheet
+import './styles/ReportsAuditor.css'; // Import ReportsAuditor stylesheet
+import './styles/TechnicianProfile.css';
+import './styles/AdminProfile.css';
 
 
 function App() {
@@ -63,7 +71,12 @@ function App() {
           <Route path="/reports-auditor" element={<ReportsAuditor />} />
           <Route path="/role" element={<Role />} /> 
           <Route path="/technicians" element={<Technicians />} /> 
-          <Route path="/documents" element={<DocumentPage />} />
+          <Route path="/auditor-profile" element={<AuditorProfile />} />
+          <Route path="/dashboard-technician" element={<DashboardTechnician />} />
+          <Route path="/unit-status-technician" element={<UnitStatusTechnician />} />
+          <Route path="/technician-profile" element={<TechnicianProfile />} />
+          <Route path="/dashboard-admin" element={<DashboardAdmin />} />
+          <Route path="/admin-profile" element={<AdminProfile />} />
         </Routes>
     </Router>
   );

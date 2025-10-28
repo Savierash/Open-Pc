@@ -11,6 +11,7 @@ import GearLogo from '../assets/GearFill.png';
 import OctagonLogo from '../assets/XOctagonFill.png';
 import StackLogo from '../assets/Stack.png';
 import ToolsLogo from '../assets/tools_logo.png';
+import CopyIcon from '../assets/ClipboardCheck.png'; // Added CopyIcon import
 
 const Technicians = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
@@ -128,8 +129,87 @@ const Technicians = () => {
           </ul>
         </aside>
 
-        <main className="main-content">
-          {/* Content for Technicians page will go here */}
+        <main className="technicians-page-main-content">
+          <div className="search-bar-container-top">
+            <div className="search-text">Search A Technician</div>
+            <div className="search-input-wrapper">
+              <input type="text" placeholder="Search A Technician" className="search-input" />
+              <img src={PersonLogo} alt="Search Icon" className="search-icon" />
+            </div>
+            <h2 className="page-title">Technicians</h2>
+          </div>
+          <div className="technicians-page-content">
+            <div className="technicians-search-panel">
+              <div className="technicians-list">
+                <div className="technician-list-item">
+                  <img src={PersonLogo} alt="Technician Icon" className="technician-icon" />
+                  <div className="technician-name-and-id">
+                    <span>Patrick Nethan</span>
+                    <span className="technician-id">05729</span>
+                  </div>
+                </div>
+                <div className="technician-list-item">
+                  <img src={PersonLogo} alt="Technician Icon" className="technician-icon" />
+                  <div className="technician-name-and-id">
+                    <span>Kresner Leonardo</span>
+                    <span className="technician-id">01593</span>
+                  </div>
+                </div>
+                <div className="technician-list-item">
+                  <img src={PersonLogo} alt="Technician Icon" className="technician-icon" />
+                  <div className="technician-name-and-id">
+                    <span>Prince Brian</span>
+                    <span className="technician-id">03259</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="technicians-info-panel">
+              <h2>Technician's Information</h2>
+              <div className="technician-detail-card">
+                <div className="technician-profile-header">
+                  <img src={PersonLogo} alt="Profile Icon" className="profile-detail-icon" />
+                  <h3>Patrick Nethan</h3>
+                </div>
+              </div>
+
+              <label className="detail-label">Full name</label>
+              <div className="detail-row-name">
+                <input type="text" value="Patrick" readOnly className="detail-input" />
+                <input type="text" value="Nethan" readOnly className="detail-input" />
+              </div>
+              
+              <label className="detail-label contact-email-label">Contact Information</label>
+              <label className="detail-label">Email</label>
+              <div className="detail-row">
+                <div className="input-with-icon-wrapper">
+                  <input type="text" value="PatrickNethan@gmail.com" readOnly className="detail-input" />
+                  <img src={CopyIcon} alt="Copy Icon" className="copy-icon" />
+                </div>
+              </div>
+              <label className="detail-label">Contact No.</label>
+              <div className="detail-row">
+                <div className="input-with-icon-wrapper">
+                  <input type="text" value="0932847387" readOnly className="detail-input" />
+                  <img src={CopyIcon} alt="Copy Icon" className="copy-icon" />
+                </div>
+              </div>
+              <label className="detail-label">Address</label>
+              <div className="detail-row">
+                <div className="input-with-icon-wrapper">
+                  <input type="text" value="Dagupan USA Chicago" readOnly className="detail-input" />
+                </div>
+              </div>
+              <label className="detail-label">Tech ID:</label>
+              <div className="detail-row">
+                <div className="input-with-icon-wrapper">
+                  <input type="text" value="05729" readOnly className="detail-input" />
+                  <img src={CopyIcon} alt="Copy Icon" className="copy-icon" />
+                </div>
+              </div>
+            </div>
+          </div>
         </main>
       </div>
     </div>

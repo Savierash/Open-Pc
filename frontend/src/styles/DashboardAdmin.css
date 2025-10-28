@@ -36,47 +36,46 @@
 
 .top-bar-dashboard {
   display: flex;
-  justify-content: space-between; /* Space out items */
+  justify-content: space-between;
   align-items: center;
-  padding: 15px 30px; /* Adjust padding */
-  background: rgba(0, 0, 0, 0.4); /* Darker, more transparent background */
-  backdrop-filter: blur(15px); /* Stronger blur effect */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  color: white;
+  padding: 10px 1rem;
+  background: rgba(0, 0, 0, 0.5);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   position: sticky;
   top: 0;
-  z-index: 1000;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Add a subtle shadow */
+  z-index: 10;
+  border-radius: 20px;
+  margin: 10px auto;
+  width: calc(100% - 20px);
+  max-width: 1200px;
+  box-sizing: border-box;
 }
 
 .logo-and-nav {
   display: flex;
   align-items: center;
+  gap: 2rem;
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 10px;
-}
-
-.computer-logo {
-  width: 45px;
-  height: 45px;
+  color: #fff;
+  font-size: clamp(1.2rem, 4vw, 1.5rem);
+  font-weight: bold;
+  margin-right: 1rem;
 }
 
 .logo-text {
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: #fff;
-  letter-spacing: 0.5px;
+  font-size: inherit;
+  font-weight: bold;
 }
 
 .logo-line {
-  font-size: 1.8rem;
-  color: #8a2be2; /* Purple color for the separator line */
-  margin: 0 8px;
-  font-weight: 300;
+  color: #fff;
+  font-weight: bold;
+  margin-left: 5px;
 }
 
 .nav-links-dashboard {
@@ -120,31 +119,19 @@
 
 .nav-actions {
   display: flex;
-  align-items: center;
-  gap: 15px;
+  gap: 10px;
+  margin-left: auto;
 }
 
 .profile-icon-dashboard {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #8a2be2; /* Purple border for profile icon */
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
 }
 
-.profile-name {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #e0e0e0;
-}
-
-.profile-role {
-  font-size: 0.9rem;
-  color: #c0c0c0;
-  background-color: rgba(138, 43, 226, 0.2); /* Light purple background for role */
-  padding: 5px 10px;
-  border-radius: 20px;
-  margin-left: 5px;
+.profile-icon-dashboard:hover {
+  transform: scale(1.1);
 }
 
 .btn-login,
@@ -1383,3 +1370,4 @@
   padding: 0 20px; /* Added horizontal padding */
   overflow: hidden;
 }
+
