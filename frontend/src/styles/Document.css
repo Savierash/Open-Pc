@@ -1,0 +1,188 @@
+/* Document page specific styles — dark faded borders for each section */
+.document-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0a0a 0%, #00023f 50%, #000033 100%);
+  color: #fff;
+}
+
+/* reuse top-bar-signup styles from Signup.css if present,
+   otherwise provide minimal fallback so header looks consistent */
+.document-page .top-bar-signup {
+  display: flex;
+  width: 90%;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 1rem;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(8px);
+  position: sticky;
+  top: 0;
+  margin: 10px auto;
+  border-radius: 12px;
+  box-sizing: border-box;
+}
+
+/* Container matching signup layout */
+.document-page .signup-container {
+  width: 825px;
+  height: 493px;
+  max-width: none;
+  margin: 24px auto;
+  padding: 50px;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.548);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.03);
+  display: flex;
+  justify-content: center;
+
+}
+
+/* Form base */
+.document-page .signup-form {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Labels outside sections: positioned above, left-aligned */
+.document-page .signup-form label {
+  display: block;
+  margin-bottom: 8px;
+  text-align: left;
+  color: #e6e6e6;
+  font-weight: 600;
+  width: 100%;
+}
+
+/* Distinct section look: dark, faded border and subtle background (now only contains file-row) */
+.document-page .signup-form section {
+  border: 1px solid #ffffff;
+  background: rgba(10, 10, 10, 0.45);
+  padding: 14px;
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.06);
+  transition: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* ensure no hover visual change for sections (override any other hover rules) */
+.document-page .signup-form section:hover {
+  transform: none !important;
+  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.06) !important;
+  border-color: #ffffff !important; /* keep border white on hover */
+}
+
+/* spacing between sections */
+.document-page .signup-form section + section {
+  margin-top: 12px;
+}
+
+/* File input row */
+.document-page .signup-form section .file-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+}
+
+/* Thumbnail */
+.document-page .signup-form section img {
+  width: 120px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #ffffff; /* changed to white */
+}
+
+/* Buttons inside section (View / Download / Remove) */
+.document-page .signup-form section .file-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Make signup-button consistent if defined in Signup.css; fallback styling */
+.document-page .signup-button,
+.document-page .signup-form section button {
+  background: linear-gradient(135deg,#442d79 0%,#6042b9 100%);
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  outline: none;
+  margin-top: 50px;
+}
+
+/* Remove button variant */
+.document-page .signup-form section button.remove {
+  background: rgba(255,0,0,0.12);
+}
+
+/* Error text */
+.document-page .signup-form .error {
+  color: #ff6b6b;
+  font-weight: 600;
+}
+
+/* file input styling - primary color #622399 */
+.document-page .signup-form section input[type="file"] {
+  color: #622399;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+/* style the file selector button (modern browsers) */
+.document-page .signup-form section input[type="file"]::file-selector-button {
+  background: #622399;
+  color: #ffffff;
+  border: none;
+  padding: 6px 10px;
+  margin-right: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* WebKit fallback */
+.document-page .signup-form section input[type="file"]::-webkit-file-upload-button {
+  background: #622399;
+  color: #ffffff;
+  border: none;
+  padding: 6px 10px;
+  margin-right: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* ensure accessibility contrast for file name text */
+.document-page .signup-form section input[type="file"]::file-selector-button,
+.document-page .signup-form section input[type="file"]::-webkit-file-upload-button {
+  outline: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .document-page .signup-container { padding: 12px; }
+  .document-page .signup-form section { padding: 12px; }
+  .document-page .signup-form section img { width: 96px; height: 64px; }
+  .document-page .signup-form section .file-actions { flex-direction: row; gap: 6px; }
+  .document-page .signup-form section {
+    align-items: flex-start;
+  }
+  .document-page .signup-form label {
+    text-align: left;
+  }
+}

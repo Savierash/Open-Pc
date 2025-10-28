@@ -52,7 +52,7 @@ const AuditorProfile = () => {
               </a>
             </li>
             <li>
-              <a href="/reports" className="sidebar-link">
+              <a href="/reports-auditor" className="sidebar-link">
                 <img src={ClipboardLogo} className="menu-icon" alt="Reports" />
                 <span>Reports</span>
               </a>
@@ -64,7 +64,7 @@ const AuditorProfile = () => {
               </a>
             </li>
             <li>
-              <a href="/account-setting" className="sidebar-link active">
+              <a href="/auditor-profile" className="sidebar-link active">
                 <img src={GearFill} className="menu-icon" alt="Account Setting" />
                 <span>Account Setting</span>
               </a>

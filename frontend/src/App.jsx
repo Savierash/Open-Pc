@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import Homepage from './pages/Homepage';  
 import Dashboard from './pages/Dashboard.jsx'; 
 import Services from './components/Services';
@@ -26,6 +26,7 @@ import TechnicianProfile from './components/TechnicianProfile.jsx';
 import AdminProfile from './components/AdminProfile.jsx';
 import UnitStatusTechnician from './components/UnitStatusTechnician.jsx';
 
+import DocumentPage from './pages/document.jsx';
 
 /*STYLES*/
 import './styles/Homepage.css';
@@ -41,6 +42,7 @@ import './styles/About.css';
 import './styles/ReportsTech.css';
 import './styles/Role.css'; 
 import './styles/AuditorProfile.css'; // Import the new AuditorProfile stylesheet
+import './styles/ReportsAuditor.css'; // Import ReportsAuditor stylesheet
 import './styles/TechnicianProfile.css';
 import './styles/AdminProfile.css';
 
@@ -49,6 +51,7 @@ function App() {
   return (
     <Router>
       <Routes>
+          <Route path="/document" element={<Navigate to="/documents" replace />} />
           <Route path="/" element={<Homepage />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/services" element={<Services />} />
@@ -68,12 +71,12 @@ function App() {
           <Route path="/reports-auditor" element={<ReportsAuditor />} />
           <Route path="/role" element={<Role />} /> 
           <Route path="/technicians" element={<Technicians />} /> 
-        <Route path="/auditor-profile" element={<AuditorProfile />} />
-        <Route path="/dashboard-technician" element={<DashboardTechnician />} />
-        <Route path="/dashboard-admin" element={<DashboardAdmin />} />
-        <Route path="/technician-profile" element={<TechnicianProfile />} />
-        <Route path="/unit-status-technician" element={<UnitStatusTechnician />} />
-        <Route path="/admin-profile" element={<AdminProfile />} />
+          <Route path="/auditor-profile" element={<AuditorProfile />} />
+          <Route path="/dashboard-technician" element={<DashboardTechnician />} />
+          <Route path="/unit-status-technician" element={<UnitStatusTechnician />} />
+          <Route path="/technician-profile" element={<TechnicianProfile />} />
+          <Route path="/dashboard-admin" element={<DashboardAdmin />} />
+          <Route path="/admin-profile" element={<AdminProfile />} />
         </Routes>
     </Router>
   );

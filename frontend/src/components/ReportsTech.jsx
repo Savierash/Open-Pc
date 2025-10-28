@@ -130,12 +130,12 @@ const ReportsTech = () => {
                 <span>Last Issued: September 1, 2025</span>
               </div>
               <div className="issues-checkbox-grid">
-                <label><input type="checkbox" checked={reportIssues.ramIssue} onChange={() => handleIssueChange('ramIssue')} /> Ram Issue</label>
-                <label><input type="checkbox" checked={reportIssues.osIssue} onChange={() => handleIssueChange('osIssue')} /> OS Issue</label>
-                <label><input type="checkbox" checked={reportIssues.cpuIssue} onChange={() => handleIssueChange('cpuIssue')} /> CPU Issue</label>
-                <label><input type="checkbox" checked={reportIssues.noInternet} onChange={() => handleIssueChange('noInternet')} /> No Internet</label>
-                <label><input type="checkbox" checked={reportIssues.storageIssue} onChange={() => handleIssueChange('storageIssue')} /> Storage Issue</label>
-                <label><input type="checkbox" checked={reportIssues.virus} onChange={() => handleIssueChange('virus')} /> Virus</label>
+                <label><input type="checkbox" checked={reportIssues.ramIssue} onChange={() => handleIssueChange('ramIssue')} disabled /> Ram Issue</label>
+                <label><input type="checkbox" checked={reportIssues.osIssue} onChange={() => handleIssueChange('osIssue')} disabled /> OS Issue</label>
+                <label><input type="checkbox" checked={reportIssues.cpuIssue} onChange={() => handleIssueChange('cpuIssue')} disabled /> CPU Issue</label>
+                <label><input type="checkbox" checked={reportIssues.noInternet} onChange={() => handleIssueChange('noInternet')} disabled /> No Internet</label>
+                <label><input type="checkbox" checked={reportIssues.storageIssue} onChange={() => handleIssueChange('storageIssue')} disabled /> Storage Issue</label>
+                <label><input type="checkbox" checked={reportIssues.virus} onChange={() => handleIssueChange('virus')} disabled /> Virus</label>
               </div>
               <div className="other-issues-textarea">
                 <textarea placeholder="Other Issues: No Signal on the monitor"></textarea>
