@@ -5,6 +5,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import ComputerLogo1 from '../assets/LOGO1.png';
 import PersonLogo from '../assets/Person.png';
 import LockLogo from '../assets/Lock.png';
+import PhoneIcon from '../assets/Telephone.png';
 import axios from 'axios';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -157,7 +158,7 @@ const Signup = () => {
                 placeholder="Phone number"
                 required
               />
-              <img src={PersonLogo} alt="Phone Number icon" className="input-icon" />
+              <img src={PhoneIcon} alt="Phone Number icon" className="input-icon" />
             </div>
 
             <div className="input-wrapper">

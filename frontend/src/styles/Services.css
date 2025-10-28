@@ -218,12 +218,16 @@
   position: relative;
 }
 
-.nav-links-services a:hover,
-.nav-links-services a.active {
+.nav-links-services a:hover {
   background-color: #8a2be2;
   color: #fff;
   padding: 5px;
   border-radius: 5px;
+}
+.nav-links-about a.active{
+  color: #fff;  
+  padding: 5px;
+  border-radius: 5px;  
 }
 
 .nav-actions {

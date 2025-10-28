@@ -79,12 +79,16 @@
   position: relative;
 }
 
-.nav-links-about a:hover,
-.nav-links-about a.active {
-  color: #ffffff;
-  background-color: #8a2be2;
+.nav-links-about a:hover {
+  background-color: #8a2be2;  
+  color: #fff;  
   padding: 5px;
-  border-radius: 5px;
+  border-radius: 5px;             
+}
+.nav-links-about a.active{
+  color: #fff;  
+  padding: 5px;
+  border-radius: 5px;  
 }
 
 .auth-buttons {
