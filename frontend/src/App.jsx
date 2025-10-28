@@ -42,6 +42,7 @@ import './styles/About.css';
 import './styles/ReportsTech.css';
 import './styles/Role.css'; 
 import './styles/AuditorProfile.css'; // Import the new AuditorProfile stylesheet
+import './styles/ReportsAuditor.css'; // Import ReportsAuditor stylesheet
 import './styles/TechnicianProfile.css';
 import './styles/AdminProfile.css';
 
