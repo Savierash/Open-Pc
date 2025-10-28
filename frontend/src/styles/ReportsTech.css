@@ -232,6 +232,11 @@
   accent-color: #8a2be2; /* Purple checkbox */
 }
 
+.issues-checkbox-grid input[type="checkbox"]:disabled {
+  opacity: 1; /* Ensure full visibility */
+  cursor: not-allowed;
+}
+
 .other-issues-textarea textarea {
   width: 100%;
   min-height: 100px;

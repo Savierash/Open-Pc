@@ -12,10 +12,23 @@ import PersonLogo from "../assets/Person.png";
 
 const UnitStatusTechnician = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
+  const [selectedUnit, setSelectedUnit] = useState({
+    name: 'ITS300-PC-002',
+    os: 'Windows 11',
+    ram: '16GB',
+    storage: '128GB SSD',
+    cpu: 'Core i3 10th Gen',
+    lastIssued: 'September 12, 2025',
+    status: 'Maintenance',
+  });
 
   const handleNavClick = (path) => {
     setActiveLink(path);
     window.location.href = path;
+  };
+
+  const handleUnitDetailChange = (field, value) => {
+    setSelectedUnit(prev => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -97,32 +110,66 @@ const UnitStatusTechnician = () => {
             <div className="unit-status-info-panel">
               <h2 className="panel-title">INFORMATION</h2>
               <div className="info-item">
-                <span>ITS300-PC-002</span>
+                <input 
+                  type="text" 
+                  value={selectedUnit.name}
+                  onChange={(e) => handleUnitDetailChange('name', e.target.value)}
+                  className="info-input"
+                />
                 <img src={ClipboardLogo} alt="Edit Icon" className="edit-icon" />
               </div>
               <div className="info-item">
-                <span>Operating System: Windows 11</span>
+                <input 
+                  type="text" 
+                  value={selectedUnit.os}
+                  onChange={(e) => handleUnitDetailChange('os', e.target.value)}
+                  className="info-input"
+                />
                 <img src={ClipboardLogo} alt="Edit Icon" className="edit-icon" />
               </div>
               <div className="info-item">
-                <span>Ram: 16GB</span>
+                <input 
+                  type="text" 
+                  value={selectedUnit.ram}
+                  onChange={(e) => handleUnitDetailChange('ram', e.target.value)}
+                  className="info-input"
+                />
                 <img src={ClipboardLogo} alt="Edit Icon" className="edit-icon" />
               </div>
               <div className="info-item">
-                <span>Storage: 128GB SSD</span>
+                <input 
+                  type="text" 
+                  value={selectedUnit.storage}
+                  onChange={(e) => handleUnitDetailChange('storage', e.target.value)}
+                  className="info-input"
+                />
                 <img src={ClipboardLogo} alt="Edit Icon" className="edit-icon" />
               </div>
               <div className="info-item">
-                <span>CPU: Core i3 10th Gen</span>
+                <input 
+                  type="text" 
+                  value={selectedUnit.cpu}
+                  onChange={(e) => handleUnitDetailChange('cpu', e.target.value)}
+                  className="info-input"
+                />
                 <img src={ClipboardLogo} alt="Edit Icon" className="edit-icon" />
               </div>
               <div className="info-item">
-                <span>Last Issued: September 12, 2025</span>
+                <input 
+                  type="text" 
+                  value={selectedUnit.lastIssued}
+                  onChange={(e) => handleUnitDetailChange('lastIssued', e.target.value)}
+                  className="info-input"
+                />
                 <img src={ClipboardLogo} alt="Edit Icon" className="edit-icon" />
               </div>
               <div className="set-status-section">
                 <span>SET STATUS:</span>
-                <select className="status-dropdown">
+                <select 
+                  className="status-dropdown"
+                  value={selectedUnit.status}
+                  onChange={(e) => handleUnitDetailChange('status', e.target.value)}
+                >
                   <option>Maintenance</option>
                   <option>Functional</option>
                   <option>Out Of Order</option>
