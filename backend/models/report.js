@@ -1,4 +1,4 @@
-// backend/models/unit.js
+// backend/models/report.js
 const mongoose = require('mongoose');
 
 const issuesSchema = new mongoose.Schema({
@@ -10,17 +10,15 @@ const issuesSchema = new mongoose.Schema({
   virus: { type: Boolean, default: false }
 }, { _id: false });
 
-const unitSchema = new mongoose.Schema({
-  name: { type: String, required: true, trim: true },
+const reportSchema = new mongoose.Schema({
+  unit: { type: mongoose.Schema.Types.ObjectId, ref: 'Unit', required: true },
   lab: { type: mongoose.Schema.Types.ObjectId, ref: 'Lab', required: true },
-  status: { type: String, default: 'Functional' }, // Functional, Maintenance, Out Of Order
-  os: { type: String, default: '' },
-  ram: { type: String, default: '' },
-  storage: { type: String, default: '' },
-  cpu: { type: String, default: '' },
-  lastIssued: { type: String, default: '' },
   technicianId: { type: String, default: '' },
+  dateIssued: { type: String, default: '' },
+  lastIssued: { type: String, default: '' },
+  status: { type: String, default: 'Functional' },
   issues: { type: issuesSchema, default: () => ({}) },
+  otherIssues: { type: String, default: '' }
 }, { timestamps: true });
 
-module.exports = mongoose.model('Unit', unitSchema);
+module.exports = mongoose.model('Report', reportSchema);

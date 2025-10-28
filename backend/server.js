@@ -54,6 +54,7 @@ app.use('/api/dashboard', dashboardRouter);
 // Mount units and labs — use plural to match frontend expectations
 app.use('/api/units', unitsRouter);
 app.use('/api/labs', labsRouter);
+app.use('/api/reports', require('./routes/reports'));
 
 // Optional alias: accept singular '/api/lab' too (helps old clients/devs)
 app.use('/api/lab', labsRouter);
