@@ -70,6 +70,12 @@ function App() {
           <Route path="/reports-auditor" element={<ReportsAuditor />} />
           <Route path="/role" element={<Role />} /> 
           <Route path="/technicians" element={<Technicians />} /> 
+          <Route path="/auditor-profile" element={<AuditorProfile />} />
+          <Route path="/dashboard-technician" element={<DashboardTechnician />} />
+          <Route path="/unit-status-technician" element={<UnitStatusTechnician />} />
+          <Route path="/technician-profile" element={<TechnicianProfile />} />
+          <Route path="/dashboard-admin" element={<DashboardAdmin />} />
+          <Route path="/admin-profile" element={<AdminProfile />} />
         </Routes>
     </Router>
   );
