@@ -55,6 +55,8 @@ const Technicians = () => {
             alt="Profile Icon" 
             className="profile-icon-dashboard"
           />
+          <span className="profile-name">John Paul</span> {/* Example Name */}
+          <span className="profile-role">Auditor</span> {/* Example Role */}
         </div>
       </header>
 
@@ -85,6 +87,19 @@ const Technicians = () => {
               >
                 <img src={StackLogo} alt="Inventory Icon" className="menu-icon" />
                 <span>Inventory</span>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/unit-status-auditor" 
+                className={`sidebar-link ${activeLink === '/unit-status-auditor' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/unit-status-auditor');
+                }}
+              >
+                <img src={PcDisplayLogo} alt="Unit Status Icon" className="menu-icon" />
+                <span>Unit Status</span>
               </a>
             </li>
             <li>

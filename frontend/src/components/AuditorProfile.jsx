@@ -8,6 +8,7 @@ import HouseLogo from "../assets/HouseFill.png";
 import StackLogo from "../assets/Stack.png";
 import ClipboardLogo from "../assets/ClipboardCheck.png";
 import ToolsLogo from "../assets/tools_logo.png";
+import PcDisplayLogo from "../assets/PcDisplayHorizontal.png"; // Added PcDisplayLogo
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const AuditorProfile = () => {
@@ -49,6 +50,12 @@ const AuditorProfile = () => {
               <a href="/inventory" className="sidebar-link">
                 <img src={StackLogo} className="menu-icon" alt="Inventory" />
                 <span>Inventory</span>
+              </a>
+            </li>
+            <li>
+              <a href="/unit-status-auditor" className="sidebar-link">
+                <img src={PcDisplayLogo} className="menu-icon" alt="Unit Status" />
+                <span>Unit Status</span>
               </a>
             </li>
             <li>

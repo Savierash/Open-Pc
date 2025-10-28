@@ -156,6 +156,19 @@ const ReportsAuditor = () => {
             </li>
             <li>
               <a 
+                href="/unit-status-auditor" 
+                className={`sidebar-link ${activeLink === '/unit-status-auditor' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/unit-status-auditor');
+                }}
+              >
+                <img src={PcDisplayLogo} alt="Unit Status Icon" className="menu-icon" />
+                <span>Unit Status</span>
+              </a>
+            </li>
+            <li>
+              <a 
                 href="/reports-auditor" 
                 className={`sidebar-link ${activeLink === '/reports-auditor' ? 'active' : ''}`}
                 onClick={(e) => {
