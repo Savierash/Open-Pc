@@ -80,16 +80,10 @@ function App() {
           <Route path="/auditor-profile" element={<AuditorProfile />} />
           <Route path="/dashboard-technician" element={<DashboardTechnician />} />
           <Route path="/unit-status-technician" element={<UnitStatusTechnician />} />
-<<<<<<< Updated upstream
-          <Route path="/technician-profile" element={<TechnicianProfile />} />
-          <Route path="/dashboard-admin" element={<DashboardAdmin />} />
-          <Route path="/admin-profile" element={<AdminProfile />} />
-          <Route path="/unit-status-auditor" element={<UnitStatusAuditor />} />
-=======
           <Route path="/technician-profile" element={<RoleRoute allowed={["technician","admin"]}><TechnicianProfile /></RoleRoute>} />
           <Route path="/dashboard-admin" element={<RoleRoute allowed={["admin"]}><DashboardAdmin /></RoleRoute>} />
           <Route path="/admin-profile" element={<RoleRoute allowed={["admin"]}><AdminProfile /></RoleRoute>} />
->>>>>>> Stashed changes
+          <Route path="/unit-status-auditor" element={<RoleRoute allowed={["auditor","admin"]}><UnitStatusAuditor /></RoleRoute>} />
         </Routes>
       </Router>
     </AuthProvider>

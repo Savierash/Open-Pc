@@ -1,6 +1,15 @@
 import axios from 'axios';
 
-const API_BASE = import.meta.env.VITE_API_BASE || import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// Normalize base URL: accept either VITE_API_BASE or VITE_API_URL and ensure it target the /api path
+function ensureApiBase(raw) {
+  if (!raw) return 'http://localhost:5000/api';
+  const trimmed = String(raw).trim();
+  if (trimmed.endsWith('/api')) return trimmed;
+  if (trimmed.endsWith('/')) return trimmed + 'api';
+  return trimmed + '/api';
+}
+
+const API_BASE = ensureApiBase(import.meta.env.VITE_API_BASE || import.meta.env.VITE_API_URL);
 
 const api = axios.create({
   baseURL: API_BASE,

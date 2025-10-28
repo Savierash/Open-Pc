@@ -12,16 +12,7 @@ import StackLogo from '../assets/Stack.png';
 import ComputerLabImage from '../assets/BACKGROUND 2.png';
 import PersonLogo from '../assets/Person.png';
 import ToolsLogo from '../assets/tools_logo.png';
-import PcDisplayLogo from "../assets/PcDisplayHorizontal.png"; // Added for unit cards
-
-<<<<<<< Updated upstream
-// Use Vite env style
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
-console.log('Inventory: API_BASE =', API_BASE);
-=======
-// centralized api client
->>>>>>> Stashed changes
-
+import PcDisplayLogo from '../assets/PcDisplayHorizontal.png'; // Added for unit cards
 
 const Inventory = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
@@ -37,6 +28,7 @@ const Inventory = () => {
   useEffect(() => {
     setActiveLink(window.location.pathname);
     fetchLabs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const navigate = useNavigate();
@@ -46,21 +38,11 @@ const Inventory = () => {
     navigate(path);
   };
 
-<<<<<<< Updated upstream
- const fetchLabs = async () => {
-  setLoading(true);
-  try {
-    const res = await axios.get(`${API_BASE}/lab`);
-    setLabs(res.data);
-    if (res.data.length > 0 && !selectedLab) {
-      setSelectedLab(res.data[0]); // Select the first lab by default
-      fetchUnitsByLab(res.data[0]._id); // Fetch units for the first lab
-=======
   // ----- Labs -----
   const fetchLabs = async () => {
     setLoading(true);
     try {
-  const res = await api.get('/lab');
+      const res = await api.get('/lab');
       setLabs(res.data || []);
       if (res.data && res.data.length > 0 && !selectedLab) {
         setSelectedLab(res.data[0]); // Select the first lab by default
@@ -72,47 +54,22 @@ const Inventory = () => {
       window.alert('Failed to load labs. See console for details.');
     } finally {
       setLoading(false);
->>>>>>> Stashed changes
     }
-  } catch (err) {
-    console.error('Failed to fetch labs', err);
-    console.error('err.response:', err?.response?.data ?? err?.message);
-    window.alert('Failed to load labs. See console for details.');
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
-const addLab = async () => {
-  const newLabName = window.prompt('Enter new lab name:');
-  if (!newLabName) return;
-  const trimmed = newLabName.trim();
-  if (trimmed === '') return window.alert('Lab name cannot be empty.');
+  const addLab = async () => {
+    const newLabName = window.prompt('Enter new lab name:');
+    if (!newLabName) return;
+    const trimmed = newLabName.trim();
+    if (trimmed === '') return window.alert('Lab name cannot be empty.');
 
-  if (labs.some(l => l.name.toLowerCase() === trimmed.toLowerCase())) {
-    return window.alert('This lab already exists.');
-  }
+    if (labs.some(l => l.name && l.name.toLowerCase() === trimmed.toLowerCase())) {
+      return window.alert('This lab already exists.');
+    }
 
-<<<<<<< Updated upstream
-  setAdding(true);
-  try {
-    const res = await axios.post(`${API_BASE}/lab`, { name: trimmed });
-    setLabs(prev => [...prev, res.data]);
-    setSelectedLab(res.data); // Select newly added lab
-    setUnits([]); // Clear units for new lab
-  } catch (err) {
-    console.error('Failed to add lab', err);
-    console.error('err.response:', err?.response?.data ?? err?.message);
-    const message = err?.response?.data?.message || 'Failed to add lab';
-    window.alert(message);
-  } finally {
-    setAdding(false);
-  }
-};
-=======
     setAdding(true);
     try {
-  const res = await api.post('/lab', { name: trimmed });
+      const res = await api.post('/lab', { name: trimmed });
       setLabs(prev => [...prev, res.data]);
       setSelectedLab(res.data); // Select newly added lab
       setUnits([]); // Clear units for new lab
@@ -125,7 +82,6 @@ const addLab = async () => {
       setAdding(false);
     }
   };
->>>>>>> Stashed changes
 
   // Remove a lab by index (with confirmation)
   const removeLab = async (index) => {
@@ -135,11 +91,7 @@ const addLab = async () => {
     if (!confirmed) return;
 
     try {
-<<<<<<< Updated upstream
-      await axios.delete(`${API_BASE}/lab/${lab._id}`);
-=======
-  await api.delete(`/lab/${lab._id}`);
->>>>>>> Stashed changes
+      await api.delete(`/lab/${lab._id}`);
       const newLabs = labs.filter((_, i) => i !== index);
       setLabs(newLabs);
       if (selectedLab?._id === lab._id) {
@@ -160,18 +112,13 @@ const addLab = async () => {
   const fetchUnitsByLab = async (labId) => {
     setLoading(true);
     try {
-<<<<<<< Updated upstream
-      const res = await axios.get(`${API_BASE}/unit/lab/${labId}`);
-      setUnits(res.data);
-      // Automatically select the first unit if units are fetched and no unit is selected
-      if (res.data.length > 0 && !selectedUnit) {
-=======
       // Prefer nested path that server handles: /api/labs/:labId/units
-  const res = await api.get(`/lab/${labId}/units`);
+      const res = await api.get(`/lab/${labId}/units`);
       setUnits(res.data || []);
       if (res.data && res.data.length > 0 && !selectedUnit) {
->>>>>>> Stashed changes
         setSelectedUnit(res.data[0]);
+      } else if (!res.data || res.data.length === 0) {
+        setSelectedUnit(null);
       }
     } catch (err) {
       console.error(`Failed to fetch units for lab ${labId}`, err);
@@ -189,11 +136,7 @@ const addLab = async () => {
     if (trimmed === '') return window.alert('Unit name cannot be empty.');
 
     try {
-<<<<<<< Updated upstream
-      const res = await axios.post(`${API_BASE}/unit`, { name: trimmed, lab: selectedLab._id });
-=======
-  const res = await api.post('/units', { name: trimmed, lab: selectedLab._id });
->>>>>>> Stashed changes
+      const res = await api.post('/units', { name: trimmed, lab: selectedLab._id });
       setUnits(prev => [...prev, res.data]);
     } catch (err) {
       console.error('Failed to add unit', err);
@@ -212,7 +155,7 @@ const addLab = async () => {
 
   // Filtered units for display
   const filteredUnits = units.filter(unit => {
-    const matchesSearch = unit.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = unit.name?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = unitStatuses.length === 0 || unitStatuses.includes(unit.status);
     return matchesSearch && matchesStatus;
   });
@@ -411,7 +354,7 @@ const addLab = async () => {
                     >
                       <img src={PcDisplayLogo} alt="PC Icon" className="inventory-pc-card-icon" />
                       <span>{unit.name}</span>
-                      <span>{unit.status} &#x25cf;</span>
+                      <span className="inventory-pc-status">{unit.status} &#x25cf;</span>
                     </div>
                   ))
                 )}
@@ -426,7 +369,7 @@ const addLab = async () => {
                   <div className="inventory-info-item">
                     <input 
                       type="text" 
-                      value={selectedUnit.name}
+                      value={selectedUnit.name || ''}
                       onChange={(e) => setSelectedUnit({ ...selectedUnit, name: e.target.value })}
                       className="inventory-info-input"
                     />
@@ -436,7 +379,7 @@ const addLab = async () => {
                     <span className="inventory-info-label">Operating System:</span>
                     <input 
                       type="text" 
-                      value={selectedUnit.os}
+                      value={selectedUnit.os || ''}
                       onChange={(e) => setSelectedUnit({ ...selectedUnit, os: e.target.value })}
                       className="inventory-info-input"
                     />
@@ -446,7 +389,7 @@ const addLab = async () => {
                     <span className="inventory-info-label">Ram:</span>
                     <input 
                       type="text" 
-                      value={selectedUnit.ram}
+                      value={selectedUnit.ram || ''}
                       onChange={(e) => setSelectedUnit({ ...selectedUnit, ram: e.target.value })}
                       className="inventory-info-input"
                     />
@@ -456,7 +399,7 @@ const addLab = async () => {
                     <span className="inventory-info-label">Storage:</span>
                     <input 
                       type="text" 
-                      value={selectedUnit.storage}
+                      value={selectedUnit.storage || ''}
                       onChange={(e) => setSelectedUnit({ ...selectedUnit, storage: e.target.value })}
                       className="inventory-info-input"
                     />
@@ -466,7 +409,7 @@ const addLab = async () => {
                     <span className="inventory-info-label">CPU:</span>
                     <input 
                       type="text" 
-                      value={selectedUnit.cpu}
+                      value={selectedUnit.cpu || ''}
                       onChange={(e) => setSelectedUnit({ ...selectedUnit, cpu: e.target.value })}
                       className="inventory-info-input"
                     />
@@ -476,7 +419,7 @@ const addLab = async () => {
                     <span className="inventory-info-label">Last Issued:</span>
                     <input 
                       type="text" 
-                      value={selectedUnit.lastIssued}
+                      value={selectedUnit.lastIssued || ''}
                       onChange={(e) => setSelectedUnit({ ...selectedUnit, lastIssued: e.target.value })}
                       className="inventory-info-input"
                     />
@@ -484,19 +427,6 @@ const addLab = async () => {
                   </div>
                   <div className="inventory-set-status-section">
                     <span>SET STATUS:</span>
-<<<<<<< Updated upstream
-                    <select 
-                      className="inventory-status-dropdown"
-                      value={selectedUnit.status}
-                      onChange={(e) => setSelectedUnit({ ...selectedUnit, status: e.target.value })}
-                    >
-                      <option value="Functional">Functional</option>
-                      <option value="Maintenance">Maintenance</option>
-                      <option value="Out Of Order">Out Of Order</option>
-                    </select>
-                  </div>
-                  <button className="inventory-save-button">Save</button>
-=======
                       <select
                         className="inventory-status-dropdown"
                         value={selectedUnit.status || 'functional'}
@@ -510,7 +440,7 @@ const addLab = async () => {
                   <button
                     className="inventory-save-button"
                     onClick={async () => {
-                      // Optional: implement save to backend
+                      // save to backend
                       try {
                         const normalizeStatus = (s) => {
                           if (!s) return 'functional';
@@ -538,7 +468,6 @@ const addLab = async () => {
                   >
                     Save
                   </button>
->>>>>>> Stashed changes
                 </>
               ) : (
                 <div>Select a unit to view details</div>
@@ -552,3 +481,4 @@ const addLab = async () => {
 };
 
 export default Inventory;
+ 
