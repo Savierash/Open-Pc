@@ -1,0 +1,756 @@
+/* AdminTechRequests.css */
+
+.profile-container {
+  padding: 1rem;
+  max-width: 900px;
+  margin: 0 auto;
+  color: #fff;
+}
+
+.profile-container h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.3rem;
+  color: #fff;
+}
+
+.profile-container p {
+  font-size: 0.9rem;
+  color: #a5b3c2;
+  margin-bottom: 1.5rem;
+}
+
+.profile-card {
+  background: rgba(0, 0, 0, 0.1); /* Changed to match input field background */
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.profile-avatar {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.profile-avatar img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #8a2be2;
+}
+
+.user-info .user-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 0.1rem;
+  color: #fff;
+}
+
+.user-info .user-detail {
+  font-size: 0.8rem;
+  color: #a5b3c2;
+  margin-bottom: 0;
+}
+
+.contact-info {
+  text-align: right;
+  color: #a5b3c2;
+}
+
+.contact-info p {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.profile-actions {
+  display: flex;
+  flex-direction: column; /* Added to stack buttons */
+  gap: 8px;
+}
+
+.delete-button,
+.upload-button {
+  background: none;
+  border: 1px solid #8a2be2;
+  color: #8a2be2;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.upload-button {
+  background-color: #8a2be2;
+  color: white;
+}
+
+.delete-button:hover {
+  background-color: rgba(255, 0, 0, 0.2);
+  color: #ff0000;
+  border-color: #ff0000;
+}
+
+.upload-button:hover {
+  background-color: #9b48f9;
+}
+
+.form-section h3 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: #fff;
+}
+
+.form-row {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.form-group {
+  flex: 1;
+  min-width: 220px;
+  position: relative;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.8rem;
+  color: #a5b3c2;
+  margin-bottom: 0.3rem;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"] {
+  width: 100%;
+  padding: 10px 40px 10px 15px; 
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1rem;
+  outline: none;
+  border: none; /* Remove border from input itself */
+  background-color: transparent; /* Make input background transparent */
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="email"]:focus,
+.form-group input[type="password"]:focus {
+  border-color: transparent; /* Remove border-color focus for input */
+}
+
+.input-with-icon {
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 8px 12px;
+  width: 100%;
+  box-sizing: border-box; /* Ensure padding is included in width */
+}
+
+.input-with-icon:focus-within {
+  border-color: #8a2be2; /* Apply focus border to the container */
+}
+
+.input-with-icon input {
+  flex-grow: 1;
+  padding: 0; /* Remove internal padding from input */
+  border: none; /* Ensure no border on the input itself */
+  background: transparent; /* Ensure transparent background */
+}
+
+.input-with-icon .input-icon {
+  position: static; /* Remove absolute positioning */
+  transform: none; /* Remove transform */
+  margin-left: 8px; /* Add some spacing between input and icon */
+  width: 16px;
+  height: 16px;
+  filter: brightness(1.2); /* Adjust icon brightness */
+}
+
+.password-row {
+  display: flex; /* Ensure it's a flex container */
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 1.5rem; /* Re-introduce gap to separate input and button */
+  /* Removed justify-content: space-between; as it's not needed with flex-grow and fixed width button */
+}
+
+.password-row .form-group {
+  flex: 1; /* Allow password input to grow and shrink */
+  min-width: 220px; /* Maintain minimum width as other form-groups */
+  margin-right: 0; /* Ensure no extra margin */
+  width: auto; /* Allow flex to manage width */
+}
+
+.logout-button {
+  background-color: #8a2be2;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+  flex-shrink: 0; /* Prevent button from shrinking */
+  width: 120px; /* Set a fixed width for the button */
+  text-align: center;
+}
+
+.logout-button:hover {
+  background-color: #9b48f9;
+}
+
+.profile-icon-dashboard {
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.profile-name {
+  font-weight: bold;
+  margin-left: 8px;
+  font-size: 0.9rem;
+}
+
+.profile-role {
+  color: #a5b3c2;
+  margin-left: 4px;
+  font-size: 0.8rem;
+}
+
+.technicians-info-panel {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  width: 100%;
+  color: #fff;
+}
+
+.technicians-info-panel h2 {
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.technician-profile-card {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.profile-detail-icon {
+  width: 48px;
+  height: 48px;
+}
+
+.profile-name {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.technicians-info-panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.name-fields-container {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.name-field {
+  flex: 1;
+}
+
+.input-field {
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.detail-input {
+  width: 100%;
+}
+
+.name-field .detail-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #fff;
+}
+
+.name-field .detail-input {
+  width: 100%;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+}
+
+/* Ensure all other inputs and wrappers take full width */
+.input-field {
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.input-with-icon-wrapper {
+  width: 100%;
+}
+
+.detail-input {
+  width: 100%;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+}
+
+.contact-and-documents {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.contact-details {
+  flex: 1;
+  width: 100%;
+}
+
+.field-group {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.field-group:last-child {
+  margin-bottom: 0;
+}
+
+/* Consistent label styling across all fields */
+.detail-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #fff;
+}
+
+.input-field {
+  margin-bottom: 1rem;
+}
+
+.input-field .detail-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: #a5b3c2;
+}
+
+.input-field .detail-input {
+  width: 100%;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+}
+
+/* Make the first two input fields (name fields) display side by side */
+.technicians-info-panel > .input-field:nth-child(3),
+.technicians-info-panel > .input-field:nth-child(4) {
+  display: inline-block;
+  width: calc(50% - 0.5rem);
+}
+
+.technicians-info-panel > .input-field:nth-child(3) {
+  margin-right: 1rem;
+}
+
+.input-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group .detail-input {
+  width: 100%;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.input-label {
+  font-size: 0.8rem;
+  color: #a5b3c2;
+}
+
+.contact-section {
+  margin-bottom: 1.5rem;
+}
+
+.contact-and-documents {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.contact-details {
+  flex: 1;
+}
+
+.field-group {
+  margin-bottom: 1rem;
+}
+
+.field-group:last-child {
+  margin-bottom: 0;
+}
+
+.detail-label {
+  display: block;
+  font-size: 0.9rem;
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.input-with-icon-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.input-with-icon-wrapper .detail-input {
+  width: 100%;
+  padding: 10px 40px 10px 15px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+}
+
+.copy-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  opacity: 0.7;
+  filter: brightness(0) invert(1); /* This will make the icon white */
+}
+
+.copy-icon:hover {
+  opacity: 1;
+}
+
+.documents-section {
+  width: 200px;
+}
+
+.document-box {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 2rem;
+  width: 100%;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.document-icon {
+  width: 48px;
+  height: 48px;
+  opacity: 0.7;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  justify-content: flex-start;
+}
+
+.accept-button,
+.decline-button {
+  padding: 0.8rem 2rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.accept-button {
+  background-color: #28a745;
+  color: white;
+}
+
+.accept-button:hover {
+  background-color: #218838;
+}
+
+.decline-button {
+  background-color: #dc3545;
+  color: white;
+}
+
+.decline-button:hover {
+  background-color: #c82333;
+}
+
+@media (max-width: 768px) {
+  .technicians-info-panel {
+    padding: 1rem;
+  }
+
+  .name-inputs {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .contact-and-documents {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .documents-section {
+    width: 100%;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .accept-button,
+  .decline-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .technicians-info-panel {
+    padding: 1rem;
+  }
+
+  .technician-detail-card {
+    padding: 1rem;
+  }
+
+  .name-inputs {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .accept-button,
+  .decline-button {
+    width: 100%;
+  }
+}
+
+.email-row {
+  width: 100%;
+  margin-bottom: 1rem; /* Adjusted margin */
+}
+
+.contact-documents-layout {
+  display: flex;
+  gap: 0.8rem; /* Adjusted gap */
+  align-items: flex-start; /* Align items to the start of the cross axis */
+}
+
+.contact-info-group {
+  width: 55%; /* Assign a specific width to control spacing */
+}
+
+.contact-info-group .detail-row {
+  margin-bottom: 0.5rem; /* Adjusted margin for detail rows within contact-info-group */
+}
+
+.documents-section {
+  margin-top: 0; /* Reset margin-top to align with contact info */
+  width: 40%; /* Give documents section a specific width */
+}
+
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 0.8rem;
+  }
+
+  .profile-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+    padding: 0.8rem;
+  }
+
+  .profile-avatar img {
+    width: 50px;
+    height: 50px;
+  }
+
+  .user-info .user-name {
+    font-size: 1.1rem;
+  }
+
+  .user-info .user-detail {
+    font-size: 0.7rem;
+  }
+
+  .contact-info {
+    text-align: left;
+  }
+
+  .contact-info p {
+    font-size: 0.7rem;
+  }
+
+  .profile-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .delete-button,
+  .upload-button {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+  }
+
+  .form-section h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .form-group {
+    min-width: unset;
+    width: 100%;
+  }
+
+  .form-group label {
+    font-size: 0.7rem;
+  }
+
+  .input-with-icon {
+    padding: 6px 10px;
+  }
+
+  .input-with-icon input {
+    font-size: 0.8rem;
+  }
+
+  .input-with-icon .input-icon {
+    width: 14px;
+    height: 14px;
+    margin-left: 6px;
+  }
+
+  .password-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.8rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .logout-button {
+    width: 100%;
+    padding: 7px 14px;
+    font-size: 0.85rem;
+  }
+
+  .documents-section {
+    margin-top: 1rem;
+  }
+
+  .document-box {
+    width: 120px;
+    height: 80px;
+    margin-bottom: 1rem;
+  }
+
+  .document-box .document-icon {
+    width: 50px;
+    height: 50px;
+  }
+
+  .action-buttons {
+    margin-top: 1.5rem;
+  }
+
+  .accept-button,
+  .decline-button {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .email-row {
+    width: 100%;
+  }
+
+  .contact-documents-layout {
+    flex-direction: column; /* Stack on small screens */
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .contact-info-group {
+    width: 100%; /* Full width on small screens */
+  }
+}
+
+.technician-name-and-id {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+}
+
+.technician-name-and-id span {
+  font-weight: 500;
+  color: #fff;
+}
+
+.settings-icon {
+  width: 20px;
+  height: 20px;
+  opacity: 0.7;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.settings-icon:hover {
+  opacity: 1;
+}

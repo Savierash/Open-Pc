@@ -114,6 +114,8 @@ const DashboardTechnician = () => {
         </div>
         <div className="nav-actions">
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
+          <span className="profile-name">Technician Name</span> {/* Example Technician Name */}
+          <span className="profile-role">Technician</span> {/* Example Technician Role */}
         </div>
       </header>
 

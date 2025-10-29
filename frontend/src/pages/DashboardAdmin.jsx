@@ -12,6 +12,8 @@ import StackLogo from "../assets/Stack.png";
 import PersonLogo from "../assets/Person.png";
 import ToolsLogo from "../assets/tools_logo.png";
 import AccountSettingLogo from "../assets/GearFill.png"; // Re-using GearFill for Account Setting
+import AdminTechnicians from "../components/AdminTechnicians";
+import AdminTechRequests from "../components/AdminTechRequests"; // Import AdminTechRequests
 import {
   ResponsiveContainer,
   LineChart,
@@ -114,6 +116,8 @@ const DashboardAdmin = () => {
         </div>
         <div className="nav-actions">
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
+          <span className="profile-name">Admin Name</span> {/* Example Admin Name */}
+          <span className="profile-role">Admin</span> {/* Example Admin Role */}
         </div>
       </header>
 
@@ -122,96 +126,109 @@ const DashboardAdmin = () => {
         <aside className="sidebar">
           <ul className="sidebar-menu">
             <li><a href="/dashboard-admin" className={`sidebar-link ${activeLink === "/dashboard-admin" ? "active" : ""}`} onClick={(e) => {e.preventDefault();handleNavClick('/dashboard-admin');}}><img src={HouseLogo} className="menu-icon" alt="Home" /><span>Dashboard</span></a></li>
+            {/*
+            <li><a href="/inventory" className={`sidebar-link ${activeLink === "/inventory" ? "active" : ""}`} onClick={(e) => {e.preventDefault();handleNavClick('/inventory');}}><img src={StackLogo} className="menu-icon" alt="Inventory" /><span>Inventory</span></a></li>
+            <li><a href="/unit-status-auditor" className={`sidebar-link ${activeLink === "/unit-status-auditor" ? "active" : ""}`} onClick={(e) => {e.preventDefault();handleNavClick('/unit-status-auditor');}}><img src={PcDisplayLogo} className="menu-icon" alt="Unit Status" /><span>Unit Status</span></a></li>
+            <li><a href="/reports-auditor" className={`sidebar-link ${activeLink === "/reports-auditor" ? "active" : ""}`} onClick={(e) => {e.preventDefault();handleNavClick('/reports-auditor');}}><img src={ClipboardLogo} className="menu-icon" alt="Reports" /><span>Reports</span></a></li>
+            */}
+            <li><a href="/admin-technicians" className={`sidebar-link ${activeLink === "/admin-technicians" ? "active" : ""}`} onClick={(e) => {e.preventDefault();handleNavClick('/admin-technicians');}}><img src={ToolsLogo} className="menu-icon" alt="Technicians" /><span>Technicians</span></a></li>
             <li><a href="/admin-profile" className={`sidebar-link ${activeLink === "/admin-profile" ? "active" : ""}`} onClick={(e) => {e.preventDefault();handleNavClick('/admin-profile');}}><img src={GearLogo} className="menu-icon" alt="Account Setting" /><span>Account Setting</span></a></li>
+            <li><a href="/admin-tech-requests" className={`sidebar-link ${activeLink === "/admin-tech-requests" ? "active" : ""}`} onClick={(e) => {e.preventDefault();handleNavClick('/admin-tech-requests');}}><img src={ClipboardLogo} className="menu-icon" alt="Tech Requests" /><span>Tech Requests</span></a></li>
           </ul>
         </aside>
 
         {/* MAIN content */}
         <main className="main-content">
-          <div className="dashboard-main-content">
-            <div className="dashboard-cards">
-              <div className="card total-units clickable-card" onClick={() => handleNavClick('/total-units')}>
-                <div className="card-header">
-                  <img src={PcDisplayLogo} alt="PC Display Icon" className="card-icon" />
-                  <h3>Total Units</h3>
+          {activeLink === "/admin-technicians" ? (
+            <AdminTechnicians />
+          ) : activeLink === "/admin-tech-requests" ? (
+            <AdminTechRequests />
+          ) : (
+            <div className="dashboard-main-content">
+              <div className="dashboard-cards">
+                <div className="card total-units clickable-card" onClick={() => handleNavClick('/total-units')}>
+                  <div className="card-header">
+                    <img src={PcDisplayLogo} alt="PC Display Icon" className="card-icon" />
+                    <h3>Total Units</h3>
+                  </div>
+                  <div className="card-body">
+                    <p className="stat-number">{loading ? "..." : totalUnits}</p>
+                  </div>
                 </div>
-                <div className="card-body">
-                  <p className="stat-number">{loading ? "..." : totalUnits}</p>
-                </div>
-              </div>
 
-              <div className="card functional clickable-card" onClick={() => handleNavClick('/functional')}>
-                <div className="card-header">
-                  <img src={ClipboardLogo} alt="Clipboard Icon" className="card-icon" />
-                  <h3>Functional</h3>
+                <div className="card functional clickable-card" onClick={() => handleNavClick('/functional')}>
+                  <div className="card-header">
+                    <img src={ClipboardLogo} alt="Clipboard Icon" className="card-icon" />
+                    <h3>Functional</h3>
+                  </div>
+                  <div className="card-body">
+                    <p className="stat-number">
+                      {loading ? "..." : `${counts.functional} / ${totalUnits}`}
+                    </p>
+                    <div className="progress-bar">
+                      <div className="progress-fill" style={{ width: `${percentFunctional}%` }}></div>
+                    </div>
+                  </div>
                 </div>
-                <div className="card-body">
-                  <p className="stat-number">
-                    {loading ? "..." : `${counts.functional} / ${totalUnits}`}
-                  </p>
-                  <div className="progress-bar">
-                    <div className="progress-fill" style={{ width: `${percentFunctional}%` }}></div>
+
+                <div className="card maintenance clickable-card" onClick={() => handleNavClick('/maintenance')}>
+                  <div className="card-header">
+                    <img src={GearLogo} alt="Gear Icon" className="card-icon" />
+                    <h3>Maintenance</h3>
+                  </div>
+                  <div className="card-body">
+                    <p className="stat-number">{loading ? "..." : counts.maintenance}</p>
                   </div>
                 </div>
               </div>
 
-              <div className="card maintenance clickable-card" onClick={() => handleNavClick('/maintenance')}>
-                <div className="card-header">
-                  <img src={GearLogo} alt="Gear Icon" className="card-icon" />
-                  <h3>Maintenance</h3>
-                </div>
-                <div className="card-body">
-                  <p className="stat-number">{loading ? "..." : counts.maintenance}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom Row */}
-            <div className="dashboard-bottom-row">
-              <div className="recent-activity-card card" style={{ flex: "0 0 60%" }}>
-                <h3>Recent Units</h3>
-                <ul className="recent-list">
-                  {recentUnits.length === 0 ? (
-                    <li style={{ padding: 8 }}>
-                      {loading ? "Loading..." : "No recent activity"}
-                    </li>
-                  ) : (
-                    recentUnits.map((u) => (
-                      <li key={u._id} className="recent-item">
-                        <strong>{u.name}</strong> —{" "}
-                        <span style={{ textTransform: "capitalize" }}>{u.status}</span>
-                        {u.lab?.name && <span> • {u.lab.name}</span>}
-                        <div style={{ fontSize: 12, color: "#666" }}>
-                          {new Date(u.updatedAt).toLocaleString()}
-                        </div>
+              {/* Bottom Row */}
+              <div className="dashboard-bottom-row">
+                <div className="recent-activity-card card" style={{ flex: "0 0 60%" }}>
+                  <h3>Recent Units</h3>
+                  <ul className="recent-list">
+                    {recentUnits.length === 0 ? (
+                      <li style={{ padding: 8 }}>
+                        {loading ? "Loading..." : "No recent activity"}
                       </li>
-                    ))
-                  )}
-                </ul>
-              </div>
-
-              {/* 🧠 System Status WITH Chart */}
-              <div className="system-status-card card" style={{ flex: "0 0 35%" }}>
-                <h3>System Status</h3>
-                <p>Database: <strong>Connected</strong></p>
-                <p>API: <strong>{loading ? "Loading..." : "OK"}</strong></p>
-
-                <div style={{ marginTop: 12, background: "transparent" }}>
-                  <StatusChart dataPoints={chartData} />
+                    ) : (
+                      recentUnits.map((u) => (
+                        <li key={u._id} className="recent-item">
+                          <strong>{u.name}</strong> —{" "}
+                          <span style={{ textTransform: "capitalize" }}>{u.status}</span>
+                          {u.lab?.name && <span> • {u.lab.name}</span>}
+                          <div style={{ fontSize: 12, color: "#666" }}>
+                            {new Date(u.updatedAt).toLocaleString()}
+                          </div>
+                        </li>
+                      ))
+                    )}
+                  </ul>
                 </div>
 
-                <div style={{ marginTop: 12, textAlign: "center", color: "#ccc" }}>
-                  <strong>{percentFunctional}%</strong> functional
-                </div>
+                {/* 🧠 System Status WITH Chart */}
+                <div className="system-status-card card" style={{ flex: "0 0 35%" }}>
+                  <h3>System Status</h3>
+                  <p>Database: <strong>Connected</strong></p>
+                  <p>API: <strong>{loading ? "Loading..." : "OK"}</strong></p>
 
-                <div style={{ marginTop: 8, textAlign: "center" }}>
-                  <button onClick={fetchDashboard} className="btn small">
-                    Refresh
-                  </button>
+                  <div style={{ marginTop: 12, background: "transparent" }}>
+                    <StatusChart dataPoints={chartData} />
+                  </div>
+
+                  <div style={{ marginTop: 12, textAlign: "center", color: "#ccc" }}>
+                    <strong>{percentFunctional}%</strong> functional
+                  </div>
+
+                  <div style={{ marginTop: 8, textAlign: "center" }}>
+                    <button onClick={fetchDashboard} className="btn small">
+                      Refresh
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
         </main>
       </div>
     </div>

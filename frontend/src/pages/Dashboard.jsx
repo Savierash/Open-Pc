@@ -115,6 +115,8 @@ const Dashboard = () => {
         </div>
         <div className="nav-actions">
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
+          <span className="profile-name">John Paul</span> {/* Example Name */}
+          <span className="profile-role">Auditor</span> {/* Example Role */}
         </div>
       </header>
 
@@ -124,6 +126,7 @@ const Dashboard = () => {
           <ul className="sidebar-menu">
             <li><a href="/dashboard" className={`sidebar-link ${activeLink === "/dashboard" ? "active" : ""}`}><img src={HouseLogo} className="menu-icon" alt="Home" /><span>Dashboard</span></a></li>
             <li><a href="/inventory" className={`sidebar-link ${activeLink === "/inventory" ? "active" : ""}`}><img src={StackLogo} className="menu-icon" alt="Inventory" /><span>Inventory</span></a></li>
+            <li><a href="/unit-status-auditor" className={`sidebar-link ${activeLink === "/unit-status-auditor" ? "active" : ""}`}><img src={PcDisplayLogo} className="menu-icon" alt="Unit Status" /><span>Unit Status</span></a></li>
             <li><a href="/reports-auditor" className={`sidebar-link ${activeLink === '/reports-auditor' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/reports-auditor');}}><img src={ClipboardLogo} alt="Reports Icon" className="menu-icon" /><span>Reports</span></a></li>
             <li><a href="/technicians" className={`sidebar-link ${activeLink === '/technicians' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/technicians');}}><img src={ToolsLogo} alt="Technicians Icon" className="menu-icon" /><span>Technicians</span></a></li>
             <li><a href="/auditor-profile" className={`sidebar-link ${activeLink === '/auditor-profile' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/auditor-profile');}}><img src={AccountSettingLogo} alt="Account Setting Icon" className="menu-icon" /><span>Account Setting</span></a></li>

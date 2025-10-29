@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "../styles/AdminProfile.css";
 import PersonCircle from "../assets/PersonCircle.png";
 import Lock from "../assets/Lock.png";
@@ -12,6 +12,12 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const AdminProfile = () => {
   const navigate = useNavigate(); // Initialize useNavigate
+  const [activeLink, setActiveLink] = useState(window.location.pathname);
+
+  const handleNavClick = (path) => {
+    setActiveLink(path);
+    navigate(path);
+  };
 
   const handleLogout = () => {
     // In a real application, you would clear user session/token here
@@ -40,15 +46,55 @@ const AdminProfile = () => {
         <aside className="sidebar">
           <ul className="sidebar-menu">
             <li>
-              <a href="/dashboard-admin" className="sidebar-link">
+              <a 
+                href="/dashboard-admin" 
+                className={`sidebar-link ${activeLink === "/dashboard-admin" ? "active" : ""}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/dashboard-admin');
+                }}
+              >
                 <img src={HouseLogo} className="menu-icon" alt="Home" />
                 <span>Dashboard</span>
               </a>
             </li>
             <li>
-              <a href="/admin-profile" className="sidebar-link active">
+              <a 
+                href="/admin-technicians" 
+                className={`sidebar-link ${activeLink === "/admin-technicians" ? "active" : ""}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/admin-technicians');
+                }}
+              >
+                <img src={ToolsLogo} className="menu-icon" alt="Technicians" />
+                <span>Technicians</span>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/admin-profile" 
+                className={`sidebar-link ${activeLink === "/admin-profile" ? "active" : ""}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/admin-profile');
+                }}
+              >
                 <img src={GearFill} className="menu-icon" alt="Account Setting" />
                 <span>Account Setting</span>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/admin-tech-requests" 
+                className={`sidebar-link ${activeLink === "/admin-tech-requests" ? "active" : ""}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/admin-tech-requests');
+                }}
+              >
+                <img src={ClipboardLogo} className="menu-icon" alt="Tech Requests" />
+                <span>Tech Requests</span>
               </a>
             </li>
           </ul>

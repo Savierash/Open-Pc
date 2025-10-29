@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles/Dashboard.css'; // Changed to Dashboard.css
+import '../styles/AdminTechnicians.css'; // Changed to AdminTechnicians.css
 import ComputerLogo1 from '../assets/LOGO1.png';
 import PersonLogo from '../assets/Person.png';
 import HouseLogo from '../assets/HouseFill.png';
@@ -13,7 +13,7 @@ import StackLogo from '../assets/Stack.png';
 import ToolsLogo from '../assets/tools_logo.png';
 import CopyIcon from '../assets/ClipboardCheck.png'; // Added CopyIcon import
 
-const Technicians = () => {
+const AdminTechnicians = () => { // Renamed component
   const [activeLink, setActiveLink] = useState(window.location.pathname);
 
   useEffect(() => {
@@ -55,8 +55,8 @@ const Technicians = () => {
             alt="Profile Icon" 
             className="profile-icon-dashboard"
           />
-          <span className="profile-name">John Paul</span> {/* Example Name */}
-          <span className="profile-role">Auditor</span> {/* Example Role */}
+          <span className="profile-name">Paul Justin</span> {/* Example Name */}
+          <span className="profile-role">Admin</span> {/* Example Role */}
         </div>
       </header>
 
@@ -65,11 +65,11 @@ const Technicians = () => {
           <ul className="sidebar-menu">
             <li>
               <a 
-                href="/dashboard" 
-                className={`sidebar-link ${activeLink === '/dashboard' ? 'active' : ''}`}
+                href="/dashboard-admin" 
+                className={`sidebar-link ${activeLink === '/dashboard-admin' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
-                  handleNavClick('/dashboard');
+                  handleNavClick('/dashboard-admin');
                 }}
               >
                 <img src={HouseLogo} alt="Home Icon" className="menu-icon" />
@@ -78,50 +78,11 @@ const Technicians = () => {
             </li>
             <li>
               <a 
-                href="/inventory" 
-                className={`sidebar-link ${activeLink === '/inventory' ? 'active' : ''}`}
+                href="/admin-technicians" 
+                className={`sidebar-link ${activeLink === '/admin-technicians' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
-                  handleNavClick('/inventory');
-                }}
-              >
-                <img src={StackLogo} alt="Inventory Icon" className="menu-icon" />
-                <span>Inventory</span>
-              </a>
-            </li>
-            <li>
-              <a 
-                href="/unit-status-auditor" 
-                className={`sidebar-link ${activeLink === '/unit-status-auditor' ? 'active' : ''}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNavClick('/unit-status-auditor');
-                }}
-              >
-                <img src={PcDisplayLogo} alt="Unit Status Icon" className="menu-icon" />
-                <span>Unit Status</span>
-              </a>
-            </li>
-            <li>
-              <a 
-                href="/reports-auditor" 
-                className={`sidebar-link ${activeLink === '/reports-auditor' ? 'active' : ''}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNavClick('/reports-auditor');
-                }}
-              >
-                <img src={ClipboardLogo} alt="Reports Icon" className="menu-icon" />
-                <span>Reports</span>
-              </a>
-            </li>
-            <li>
-              <a 
-                href="/technicians" 
-                className={`sidebar-link ${activeLink === '/technicians' ? 'active' : ''}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNavClick('/technicians');
+                  handleNavClick('/admin-technicians');
                 }}
               >
                 <img src={ToolsLogo} alt="Technicians Icon" className="menu-icon" />
@@ -130,15 +91,28 @@ const Technicians = () => {
             </li>
             <li>
               <a 
-                href="/auditor-profile" 
-                className={`sidebar-link ${activeLink === '/auditor-profile' ? 'active' : ''}`}
+                href="/admin-profile" 
+                className={`sidebar-link ${activeLink === '/admin-profile' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
-                  handleNavClick('/auditor-profile');
+                  handleNavClick('/admin-profile');
                 }}
               >
                 <img src={GearLogo} alt="Account Setting Icon" className="menu-icon" />
                 <span>Account Setting</span>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/admin-tech-requests" 
+                className={`sidebar-link ${activeLink === '/admin-tech-requests' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/admin-tech-requests');
+                }}
+              >
+                <img src={ClipboardLogo} alt="Tech Requests Icon" className="menu-icon" />
+                <span>Tech Requests</span>
               </a>
             </li>
           </ul>
@@ -231,4 +205,4 @@ const Technicians = () => {
   );
 };
 
-export default Technicians;
+export default AdminTechnicians;

@@ -25,6 +25,9 @@ import DashboardAdmin from './pages/DashboardAdmin.jsx';
 import TechnicianProfile from './components/TechnicianProfile.jsx';
 import AdminProfile from './components/AdminProfile.jsx';
 import UnitStatusTechnician from './components/UnitStatusTechnician.jsx';
+import UnitStatusAuditor from './components/UnitStatusAuditor.jsx';
+import AdminTechnicians from './components/AdminTechnicians.jsx'; // Import AdminTechnicians
+import AdminTechRequests from './components/AdminTechRequests.jsx'; // Import AdminTechRequests
 
 import DocumentPage from './pages/document.jsx';
 
@@ -45,6 +48,7 @@ import './styles/AuditorProfile.css'; // Import the new AuditorProfile styleshee
 import './styles/ReportsAuditor.css'; // Import ReportsAuditor stylesheet
 import './styles/TechnicianProfile.css';
 import './styles/AdminProfile.css';
+import './styles/UnitStatusAuditor.css';
 
 
 function App() {
@@ -77,6 +81,9 @@ function App() {
           <Route path="/technician-profile" element={<TechnicianProfile />} />
           <Route path="/dashboard-admin" element={<DashboardAdmin />} />
           <Route path="/admin-profile" element={<AdminProfile />} />
+          <Route path="/unit-status-auditor" element={<UnitStatusAuditor />} />
+          <Route path="/admin-technicians" element={<AdminTechnicians />} /> {/* New Route */}
+          <Route path="/admin-tech-requests" element={<AdminTechRequests />} /> {/* New Route */}
         </Routes>
     </Router>
   );
