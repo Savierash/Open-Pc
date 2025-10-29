@@ -45,6 +45,12 @@ const Signup = () => {
     setLoading(true);
     try {
       const username = `${firstName.trim()} ${lastName.trim()}`.trim();
+
+      // Read role from query param (e.g. /signup?role=auditor)
+      const query = new URLSearchParams(location.search);
+      const selectedRole = query.get('role') || 'user';
+
+      // include role in payload so backend can set it
       const res = await api.post('/api/auth/register', {
         username,
         firstName,
@@ -53,19 +59,40 @@ const Signup = () => {
         email,
         password,
         confirmPassword,
+        role: selectedRole,
       });
+
       const { token, user } = res.data;
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
-      // navigate instead of hard reload if you want SPA behavior:
-      navigate('/dashboard', { replace: true });
-      // or use window.location.href = '/';
+
+      // Determine redirect path based on user.role returned from backend (fallback to selectedRole)
+      const userRole = (user && user.role) ? String(user.role).toLowerCase() : String(selectedRole).toLowerCase();
+
+      let redirectPath = '/dashboard'; // fallback
+
+      if (userRole === 'admin') {
+        // admin goes to admin panel/dashboard-adminpanel (adjust path if different in your app)
+        redirectPath = '/dashboard-adminpanel';
+      } else if (userRole === 'auditor') {
+        // auditor goes where your auditor dashboard lives
+        redirectPath = '/dashboard-admin';
+      } else if (userRole === 'tech' || userRole === 'technician') {
+        // technician/tech goes to technician dashboard
+        redirectPath = '/dashboard-technician';
+      } else {
+        // default fallback (regular user)
+        redirectPath = '/dashboard';
+      }
+
+      navigate(redirectPath, { replace: true });
     } catch (err) {
       console.error('Signup error', err);
       // Detailed logging for network vs server errors:
       if (!err.response) {
         setError(`Network error: ${err.message}`);
       } else {
+        // prefer server message if available
         setError(err.response?.data?.message || 'Signup failed');
       }
     } finally {

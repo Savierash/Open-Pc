@@ -1,22 +1,19 @@
+// src/pages/Role.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/Role.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ComputerLogo1 from '../assets/LOGO1.png';
-import AuditorButton from '../assets/AUDITOR BUTTON.png'; // Import Auditor image
-import TechButton from '../assets/TECH BUTTON.png';     // Import Tech image
+import AuditorButton from '../assets/AUDITOR BUTTON.png';
+import TechButton from '../assets/TECH BUTTON.png';
 
 const apiBase = import.meta.env.VITE_APP_API_URL || 'http://localhost:5000';
 
 const Role = () => {
   const [activeLink, setActiveLink] = useState('');
-  const [roles, setRoles] = useState([]); // roles from backend
+  const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // NEW: track currently selected role
-  const [selectedRoleKey, setSelectedRoleKey] = useState(null);
-
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -25,7 +22,6 @@ const Role = () => {
   }, [location.pathname]);
 
   useEffect(() => {
-    // fetch roles from backend
     let mounted = true;
     setLoading(true);
     setError(null);
@@ -48,34 +44,27 @@ const Role = () => {
     return () => { mounted = false; };
   }, []);
 
-  const handleNavClick = (path) => {
-    navigate(path);
+  const handleNavClick = (path) => navigate(path);
+
+  // Handle click for role cards — direct navigation
+  const handleRoleClick = (roleKey) => {
+    if (!roleKey) return;
+    navigate(`/signup?role=${encodeURIComponent(roleKey)}`);
   };
 
-  // decide which image to show for a role key (fallback if any)
+  // Decide image for backend roles (if any extra)
   const roleImageForKey = (key) => {
     if (!key) return null;
     const k = key.toLowerCase();
     if (k === 'auditor') return AuditorButton;
     if (k === 'tech' || k === 'technician') return TechButton;
-    // fallback: use null
     return null;
   };
 
-  // NEW: when user clicks a role card, mark it selected (do NOT navigate immediately)
-  const handleSelectRole = (roleKey) => {
-    setSelectedRoleKey(prev => (prev === roleKey ? null : roleKey)); // toggle
-  };
-
-  // NEW: Create Account behavior — if a role selected, pass role in query param
-  const handleCreateAccount = () => {
-    if (selectedRoleKey) {
-      navigate(`/signup?role=${encodeURIComponent(selectedRoleKey)}`);
-    } else {
-      // fallback
-      navigate('/signup');
-    }
-  };
+  const backendRolesFiltered = roles.filter(r => {
+    const k = (r.key || '').toString().toLowerCase();
+    return k !== 'auditor' && k !== 'tech' && k !== 'technician';
+  });
 
   return (
     <div className="role-page">
@@ -91,35 +80,22 @@ const Role = () => {
             <a
               className={`nav-link-role ${activeLink === '/' ? 'active' : ''}`}
               onClick={() => handleNavClick('/')}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleNavClick('/'); }}
             >
               Home
             </a>
             <a
               className={`nav-link-role ${activeLink === '/about' ? 'active' : ''}`}
               onClick={() => handleNavClick('/about')}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleNavClick('/about'); }}
             >
               About
             </a>
             <a
               className={`nav-link-role ${activeLink === '/services' ? 'active' : ''}`}
               onClick={() => handleNavClick('/services')}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleNavClick('/services'); }}
             >
               Services
             </a>
           </nav>
-        </div>
-
-        <div className="nav-actions">
-         
         </div>
       </header>
 
@@ -130,67 +106,58 @@ const Role = () => {
           {loading && <div style={{ color: 'rgba(255,255,255,0.85)' }}>Loading roles...</div>}
           {error && <div style={{ color: '#ffb4b4' }}>{error}</div>}
 
-          {!loading && !error && roles.length === 0 && (
-            // If backend returned nothing, show static buttons (existing images)
-            <>
-              <div
-                role="button"
-                tabIndex={0}
-                className="role-image"
-                onClick={() => handleSelectRole('auditor')}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleSelectRole('auditor'); }}
-                style={{
-                  backgroundImage: `url(${AuditorButton})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  outline: selectedRoleKey === 'auditor' ? '3px solid rgba(124,58,237,0.9)' : 'none',
-                  transform: selectedRoleKey === 'auditor' ? 'translateY(-6px) scale(1.02)' : undefined,
-                  transition: 'transform .18s, outline .12s'
-                }}
-                aria-pressed={selectedRoleKey === 'auditor'}
-                aria-label="Select Auditor role"
-              />
+          {/* AUDITOR CARD */}
+          <div
+            role="button"
+            tabIndex={0}
+            className="role-image"
+            onClick={() => handleRoleClick('inventory')}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleRoleClick('inventory'); }}
+            style={{
+              backgroundImage: `url(${AuditorButton})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center', 
+              transition: 'transform .18s, outline .12s',
+              marginRight: 12,
+            }}
+            aria-label="Auditor role"
+            title="Auditor"
+          />
 
-              <div
-                role="button"
-                tabIndex={0}
-                className="role-image"
-                onClick={() => handleSelectRole('tech')}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleSelectRole('tech'); }}
-                style={{
-                  backgroundImage: `url(${TechButton})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  outline: selectedRoleKey === 'tech' ? '3px solid rgba(124,58,237,0.9)' : 'none',
-                  transform: selectedRoleKey === 'tech' ? 'translateY(-6px) scale(1.02)' : undefined,
-                  transition: 'transform .18s, outline .12s'
-                }}
-                aria-pressed={selectedRoleKey === 'tech'}
-                aria-label="Select Tech role"
-              />
-            </>
-          )}
+          {/* TECH CARD */}
+          <div
+            role="button"
+            tabIndex={0}
+            className="role-image"
+            onClick={() => handleRoleClick('tech')}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleRoleClick('tech'); }}
+            style={{
+              backgroundImage: `url(${TechButton})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              transition: 'transform .18s, outline .12s',
+            }}
+            aria-label="Tech role"
+            title="Technician"
+          />
 
-          {!loading && !error && roles.length > 0 && roles.map((r) => {
+          {/* Render backend roles if available */}
+          {!loading && !error && backendRolesFiltered.length > 0 && backendRolesFiltered.map((r) => {
             const img = roleImageForKey(r.key);
-            const isSelected = selectedRoleKey === r.key;
             return (
               <div
                 key={r.key}
                 role="button"
                 tabIndex={0}
                 className="role-image"
-                onClick={() => handleSelectRole(r.key)}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleSelectRole(r.key); }}
+                onClick={() => handleRoleClick(r.key)}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleRoleClick(r.key); }}
                 style={{
                   ...(img ? { backgroundImage: `url(${img})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}),
-                  outline: isSelected ? '3px solid rgba(124,58,237,0.9)' : 'none',
-                  transform: isSelected ? 'translateY(-6px) scale(1.02)' : undefined,
-                  transition: 'transform .18s, outline .12s'
+                  transition: 'transform .18s, outline .12s',
                 }}
                 aria-label={`Select ${r.name} role`}
                 title={r.name}
-                aria-pressed={isSelected}
               >
                 {!img && (
                   <div style={{
@@ -210,22 +177,21 @@ const Role = () => {
           })}
         </div>
 
+        {/* Keep Create Account button (optional) */}
         <button
           type="button"
           className="create-account-button-role"
-          onClick={handleCreateAccount}
-          // visually indicate disabled state when no role selected
+          onClick={() => navigate('/signup')}
           style={{
-            opacity: selectedRoleKey ? 1 : 0.85,
+            opacity: 0.9,
             cursor: 'pointer'
           }}
         >
           Create Account
         </button>
 
-        {/* helper text */}
         <div style={{ marginTop: 10, color: 'rgba(255,255,255,0.65)', fontSize: 13 }}>
-          {selectedRoleKey ? `Signing up as: ${selectedRoleKey.toUpperCase()}` : 'Select a role, then click Create Account'}
+          Click your role to go directly to signup
         </div>
       </main>
     </div>
