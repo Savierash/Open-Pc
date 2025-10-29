@@ -26,47 +26,46 @@ router.get('/', async (req, res) => {
 
 // POST /api/units
 router.post('/', async (req, res) => {
-  const { name, lab, status = 'Functional', os = '', ram = '', storage = '', cpu = '', lastIssued = '' } = req.body;
-  if (!name || !lab) return res.status(400).json({ message: 'name and lab required' });
-  if (!mongoose.Types.ObjectId.isValid(lab)) return res.status(400).json({ message: 'Invalid lab id' });
-
   try {
-    const unit = new Unit({ name, lab, status, os, ram, storage, cpu, lastIssued });
-    const saved = await unit.save();
-    return res.status(201).json(saved);
+    const { name, lab, status, os, ram, storage, cpu, lastIssued, notes } = req.body;
+    if (!name || !lab) return res.status(400).json({ message: 'name and lab required' });
+    if (!mongoose.Types.ObjectId.isValid(lab)) return res.status(400).json({ message: 'Invalid lab id' });
+    const exists = await Unit.findOne({ name: name.trim(), lab });
+    if (exists) return res.status(409).json({ message: 'Unit already exists in this lab' });
+    const unit = await Unit.create({ name: name.trim(), lab, status, os, ram, storage, cpu, lastIssued, notes });
+    res.status(201).json(unit);
   } catch (err) {
-    console.error('Failed to create unit', err);
-    return res.status(500).json({ message: 'Server error', error: err.message });
+    console.error('POST /api/units', err);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
 // PUT /api/units/:id
 router.put('/:id', async (req, res) => {
-  const id = req.params.id;
-  if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ message: 'Invalid unit id' });
-
   try {
-    const updated = await Unit.findByIdAndUpdate(id, req.body, { new: true });
+    const id = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ message: 'Invalid id' });
+    const updates = req.body;
+    const updated = await Unit.findByIdAndUpdate(id, updates, { new: true, runValidators: true });
     if (!updated) return res.status(404).json({ message: 'Unit not found' });
-    return res.json(updated);
+    res.json(updated);
   } catch (err) {
-    console.error('Failed to update unit', id, err);
-    return res.status(500).json({ message: 'Server error', error: err.message });
+    console.error('PUT /api/units/:id', err);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
 // DELETE /api/units/:id
 router.delete('/:id', async (req, res) => {
-  const id = req.params.id;
-  if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ message: 'Invalid unit id' });
-
   try {
+    const id = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ message: 'Invalid id' });
     const removed = await Unit.findByIdAndDelete(id);
     if (!removed) return res.status(404).json({ message: 'Unit not found' });
-    return res.json({ message: 'Unit deleted', id: removed._id });
+    res.json({ message: 'Deleted', id: removed._id });
   } catch (err) {
-    console.error('Failed to delete unit', id, err);
-    return res.status(500).json({ message: 'Server error', error: err.message });
+    console.error('DELETE /api/units/:id', err);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
