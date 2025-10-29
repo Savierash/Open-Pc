@@ -31,6 +31,13 @@ const Inventory = () => {
   const [selectedUnit, setSelectedUnit] = useState(null); // Added for selected unit details
   const [unitStatuses, setUnitStatuses] = useState([]); // Added for filtering units
 
+  // New state for modal / add-lab form
+  const [showAddLabModal, setShowAddLabModal] = useState(false);
+  const [newLabName, setNewLabName] = useState('');
+  const [newLabLocation, setNewLabLocation] = useState('');
+  const [newLabTotalUnits, setNewLabTotalUnits] = useState(0);
+  const [creatingLab, setCreatingLab] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -63,29 +70,95 @@ const Inventory = () => {
     }
   };
 
-  const addLab = async () => {
-    const newLabName = window.prompt('Enter new lab name:');
-    if (!newLabName) return;
-    const trimmed = newLabName.trim();
-    if (trimmed === '') return window.alert('Lab name cannot be empty.');
+  // open modal instead of prompt
+  const openAddLabModal = () => {
+    setNewLabName('');
+    setNewLabLocation('');
+    setNewLabTotalUnits(0);
+    setShowAddLabModal(true);
+  };
+
+  const closeAddLabModal = () => {
+    setShowAddLabModal(false);
+  };
+
+  // helper to create a safe short prefix from lab name (for unit naming)
+  function labShortFromName(name) {
+    if (!name) return 'LAB';
+    // remove non-alphanum, collapse spaces, uppercase
+    const keep = String(name).replace(/[^0-9A-Za-z]/g, '');
+    return (keep || 'LAB').toUpperCase();
+  }
+
+  // submit handler for modal
+  const submitAddLab = async (e) => {
+    e?.preventDefault?.();
+    const trimmed = (newLabName || '').trim();
+    if (!trimmed) return window.alert('Lab name cannot be empty.');
+    let total = Number(newLabTotalUnits) || 0;
+    if (total < 0) total = 0;
+    if (!Number.isInteger(total) || total < 0) return window.alert('Total units must be a whole number (0 or greater).');
+    if (total > 200) {
+      const ok = window.confirm('You requested more than 200 units. Continue?');
+      if (!ok) return;
+    }
 
     if (labs.some(l => l.name && l.name.toLowerCase() === trimmed.toLowerCase())) {
       return window.alert('This lab already exists.');
     }
 
-    setAdding(true);
+    setCreatingLab(true);
     try {
-      const res = await axios.post(`${API_BASE}/labs`, { name: trimmed });
-      setLabs(prev => [...prev, res.data]);
-      setSelectedLab(res.data); // Select newly added lab
-      setUnits([]); // Clear units for new lab
+      // create lab (includes location in body; server may ignore additional fields)
+      const res = await axios.post(`${API_BASE}/labs`, { name: trimmed, location: newLabLocation || '' });
+      const createdLab = res.data;
+      // create units if requested
+      if (total > 0) {
+        const prefix = labShortFromName(trimmed); // e.g., ITS300 -> ITS300
+        // create units sequentially (you could parallelize, but sequential keeps server-friendly)
+        const createdUnits = [];
+        for (let i = 1; i <= total; i++) {
+          const num = String(i).padStart(3, '0'); // 001
+          const unitName = `${prefix}-PC-${num}`; // e.g., ITS300-PC-001
+          try {
+            const ures = await axios.post(`${API_BASE}/units`, { name: unitName, lab: createdLab._id, status: 'Functional' });
+            createdUnits.push(ures.data);
+          } catch (uerr) {
+            // log and continue - maybe unit exists already
+            console.warn(`Failed to create unit ${unitName}`, uerr?.response?.data ?? uerr?.message ?? uerr);
+            // continue creating remaining units
+          }
+        }
+        // option: setUnits([...createdUnits]) - but we'll refetch units below
+      }
+
+      // refresh labs list and select new lab
+      await fetchLabs();
+      // select created lab (by id) to ensure it's selected
+      if (createdLab && createdLab._id) {
+        const found = (await axios.get(`${API_BASE}/labs`)).data || [];
+        const picked = found.find(l => String(l._id) === String(createdLab._id));
+        if (picked) {
+          setSelectedLab(picked);
+          fetchUnitsByLab(picked._id);
+        } else {
+          // fallback: select first
+          if (found.length > 0) {
+            setSelectedLab(found[0]);
+            fetchUnitsByLab(found[0]._id);
+          }
+        }
+      }
+
+      setShowAddLabModal(false);
+      window.alert('Lab created' + (total > 0 ? ` (attempted to create ${total} units)` : ''));
     } catch (err) {
       console.error('Failed to add lab', err);
       console.error('err.response:', err?.response?.data ?? err?.message);
       const message = err?.response?.data?.message || 'Failed to add lab';
       window.alert(message);
     } finally {
-      setAdding(false);
+      setCreatingLab(false);
     }
   };
 
@@ -285,10 +358,10 @@ const Inventory = () => {
             <div className="inventory-lab-panel">
               <button
                 className="inventory-add-lab-button"
-                onClick={addLab}
-                disabled={adding}
+                onClick={openAddLabModal}
+                disabled={adding || creatingLab}
               >
-                {adding ? 'ADDING...' : 'ADD LAB'}
+                {(adding || creatingLab) ? 'ADDING...' : 'ADD LAB'}
               </button>
               <div className="inventory-lab-list-container">
                 {loading ? (
@@ -308,7 +381,8 @@ const Inventory = () => {
                     ))}
                     <div
                       className={`inventory-lab-card inventory-add-lab-card ${selectedLab ? 'active' : ''}`}
-                      onClick={addLab}
+                      onClick={openAddLabModal}
+                      title="Add new lab"
                     >
                       +
                     </div>
@@ -463,8 +537,81 @@ const Inventory = () => {
           </div>
         </main>
       </div>
+
+      {/* Add Lab Modal */}
+      {showAddLabModal && (
+        <div style={modalOverlayStyle}>
+          <div style={modalStyle}>
+            <h3 style={{ marginTop: 0, color: '#000' }}>Add New Lab</h3>
+            <form onSubmit={submitAddLab}>
+              <div style={rowStyle}>
+                <label style={labelStyle}>Lab Name</label>
+                <input
+                  style={inputStyle}
+                  value={newLabName}
+                  onChange={(e) => setNewLabName(e.target.value)}
+                  placeholder="e.g., ITS 300"
+                  required
+                />
+              </div>
+              <div style={rowStyle}>
+                <label style={labelStyle}>Location</label>
+                <input
+                  style={inputStyle}
+                  value={newLabLocation}
+                  onChange={(e) => setNewLabLocation(e.target.value)}
+                  placeholder="e.g., Block A, Building 1"
+                />
+              </div>
+              <div style={rowStyle}>
+                <label style={labelStyle}>Total Units</label>
+                <input
+                  style={inputStyle}
+                  type="number"
+                  min={0}
+                  max={2000}
+                  value={newLabTotalUnits}
+                  onChange={(e) => setNewLabTotalUnits(Number(e.target.value))}
+                />
+                <small style={{ color: '#666' }}>How many unit records to create (0 = none)</small>
+              </div>
+
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 12 }}>
+                <button type="button" onClick={closeAddLabModal} style={btnSecondaryStyle} disabled={creatingLab}>Cancel</button>
+                <button type="submit" style={btnPrimaryStyle} disabled={creatingLab}>
+                  {creatingLab ? 'CREATING...' : 'Create Lab'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+
+/* Inline minimal styles for modal (you may move them to Inventory.css) */
+const modalOverlayStyle = {
+  position: 'fixed',
+  inset: 0,
+  background: 'rgba(0,0,0,0.45)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  zIndex: 3000
+};
+const modalStyle = {
+  width: 420,
+  maxWidth: '95%',
+  background: '#fff',
+  padding: 18,
+  borderRadius: 8,
+  boxShadow: '0 6px 18px rgba(0,0,0,0.16)'
+};
+const rowStyle = { display: 'flex', flexDirection: 'column', marginBottom: 10 };
+const labelStyle = { fontSize: 13, marginBottom: 6, color: '#333' };
+const inputStyle = { padding: '8px 10px', fontSize: 14, borderRadius: 6, border: '1px solid #ddd' };
+const btnPrimaryStyle = { background: '#1f7aed', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: 6, cursor: 'pointer' };
+const btnSecondaryStyle = { background: '#f1f1f1', color: '#222', border: 'none', padding: '8px 12px', borderRadius: 6, cursor: 'pointer' };
 
 export default Inventory;
