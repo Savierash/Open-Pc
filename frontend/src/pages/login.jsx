@@ -1,3 +1,4 @@
+// src/pages/Login.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
@@ -16,7 +17,6 @@ const api = axios.create({
   withCredentials: true, // important for cookie-based login
 });
 
-
 const Login = () => {
   const [usernameOrEmail, setUsernameOrEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -34,25 +34,69 @@ const Login = () => {
 
   const handleNavClick = (path) => navigate(path);
 
+  // --- Helper: Extract roles from the returned user object ---
+  const extractRoles = (user) => {
+    if (!user) return [];
+
+    const roles = [];
+
+    // Common shapes:
+    // user.role: 'admin'   OR user.role: { key: 'admin' } OR user.roles: ['admin'] OR user.roles: [{key:'auditor'}]
+    if (typeof user.role === 'string') roles.push(user.role.toLowerCase());
+    if (user.role && typeof user.role === 'object') {
+      if (user.role.key) roles.push(String(user.role.key).toLowerCase());
+      if (user.role.name) roles.push(String(user.role.name).toLowerCase());
+    }
+
+    if (Array.isArray(user.roles)) {
+      user.roles.forEach((r) => {
+        if (!r) return;
+        if (typeof r === 'string') roles.push(r.toLowerCase());
+        else if (r.key) roles.push(String(r.key).toLowerCase());
+        else if (r.name) roles.push(String(r.name).toLowerCase());
+      });
+    }
+
+    // Some backends put role info inside user.roleKey or user.roleName
+    if (user.roleKey) roles.push(String(user.roleKey).toLowerCase());
+    if (user.roleName) roles.push(String(user.roleName).toLowerCase());
+
+    return Array.from(new Set(roles)); // dedupe
+  };
+
+  // --- Map roles to pages (priority-aware) ---
+  // Priority: admin > auditor > tech > default
+  const getDashboardPath = (roles) => {
+    if (!roles || roles.length === 0) return '/dashboard';
+
+    const lower = roles.map(r => String(r).toLowerCase());
+
+    if (lower.includes('admin') || lower.includes('administrator')) return '/dashboard-admin';
+    if (lower.includes('auditor')) return '/inventory'; // <-- per your request auditor -> /inventory
+    if (lower.includes('tech') || lower.includes('technician')) return '/dashboard-tech';
+
+    return '/dashboard';
+  };
+
+  // --- Login Submit ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-      // Use the api instance created above
-      const res = await api.post('/api/auth/login', {
-        usernameOrEmail,
-        password,
-      });
+      const res = await api.post('/api/auth/login', { usernameOrEmail, password });
 
-      const { token, user } = res.data ?? {};
+      const { token, user } = res.data || {};
 
       if (token) localStorage.setItem('token', token);
       if (user) localStorage.setItem('user', JSON.stringify(user));
 
-      // Redirect to dashboard (replace so they can't go back to login)
-      navigate('/dashboard', { replace: true });
+      // extract roles and redirect accordingly
+      const userRoles = extractRoles(user);
+      const dashboardPath = getDashboardPath(userRoles);
+
+      navigate(dashboardPath, { replace: true });
     } catch (err) {
       console.error('Login error:', err);
       const serverMsg =
@@ -146,8 +190,6 @@ const Login = () => {
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M3 3L21 21" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     <path d="M10.58 10.58C10.2 10.95 10 11.44 10 12C10 13.66 11.34 15 13 15c.56 0 1.05-.2 1.42-.58" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M14.12 14.12C15.06 13.18 15.6 12.13 15.6 12c0-2.21-1.79-4-4-4-.13 0-1.18.54-2.12 1.48" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M2.5 12C3.9 7.5 7.7 4 12 4c1.39 0 2.71.26 3.95.74" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 ) : (
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -177,3 +219,4 @@ const Login = () => {
 };
 
 export default Login;
+  
