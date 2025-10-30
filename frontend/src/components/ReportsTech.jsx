@@ -7,7 +7,9 @@ import PersonLogo from '../assets/Person.png';
 import HouseLogo from "../assets/HouseFill.png";
 import PcDisplayLogo from "../assets/PcDisplayHorizontal.png";
 import ClipboardLogo from "../assets/ClipboardCheck.png";
-import AccountSettingLogo from "../assets/GearFill.png"; 
+import AccountSettingLogo from "../assets/GearFill.png";
+import MenuButtonWide from "../assets/menubuttonwide.png"; // Unit Status icon
+import ClipboardX from "../assets/clipboardx.png"; // Reports icon 
 
 const ReportsTech = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
@@ -47,14 +49,7 @@ const ReportsTech = () => {
             <span className="logo-text">OpenPC</span>
             <span className="logo-line">|</span>
           </div>
-          <nav className="nav-links-dashboard">
-            <a 
-              href="/dashboard" 
-              className={`nav-link-dashboard`}
-            >
-              Dashboard
-            </a>
-          </nav>
+          <span className="page-title">Reports</span>
         </div>
         <div className="nav-actions">
           <img 
@@ -71,8 +66,8 @@ const ReportsTech = () => {
         <aside className="sidebar">
           <ul className="sidebar-menu">
             <li><a href="/dashboard-technician" className={`sidebar-link ${activeLink === "/dashboard-technician" ? "active" : ""}`}><img src={HouseLogo} className="menu-icon" alt="Home" /><span>Dashboard</span></a></li>
-            <li><a href="/unit-status-technician" className={`sidebar-link ${activeLink === "/unit-status-technician" ? "active" : ""}`}><img src={PcDisplayLogo} className="menu-icon" alt="Unit Status" /><span>Unit Status</span></a></li>
-            <li><a href="/reports-tech" className={`sidebar-link ${activeLink === '/reports-tech' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/reports-tech');}}><img src={ClipboardLogo} alt="Reports Icon" className="menu-icon" /><span>Reports</span></a></li>
+            <li><a href="/unit-status-technician" className={`sidebar-link ${activeLink === "/unit-status-technician" ? "active" : ""}`}><img src={MenuButtonWide} className="menu-icon" alt="Unit Status" /><span>Unit Status</span></a></li>
+            <li><a href="/reports-tech" className={`sidebar-link ${activeLink === '/reports-tech' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/reports-tech');}}><img src={ClipboardX} alt="Reports Icon" className="menu-icon" /><span>Reports</span></a></li>
             <li><a href="/technician-profile" className={`sidebar-link ${activeLink === '/technician-profile' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/technician-profile');}}><img src={AccountSettingLogo} alt="Account Setting Icon" className="menu-icon" /><span>Account Setting</span></a></li>
           </ul>
         </aside>

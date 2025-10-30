@@ -11,7 +11,9 @@ import GearLogo from '../assets/GearFill.png';
 import OctagonLogo from '../assets/XOctagonFill.png';
 import StackLogo from '../assets/Stack.png';
 import ToolsLogo from '../assets/tools_logo.png';
-import CopyIcon from '../assets/ClipboardCheck.png'; // Added CopyIcon import
+import CopyIcon from '../assets/copypaste.png'; // Copy icon for input fields
+import EnvelopeCheck from '../assets/envelopecheck.png'; // Tech Requests icon
+import DocumentIcon from '../assets/icon_5.png'; // Documents icon
 
 const AdminTechRequests = () => { // Renamed component
   const [activeLink, setActiveLink] = useState(window.location.pathname);
@@ -36,18 +38,7 @@ const AdminTechRequests = () => { // Renamed component
             <span className="logo-text">OpenPC</span>
             <span className="logo-line">|</span>
           </div>
-          <nav className="nav-links-dashboard">
-            <a 
-              href="/dashboard-admin" 
-              className={`nav-link-dashboard active`}
-              onClick={(e) => {
-                e.preventDefault();
-                handleNavClick('/dashboard-admin');
-              }}
-            >
-              Admin Dashboard
-            </a>
-          </nav>
+          <span className="page-title">Tech Requests</span>
         </div>
         <div className="nav-actions">
           <img 
@@ -111,7 +102,7 @@ const AdminTechRequests = () => { // Renamed component
                   handleNavClick('/admin-tech-requests');
                 }}
               >
-                <img src={ClipboardLogo} alt="Tech Requests Icon" className="menu-icon" />
+                <img src={EnvelopeCheck} alt="Tech Requests Icon" className="menu-icon" />
                 <span>Tech Requests</span>
               </a>
             </li>
@@ -206,7 +197,7 @@ const AdminTechRequests = () => { // Renamed component
                 <div className="documents-section">
                   <label className="detail-label">Documents</label>
                   <div className="document-box">
-                    <img src={ClipboardLogo} alt="Documents Icon" className="document-icon" />
+                    <img src={DocumentIcon} alt="Documents Icon" className="document-icon" />
                   </div>
                 </div>
               </div>

@@ -3,15 +3,18 @@ import '../styles/Dashboard.css';
 import '../styles/UnitStatusAuditor.css';
 import ComputerLogo1 from "../assets/LOGO1.png";
 import HouseLogo from "../assets/HouseFill.png";
-import StackLogo from "../assets/Stack.png";
+import StackLogo from "../assets/icon_6.png"; // Inventory icon
 import ClipboardLogo from "../assets/ClipboardCheck.png";
 import ToolsLogo from "../assets/tools_logo.png";
 import AccountSettingLogo from "../assets/GearFill.png";
 import PcDisplayLogo from "../assets/PcDisplayHorizontal.png";
+import MenuButtonWide from "../assets/menubuttonwide.png"; // Unit Status icon
+import ClipboardX from "../assets/clipboardx.png"; // Reports icon
 import PersonLogo from "../assets/Person.png";
 import XOctagonFill from "../assets/XOctagonFill.png";
 import GraphUp from "../assets/GraphUp.png";
 import ShieldLockFill from "../assets/ShieldLockFill.png";
+import PcDisplayIcon from "../assets/pcdisplay.png"; // PC card icon
 
 const UnitStatusAuditor = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
@@ -90,8 +93,8 @@ const UnitStatusAuditor = () => {
           <ul className="sidebar-menu">
             <li><a href="/dashboard" className={`sidebar-link ${activeLink === "/dashboard-admin" ? "active" : ""}`}><img src={HouseLogo} className="menu-icon" alt="Home" /><span>Dashboard</span></a></li>
             <li><a href="/inventory" className={`sidebar-link ${activeLink === "/inventory" ? "active" : ""}`}><img src={StackLogo} className="menu-icon" alt="Inventory" /><span>Inventory</span></a></li>
-            <li><a href="/unit-status-auditor" className={`sidebar-link ${activeLink === "/unit-status-auditor" ? "active" : ""}`}><img src={PcDisplayLogo} className="menu-icon" alt="Unit Status" /><span>Unit Status</span></a></li>
-            <li><a href="/reports-auditor" className={`sidebar-link ${activeLink === "/reports-auditor" ? "active" : ""}`}><img src={ClipboardLogo} alt="Reports Icon" className="menu-icon" /><span>Reports</span></a></li>
+            <li><a href="/unit-status-auditor" className={`sidebar-link ${activeLink === "/unit-status-auditor" ? "active" : ""}`}><img src={MenuButtonWide} className="menu-icon" alt="Unit Status" /><span>Unit Status</span></a></li>
+            <li><a href="/reports-auditor" className={`sidebar-link ${activeLink === "/reports-auditor" ? "active" : ""}`}><img src={ClipboardX} alt="Reports Icon" className="menu-icon" /><span>Reports</span></a></li>
             <li><a href="/technicians" className={`sidebar-link ${activeLink === "/technicians" ? "active" : ""}`}><img src={ToolsLogo} alt="Technicians Icon" className="menu-icon" /><span>Technicians</span></a></li>
             <li><a href="/auditor-profile" className={`sidebar-link ${activeLink === "/auditor-profile" ? "active" : ""}`}><img src={AccountSettingLogo} className="menu-icon" alt="Account Setting" /><span>Account Setting</span></a></li>
           </ul>
@@ -157,7 +160,7 @@ const UnitStatusAuditor = () => {
             <div className="auditor-unit-cards-grid">
               {filteredUnits.map(unit => (
                 <div className="auditor-pc-card" key={unit.id}>
-                  <img src={PcDisplayLogo} alt="PC Icon" className="auditor-pc-card-icon" />
+                  <img src={PcDisplayIcon} alt="PC Icon" className="auditor-pc-card-icon" />
                   <div className="auditor-pc-card-content">
                     <span>{unit.id}</span>
                     <div className="status-indicator">

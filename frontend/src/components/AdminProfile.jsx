@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import "../styles/AdminProfile.css";
 import PersonCircle from "../assets/PersonCircle.png";
-import Lock from "../assets/Lock.png";
+import PencilSquare from "../assets/pencilsquare.png"; // Edit icon
 import GearFill from "../assets/GearFill.png";
 import ComputerLogo1 from "../assets/LOGO1.png";
 import HouseLogo from "../assets/HouseFill.png";
 import StackLogo from "../assets/Stack.png";
 import ClipboardLogo from "../assets/ClipboardCheck.png";
 import ToolsLogo from "../assets/tools_logo.png";
+import EnvelopeCheck from "../assets/envelopecheck.png"; // Tech Requests icon
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const AdminProfile = () => {
@@ -93,7 +94,7 @@ const AdminProfile = () => {
                   handleNavClick('/admin-tech-requests');
                 }}
               >
-                <img src={ClipboardLogo} className="menu-icon" alt="Tech Requests" />
+                <img src={EnvelopeCheck} className="menu-icon" alt="Tech Requests" />
                 <span>Tech Requests</span>
               </a>
             </li>
@@ -130,14 +131,14 @@ const AdminProfile = () => {
                   <label>Full name</label>
                   <div className="input-with-icon">
                     <input type="text" value="Kresner" readOnly />
-                    <img src={Lock} alt="Lock Icon" className="input-icon" />
+                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
                   </div>
                 </div>
                 <div className="form-group">
                   <label>Last Name</label>
                   <div className="input-with-icon">
                     <input type="text" value="Leonardo" readOnly />
-                    <img src={Lock} alt="Lock Icon" className="input-icon" />
+                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
                   </div>
                 </div>
               </div>
@@ -148,21 +149,21 @@ const AdminProfile = () => {
                   <label>Email</label>
                   <div className="input-with-icon">
                     <input type="email" value="kresnerleonardo@gmail.com" readOnly />
-                    <img src={Lock} alt="Lock Icon" className="input-icon" />
+                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
                   </div>
                 </div>
                 <div className="form-group">
                   <label>Contact No.</label>
                   <div className="input-with-icon">
                     <input type="text" value="0918453982" readOnly />
-                    <img src={Lock} alt="Lock Icon" className="input-icon" />
+                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
                   </div>
                 </div>
                 <div className="form-group">
                   <label>Address</label>
                   <div className="input-with-icon">
                     <input type="text" value="Dagupan USA Chicago" readOnly />
-                    <img src={Lock} alt="Lock Icon" className="input-icon" />
+                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
                   </div>
                 </div>
               </div>
@@ -172,7 +173,7 @@ const AdminProfile = () => {
                 <div className="form-group">
                   <div className="input-with-icon">
                     <input type="password" value="........." readOnly />
-                    <img src={Lock} alt="Lock Icon" className="input-icon" />
+                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
                   </div>
                 </div>
                 <button className="logout-button" onClick={handleLogout}>LOGOUT</button>

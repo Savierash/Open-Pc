@@ -9,10 +9,12 @@ import PcDisplayLogo from '../assets/PcDisplayHorizontal.png';
 import ClipboardLogo from '../assets/ClipboardCheck.png';
 import GearLogo from '../assets/GearFill.png';
 import OctagonLogo from '../assets/XOctagonFill.png';
-import StackLogo from '../assets/Stack.png';
+import StackLogo from '../assets/icon_6.png'; // Inventory icon
 import ToolsLogo from '../assets/tools_logo.png';
 import SearchIcon from '../assets/Person.png'; // Assuming Person.png is used as a search icon as in ReportsTech.jsx
 import EditIcon from '../assets/GearFill.png'; // Using GearFill.png as an edit icon
+import MenuButtonWide from '../assets/menubuttonwide.png'; // Unit Status icon
+import ClipboardX from '../assets/clipboardx.png'; // Reports icon
 
 const ReportsAuditor = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
@@ -100,19 +102,7 @@ const ReportsAuditor = () => {
             <span className="logo-text">OpenPC</span>
             <span className="logo-line">|</span>
           </div>
-          <nav className="nav-links-dashboard">
-            <a 
-              href="/dashboard" 
-              className={`nav-link-dashboard ${activeLink === '/dashboard' || activeLink === '/reports-auditor' ? 'active' : ''}`}
-              onClick={(e) => {
-                e.preventDefault();
-                handleNavClick('/dashboard');
-              }}
-            >
-              Dashboard
-            </a>
-            <span className="logo-text">Reports</span> {/* Add Reports text */}
-          </nav>
+          <span className="page-title">Reports</span>
         </div>
         <div className="nav-actions">
           <img 
@@ -163,7 +153,7 @@ const ReportsAuditor = () => {
                   handleNavClick('/unit-status-auditor');
                 }}
               >
-                <img src={PcDisplayLogo} alt="Unit Status Icon" className="menu-icon" />
+                <img src={MenuButtonWide} alt="Unit Status Icon" className="menu-icon" />
                 <span>Unit Status</span>
               </a>
             </li>
@@ -176,7 +166,7 @@ const ReportsAuditor = () => {
                   handleNavClick('/reports-auditor');
                 }}
               >
-                <img src={ClipboardLogo} alt="Reports Auditor Icon" className="menu-icon" />
+                <img src={ClipboardX} alt="Reports Auditor Icon" className="menu-icon" />
                 <span>Reports</span>
               </a>
             </li>

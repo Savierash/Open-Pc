@@ -5,6 +5,42 @@
   background: linear-gradient(135deg, #0a0a0a 0%, #00023f 50%, #000033 100%);
   background-size: cover;
   color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background decorative logos */
+.bg-logo {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bg-logo-top-left {
+  top: 15%;
+  left: 15%;
+  transform: rotate(-15deg);
+}
+
+.bg-logo-top-right {
+  top: 15%;
+  right: 15%;
+  transform: rotate(15deg);
+}
+
+.bg-logo-bottom-left {
+  bottom: 10%;
+  left: 15%;
+  transform: rotate(15deg);
+}
+
+.bg-logo-bottom-right {
+  bottom: 10%;
+  right: 15%;
+  transform: rotate(-15deg);
 }
 
 .top-bar-otp {

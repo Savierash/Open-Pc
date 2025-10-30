@@ -12,6 +12,10 @@ import StackLogo from "../assets/Stack.png";
 import PersonLogo from "../assets/Person.png";
 import ToolsLogo from "../assets/tools_logo.png";
 import AccountSettingLogo from "../assets/GearFill.png"; // Re-using GearFill for Account Setting
+import HeadsetPurple from "../assets/headsetpurple.png";
+import PersonCheckFill from "../assets/personcheckfill.png";
+import PersonRed from "../assets/Personred.png";
+import EnvelopeCheck from "../assets/envelopecheck.png"; // Tech Requests icon
 import AdminTechnicians from "../components/AdminTechnicians";
 import AdminTechRequests from "../components/AdminTechRequests"; // Import AdminTechRequests
 import {
@@ -36,6 +40,9 @@ const DashboardAdmin = () => {
     perLab: [],
     recentUnits: [],
     trend: [],
+    accounts: 0,
+    accepted: 0,
+    rejected: 0,
   });
 
   useEffect(() => {
@@ -56,7 +63,7 @@ const DashboardAdmin = () => {
     }
   }
 
-  const { totalUnits, counts, percentFunctional, perLab, recentUnits, trend } = data;
+  const { totalUnits, counts, percentFunctional, perLab, recentUnits, trend, accounts, accepted, rejected } = data;
 
   // fallback trend data
   const mockTrend = [
@@ -108,11 +115,7 @@ const DashboardAdmin = () => {
             <span className="logo-text">OpenPC</span>
             <span className="logo-line">|</span>
           </div>
-          <nav className="nav-links-dashboard">
-            <a href="/dashboard-admin" className={`nav-link-dashboard ${activeLink === "/dashboard-admin" ? "active" : ""}`} onClick={(e) => {e.preventDefault();handleNavClick('/dashboard-admin');}}>
-              Admin Dashboard
-            </a>
-          </nav>
+          <span className="page-title">Admin Dashboard</span>
         </div>
         <div className="nav-actions">
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
@@ -133,7 +136,7 @@ const DashboardAdmin = () => {
             */}
             <li><a href="/admin-technicians" className={`sidebar-link ${activeLink === "/admin-technicians" ? "active" : ""}`} onClick={(e) => {e.preventDefault();handleNavClick('/admin-technicians');}}><img src={ToolsLogo} className="menu-icon" alt="Technicians" /><span>Technicians</span></a></li>
             <li><a href="/admin-profile" className={`sidebar-link ${activeLink === "/admin-profile" ? "active" : ""}`} onClick={(e) => {e.preventDefault();handleNavClick('/admin-profile');}}><img src={GearLogo} className="menu-icon" alt="Account Setting" /><span>Account Setting</span></a></li>
-            <li><a href="/admin-tech-requests" className={`sidebar-link ${activeLink === "/admin-tech-requests" ? "active" : ""}`} onClick={(e) => {e.preventDefault();handleNavClick('/admin-tech-requests');}}><img src={ClipboardLogo} className="menu-icon" alt="Tech Requests" /><span>Tech Requests</span></a></li>
+            <li><a href="/admin-tech-requests" className={`sidebar-link ${activeLink === "/admin-tech-requests" ? "active" : ""}`} onClick={(e) => {e.preventDefault();handleNavClick('/admin-tech-requests');}}><img src={EnvelopeCheck} className="menu-icon" alt="Tech Requests" /><span>Tech Requests</span></a></li>
           </ul>
         </aside>
 
@@ -146,38 +149,27 @@ const DashboardAdmin = () => {
           ) : (
             <div className="dashboard-main-content">
               <div className="dashboard-cards">
-                <div className="card total-units clickable-card" onClick={() => handleNavClick('/total-units')}>
-                  <div className="card-header">
-                    <img src={PcDisplayLogo} alt="PC Display Icon" className="card-icon" />
-                    <h3>Total Units</h3>
-                  </div>
-                  <div className="card-body">
-                    <p className="stat-number">{loading ? "..." : totalUnits}</p>
+                <div className="card accounts clickable-card" onClick={() => handleNavClick('/accounts')}>
+                  <img src={HeadsetPurple} alt="Accounts Icon" className="card-icon" />
+                  <div className="card-content">
+                    <h3>Accounts</h3>
+                    <p className="stat-number">{loading ? "..." : accounts}</p>
                   </div>
                 </div>
 
-                <div className="card functional clickable-card" onClick={() => handleNavClick('/functional')}>
-                  <div className="card-header">
-                    <img src={ClipboardLogo} alt="Clipboard Icon" className="card-icon" />
-                    <h3>Functional</h3>
-                  </div>
-                  <div className="card-body">
-                    <p className="stat-number">
-                      {loading ? "..." : `${counts.functional} / ${totalUnits}`}
-                    </p>
-                    <div className="progress-bar">
-                      <div className="progress-fill" style={{ width: `${percentFunctional}%` }}></div>
-                    </div>
+                <div className="card accepted clickable-card" onClick={() => handleNavClick('/accepted')}>
+                  <img src={PersonCheckFill} alt="Accepted Icon" className="card-icon" />
+                  <div className="card-content">
+                    <h3>Accepted</h3>
+                    <p className="stat-number">{loading ? "..." : accepted}</p>
                   </div>
                 </div>
 
-                <div className="card maintenance clickable-card" onClick={() => handleNavClick('/maintenance')}>
-                  <div className="card-header">
-                    <img src={GearLogo} alt="Gear Icon" className="card-icon" />
-                    <h3>Maintenance</h3>
-                  </div>
-                  <div className="card-body">
-                    <p className="stat-number">{loading ? "..." : counts.maintenance}</p>
+                <div className="card rejected clickable-card" onClick={() => handleNavClick('/rejected')}>
+                  <img src={PersonRed} alt="Rejected Icon" className="card-icon" />
+                  <div className="card-content">
+                    <h3>Rejected</h3>
+                    <p className="stat-number">{loading ? "..." : rejected}</p>
                   </div>
                 </div>
               </div>
