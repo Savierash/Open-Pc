@@ -27,7 +27,7 @@ const AuditorProfile = () => {
             <img src={ComputerLogo1} alt="PC LOGO" className="computer-logo" />
             <span className="logo-text">OpenPC</span>
             <span className="logo-line">|</span>
-            <span className="logo-text">Accout Setting</span>
+            <span className="logo-text">Account Setting</span>
           </div>
         </div>
         <div className="nav-actions">
