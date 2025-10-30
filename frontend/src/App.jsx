@@ -59,7 +59,7 @@ function App() {
   return (
     <Router>
       <Routes>
-          <Route path="/document" element={<Navigate to="/documents" replace />} />
+          <Route path="/document" element={<DocumentPage replace />} />
           <Route path="/" element={<Homepage />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/services" element={<Services />} />

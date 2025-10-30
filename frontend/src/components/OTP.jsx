@@ -44,6 +44,8 @@ const OTP = () => {
       email,
       otp: code,
     });
+    console.log(response.data.message);
+    alert('✅ OTP has been sent to your email.');
 
     console.log('✅ OTP verification success:', res.data);
     const userRole = res.data.user.role;
