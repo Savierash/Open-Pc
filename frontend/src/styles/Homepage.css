@@ -76,12 +76,16 @@
   position: relative;
 }
 
-.nav-links-homepage a:hover,
-.nav-links-homepage a.active {
+.nav-links-homepage a:hover {
   background-color: #8a2be2;  
   color: #fff;  
   padding: 5px;
   border-radius: 5px;             
+}
+.nav-links-homepage a.active{
+  color: #fff;  
+  padding: 5px;
+  border-radius: 5px;  
 }
 
 .nav-actions {

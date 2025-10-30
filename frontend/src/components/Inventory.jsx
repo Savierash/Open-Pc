@@ -1,3 +1,4 @@
+// src/pages/inventory/Inventory.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -14,10 +15,10 @@ import PersonLogo from '../assets/Person.png';
 import ToolsLogo from '../assets/tools_logo.png';
 import PcDisplayLogo from "../assets/PcDisplayHorizontal.png"; // Added for unit cards
 
-// Use Vite env style
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
+// Use Vite env style and ensure no trailing slash
+const RAW_API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
+const API_BASE = RAW_API_BASE.replace(/\/+$/, ''); // remove trailing slash if any
 console.log('Inventory: API_BASE =', API_BASE);
-
 
 const Inventory = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
@@ -30,63 +31,64 @@ const Inventory = () => {
   const [selectedUnit, setSelectedUnit] = useState(null); // Added for selected unit details
   const [unitStatuses, setUnitStatuses] = useState([]); // Added for filtering units
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     setActiveLink(window.location.pathname);
     fetchLabs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const navigate = useNavigate();
 
   const handleNavClick = (path) => {
     setActiveLink(path);
     navigate(path);
   };
 
- const fetchLabs = async () => {
-  setLoading(true);
-  try {
-    const res = await axios.get(`${API_BASE}/lab`);
-    setLabs(res.data);
-    if (res.data.length > 0 && !selectedLab) {
-      setSelectedLab(res.data[0]); // Select the first lab by default
-      fetchUnitsByLab(res.data[0]._id); // Fetch units for the first lab
+  // ----- Labs -----
+  const fetchLabs = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`${API_BASE}/labs`);
+      setLabs(res.data || []);
+      if (res.data && res.data.length > 0 && !selectedLab) {
+        setSelectedLab(res.data[0]); // Select the first lab by default
+        fetchUnitsByLab(res.data[0]._id); // Fetch units for the first lab
+      }
+    } catch (err) {
+      console.error('Failed to fetch labs', err);
+      console.error('err.response:', err?.response?.data ?? err?.message);
+      window.alert('Failed to load labs. See console for details.');
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error('Failed to fetch labs', err);
-    console.error('err.response:', err?.response?.data ?? err?.message);
-    window.alert('Failed to load labs. See console for details.');
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
-const addLab = async () => {
-  const newLabName = window.prompt('Enter new lab name:');
-  if (!newLabName) return;
-  const trimmed = newLabName.trim();
-  if (trimmed === '') return window.alert('Lab name cannot be empty.');
+  const addLab = async () => {
+    const newLabName = window.prompt('Enter new lab name:');
+    if (!newLabName) return;
+    const trimmed = newLabName.trim();
+    if (trimmed === '') return window.alert('Lab name cannot be empty.');
 
-  if (labs.some(l => l.name.toLowerCase() === trimmed.toLowerCase())) {
-    return window.alert('This lab already exists.');
-  }
+    if (labs.some(l => l.name && l.name.toLowerCase() === trimmed.toLowerCase())) {
+      return window.alert('This lab already exists.');
+    }
 
-  setAdding(true);
-  try {
-    const res = await axios.post(`${API_BASE}/lab`, { name: trimmed });
-    setLabs(prev => [...prev, res.data]);
-    setSelectedLab(res.data); // Select newly added lab
-    setUnits([]); // Clear units for new lab
-  } catch (err) {
-    console.error('Failed to add lab', err);
-    console.error('err.response:', err?.response?.data ?? err?.message);
-    const message = err?.response?.data?.message || 'Failed to add lab';
-    window.alert(message);
-  } finally {
-    setAdding(false);
-  }
-};
+    setAdding(true);
+    try {
+      const res = await axios.post(`${API_BASE}/labs`, { name: trimmed });
+      setLabs(prev => [...prev, res.data]);
+      setSelectedLab(res.data); // Select newly added lab
+      setUnits([]); // Clear units for new lab
+    } catch (err) {
+      console.error('Failed to add lab', err);
+      console.error('err.response:', err?.response?.data ?? err?.message);
+      const message = err?.response?.data?.message || 'Failed to add lab';
+      window.alert(message);
+    } finally {
+      setAdding(false);
+    }
+  };
 
-  // Remove a lab by index (with confirmation)
   const removeLab = async (index) => {
     const lab = labs[index];
     if (!lab) return;
@@ -94,35 +96,39 @@ const addLab = async () => {
     if (!confirmed) return;
 
     try {
-      await axios.delete(`${API_BASE}/lab/${lab._id}`);
+      await axios.delete(`${API_BASE}/labs/${lab._id}`);
       const newLabs = labs.filter((_, i) => i !== index);
       setLabs(newLabs);
       if (selectedLab?._id === lab._id) {
-        setSelectedLab(newLabs.length > 0 ? newLabs[0] : null); // Select first lab or none
+        setSelectedLab(newLabs.length > 0 ? newLabs[0] : null);
         setUnits([]);
+        if (newLabs.length > 0) {
+          fetchUnitsByLab(newLabs[0]._id);
+        }
       }
     } catch (err) {
       console.error('Failed to delete lab', err);
+      console.error('err.response:', err?.response?.data ?? err?.message);
       window.alert('Failed to delete lab. See console for details.');
     }
   };
 
-  const handleLabDoubleClick = (index) => {
-    removeLab(index);
-  };
-
-  // New functions for unit management
+  // ----- Units -----
   const fetchUnitsByLab = async (labId) => {
+    if (!labId) return;
     setLoading(true);
     try {
-      const res = await axios.get(`${API_BASE}/unit/lab/${labId}`);
-      setUnits(res.data);
-      // Automatically select the first unit if units are fetched and no unit is selected
-      if (res.data.length > 0 && !selectedUnit) {
+      // Prefer nested path that server handles: /api/labs/:labId/units
+      const res = await axios.get(`${API_BASE}/labs/${labId}/units`);
+      setUnits(res.data || []);
+      if (res.data && res.data.length > 0 && !selectedUnit) {
         setSelectedUnit(res.data[0]);
+      } else if (!res.data || res.data.length === 0) {
+        setSelectedUnit(null);
       }
     } catch (err) {
       console.error(`Failed to fetch units for lab ${labId}`, err);
+      console.error('err.response:', err?.response?.data ?? err?.message);
       window.alert('Failed to load units. See console for details.');
     } finally {
       setLoading(false);
@@ -137,10 +143,12 @@ const addLab = async () => {
     if (trimmed === '') return window.alert('Unit name cannot be empty.');
 
     try {
-      const res = await axios.post(`${API_BASE}/unit`, { name: trimmed, lab: selectedLab._id });
+      const res = await axios.post(`${API_BASE}/units`, { name: trimmed, lab: selectedLab._id });
       setUnits(prev => [...prev, res.data]);
+      setSelectedUnit(res.data);
     } catch (err) {
       console.error('Failed to add unit', err);
+      console.error('err.response:', err?.response?.data ?? err?.message);
       window.alert('Failed to add unit. See console for details.');
     }
   };
@@ -156,7 +164,7 @@ const addLab = async () => {
 
   // Filtered units for display
   const filteredUnits = units.filter(unit => {
-    const matchesSearch = unit.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = unit.name?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = unitStatuses.length === 0 || unitStatuses.includes(unit.status);
     return matchesSearch && matchesStatus;
   });
@@ -171,8 +179,8 @@ const addLab = async () => {
             <span className="logo-line">|</span>
           </div>
           <nav className="nav-links-dashboard">
-            <a 
-              href="/dashboard" 
+            <a
+              href="/dashboard"
               className={`nav-link-dashboard ${activeLink === '/dashboard-admin' ? 'active' : ''}`}
               onClick={(e) => {
                 e.preventDefault();
@@ -199,13 +207,13 @@ const addLab = async () => {
           <span className="profile-role">Auditor</span>
         </div>
       </header>
-      
+
       <div className="inventory-main-layout">
         <aside className="sidebar inventory-sidebar">
           <ul className="sidebar-menu">
             <li>
-              <a 
-                href="/dashboard" 
+              <a
+                href="/dashboard"
                 className={`sidebar-link ${activeLink === '/dashboard' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
@@ -217,8 +225,8 @@ const addLab = async () => {
               </a>
             </li>
             <li>
-              <a 
-                href="/inventory" 
+              <a
+                href="/inventory"
                 className={`sidebar-link ${activeLink === '/inventory' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
@@ -243,8 +251,8 @@ const addLab = async () => {
               </a>
             </li>
             <li>
-              <a 
-                href="/reports-auditor" 
+              <a
+                href="/reports-auditor"
                 className={`sidebar-link ${activeLink === '/reports-auditor' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
@@ -256,8 +264,8 @@ const addLab = async () => {
               </a>
             </li>
             <li>
-              <a 
-                href="/technicians" 
+              <a
+                href="/technicians"
                 className={`sidebar-link ${activeLink === '/technicians' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
@@ -269,8 +277,8 @@ const addLab = async () => {
               </a>
             </li>
             <li>
-              <a 
-                href="/auditor-profile" 
+              <a
+                href="/auditor-profile"
                 className={`sidebar-link ${activeLink === '/auditor-profile' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
@@ -288,9 +296,9 @@ const addLab = async () => {
           <div className="inventory-page-content">
             {/* Left Container: Lab List */}
             <div className="inventory-lab-panel">
-              <button 
-                className="inventory-add-lab-button" 
-                onClick={addLab} 
+              <button
+                className="inventory-add-lab-button"
+                onClick={addLab}
                 disabled={adding}
               >
                 {adding ? 'ADDING...' : 'ADD LAB'}
@@ -311,7 +319,7 @@ const addLab = async () => {
                         {lab.name}
                       </div>
                     ))}
-                    <div 
+                    <div
                       className={`inventory-lab-card inventory-add-lab-card ${selectedLab ? 'active' : ''}`}
                       onClick={addLab}
                     >
@@ -354,8 +362,8 @@ const addLab = async () => {
                       onClick={() => handleUnitClick(unit)}
                     >
                       <img src={PcDisplayLogo} alt="PC Icon" className="inventory-pc-card-icon" />
-                      <span>{unit.name}</span>
-                      <span>{unit.status} &#x25cf;</span>
+                      <span className="inventory-pc-name">{unit.name}</span>
+                      <span className="inventory-pc-status">{unit.status} &#x25cf;</span>
                     </div>
                   ))
                 )}
@@ -368,9 +376,9 @@ const addLab = async () => {
               {selectedUnit ? (
                 <>
                   <div className="inventory-info-item">
-                    <input 
-                      type="text" 
-                      value={selectedUnit.name}
+                    <input
+                      type="text"
+                      value={selectedUnit.name || ''}
                       onChange={(e) => setSelectedUnit({ ...selectedUnit, name: e.target.value })}
                       className="inventory-info-input"
                     />
@@ -378,9 +386,9 @@ const addLab = async () => {
                   </div>
                   <div className="inventory-info-item">
                     <span className="inventory-info-label">Operating System:</span>
-                    <input 
-                      type="text" 
-                      value={selectedUnit.os}
+                    <input
+                      type="text"
+                      value={selectedUnit.os || ''}
                       onChange={(e) => setSelectedUnit({ ...selectedUnit, os: e.target.value })}
                       className="inventory-info-input"
                     />
@@ -388,9 +396,9 @@ const addLab = async () => {
                   </div>
                   <div className="inventory-info-item">
                     <span className="inventory-info-label">Ram:</span>
-                    <input 
-                      type="text" 
-                      value={selectedUnit.ram}
+                    <input
+                      type="text"
+                      value={selectedUnit.ram || ''}
                       onChange={(e) => setSelectedUnit({ ...selectedUnit, ram: e.target.value })}
                       className="inventory-info-input"
                     />
@@ -398,9 +406,9 @@ const addLab = async () => {
                   </div>
                   <div className="inventory-info-item">
                     <span className="inventory-info-label">Storage:</span>
-                    <input 
-                      type="text" 
-                      value={selectedUnit.storage}
+                    <input
+                      type="text"
+                      value={selectedUnit.storage || ''}
                       onChange={(e) => setSelectedUnit({ ...selectedUnit, storage: e.target.value })}
                       className="inventory-info-input"
                     />
@@ -408,9 +416,9 @@ const addLab = async () => {
                   </div>
                   <div className="inventory-info-item">
                     <span className="inventory-info-label">CPU:</span>
-                    <input 
-                      type="text" 
-                      value={selectedUnit.cpu}
+                    <input
+                      type="text"
+                      value={selectedUnit.cpu || ''}
                       onChange={(e) => setSelectedUnit({ ...selectedUnit, cpu: e.target.value })}
                       className="inventory-info-input"
                     />
@@ -418,9 +426,9 @@ const addLab = async () => {
                   </div>
                   <div className="inventory-info-item">
                     <span className="inventory-info-label">Last Issued:</span>
-                    <input 
-                      type="text" 
-                      value={selectedUnit.lastIssued}
+                    <input
+                      type="text"
+                      value={selectedUnit.lastIssued || ''}
                       onChange={(e) => setSelectedUnit({ ...selectedUnit, lastIssued: e.target.value })}
                       className="inventory-info-input"
                     />
@@ -428,9 +436,9 @@ const addLab = async () => {
                   </div>
                   <div className="inventory-set-status-section">
                     <span>SET STATUS:</span>
-                    <select 
+                    <select
                       className="inventory-status-dropdown"
-                      value={selectedUnit.status}
+                      value={selectedUnit.status || 'Functional'}
                       onChange={(e) => setSelectedUnit({ ...selectedUnit, status: e.target.value })}
                     >
                       <option value="Functional">Functional</option>
@@ -438,7 +446,28 @@ const addLab = async () => {
                       <option value="Out Of Order">Out Of Order</option>
                     </select>
                   </div>
-                  <button className="inventory-save-button">Save</button>
+                  <button
+                    className="inventory-save-button"
+                    onClick={async () => {
+                      // Optional: implement save to backend
+                      try {
+                        const payload = { ...selectedUnit };
+                        // send to API (assumes PUT /units/:id exists)
+                        if (selectedUnit._id) {
+                          await axios.put(`${API_BASE}/units/${selectedUnit._id}`, payload);
+                          // update units list locally
+                          setUnits(prev => prev.map(u => (u._id === selectedUnit._id ? selectedUnit : u)));
+                          window.alert('Unit saved');
+                        }
+                      } catch (err) {
+                        console.error('Failed to save unit', err);
+                        console.error('err.response:', err?.response?.data ?? err?.message);
+                        window.alert('Failed to save unit. See console.');
+                      }
+                    }}
+                  >
+                    Save
+                  </button>
                 </>
               ) : (
                 <div>Select a unit to view details</div>

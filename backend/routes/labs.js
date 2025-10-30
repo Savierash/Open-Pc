@@ -3,68 +3,67 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const Lab = require('../models/lab');
+const Unit = require('../models/unit'); 
+const unitsRouter = require('./units');
 
-// GET /api/labs
+
+// GET /api/labs  -> list labs
 router.get('/', async (req, res) => {
   try {
-    const labs = await Lab.find().sort({ createdAt: 1 });
-    res.json(labs);
+    const labs = await Lab.find({}).sort({ name: 1 });
+    return res.json(labs);
   } catch (err) {
-    console.error('GET /api/labs error', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Failed to fetch labs', err);
+    return res.status(500).json({ message: 'Server error', error: err.message });
   }
 });
 
-// POST /api/labs
+// POST /api/labs -> create lab
 router.post('/', async (req, res) => {
+  const { name } = req.body;
+  if (!name) return res.status(400).json({ message: 'name required' });
+
   try {
-    const { name } = req.body;
-    if (!name || !name.trim()) return res.status(400).json({ message: 'Name required' });
+    const existing = await Lab.findOne({ name });
+    if (existing) return res.status(409).json({ message: 'Lab already exists' });
 
-    const exists = await Lab.findOne({ name: { $regex: `^${name.trim()}$`, $options: 'i' }});
-    if (exists) return res.status(409).json({ message: 'Lab exists' });
-
-    const lab = new Lab({ name: name.trim() });
-    await lab.save();
-    res.status(201).json(lab);
+    const lab = new Lab({ name });
+    const saved = await lab.save();
+    return res.status(201).json(saved);
   } catch (err) {
-    console.error('POST /api/labs error', err);
-    if (err.code === 11000) return res.status(409).json({ message: 'Lab exists' });
-    res.status(500).json({ message: 'Server error' });
+    console.error('Failed to create lab', err);
+    return res.status(500).json({ message: 'Server error', error: err.message });
   }
 });
 
-// PUT /api/labs/:id
-router.put('/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ message: 'Invalid id' });
-    const { name } = req.body;
-    if (!name || !name.trim()) return res.status(400).json({ message: 'Name required' });
-
-    const duplicate = await Lab.findOne({ _id: { $ne: id }, name: { $regex: `^${name.trim()}$`, $options: 'i' }});
-    if (duplicate) return res.status(409).json({ message: 'Another lab already has that name' });
-
-    const updated = await Lab.findByIdAndUpdate(id, { name: name.trim() }, { new: true, runValidators: true });
-    if (!updated) return res.status(404).json({ message: 'Lab not found' });
-    res.json(updated);
-  } catch (err) {
-    console.error('PUT /api/labs/:id error', err);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// DELETE /api/labs/:id
+// DELETE /api/labs/:id -> delete lab and optionally its units (or keep)
 router.delete('/:id', async (req, res) => {
+  const id = req.params.id;
+  if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ message: 'Invalid lab id' });
+
   try {
-    const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ message: 'Invalid id' });
-    const deleted = await Lab.findByIdAndDelete(id);
-    if (!deleted) return res.status(404).json({ message: 'Lab not found' });
-    res.json({ message: 'Deleted', id: deleted._id });
+    const removed = await Lab.findByIdAndDelete(id);
+    if (!removed) return res.status(404).json({ message: 'Lab not found' });
+    // Optional: remove units belonging to lab
+    await Unit.deleteMany({ lab: id }).catch(e => console.warn('Failed to delete units for lab', id, e));
+    return res.json({ message: 'Lab deleted', id: removed._id });
   } catch (err) {
-    console.error('DELETE /api/labs/:id error', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Failed to delete lab', id, err);
+    return res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
+// OPTIONAL: nested route GET /api/labs/:labId/units (handy if you prefer not to use server internal forward)
+router.get('/:labId/units', async (req, res) => {
+  const labId = req.params.labId;
+  if (!mongoose.Types.ObjectId.isValid(labId)) return res.status(400).json({ message: 'Invalid labId' });
+
+  try {
+    const units = await Unit.find({ lab: labId }).sort({ name: 1 });
+    return res.json(units);
+  } catch (err) {
+    console.error('Failed to fetch units for lab (nested)', labId, err);
+    return res.status(500).json({ message: 'Server error', error: err.message });
   }
 });
 
