@@ -130,15 +130,36 @@ const ReportsTech = () => {
                 <span>Last Issued: September 1, 2025</span>
               </div>
               <div className="issues-checkbox-grid">
-                <label><input type="checkbox" checked={reportIssues.ramIssue} onChange={() => handleIssueChange('ramIssue')} disabled /> Ram Issue</label>
-                <label><input type="checkbox" checked={reportIssues.osIssue} onChange={() => handleIssueChange('osIssue')} disabled /> OS Issue</label>
-                <label><input type="checkbox" checked={reportIssues.cpuIssue} onChange={() => handleIssueChange('cpuIssue')} disabled /> CPU Issue</label>
-                <label><input type="checkbox" checked={reportIssues.noInternet} onChange={() => handleIssueChange('noInternet')} disabled /> No Internet</label>
-                <label><input type="checkbox" checked={reportIssues.storageIssue} onChange={() => handleIssueChange('storageIssue')} disabled /> Storage Issue</label>
-                <label><input type="checkbox" checked={reportIssues.virus} onChange={() => handleIssueChange('virus')} disabled /> Virus</label>
+                <div>
+                  <input type="checkbox" id="ramIssue" checked={reportIssues.ramIssue} onChange={() => handleIssueChange('ramIssue')} disabled />
+                  <label htmlFor="ramIssue">Ram Issue</label>
+                </div>
+                <div>
+                  <input type="checkbox" id="osIssue" checked={reportIssues.osIssue} onChange={() => handleIssueChange('osIssue')} disabled />
+                  <label htmlFor="osIssue">OS Issue</label>
+                </div>
+                <div>
+                  <input type="checkbox" id="cpuIssue" checked={reportIssues.cpuIssue} onChange={() => handleIssueChange('cpuIssue')} disabled />
+                  <label htmlFor="cpuIssue">CPU Issue</label>
+                </div>
+                <div>
+                  <input type="checkbox" id="noInternet" checked={reportIssues.noInternet} onChange={() => handleIssueChange('noInternet')} disabled />
+                  <label htmlFor="noInternet">No Internet</label>
+                </div>
+                <div>
+                  <input type="checkbox" id="storageIssue" checked={reportIssues.storageIssue} onChange={() => handleIssueChange('storageIssue')} disabled />
+                  <label htmlFor="storageIssue">Storage Issue</label>
+                </div>
+                <div>
+                  <input type="checkbox" id="virus" checked={reportIssues.virus} onChange={() => handleIssueChange('virus')} disabled />
+                  <label htmlFor="virus">Virus</label>
+                </div>
               </div>
               <div className="other-issues-textarea">
-                <textarea placeholder="Other Issues: No Signal on the monitor"></textarea>
+                <textarea 
+                  value="No Signal on the monitor"
+                  readOnly
+                ></textarea>
               </div>
             </div>
           </div>

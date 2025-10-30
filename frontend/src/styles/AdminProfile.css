@@ -115,6 +115,7 @@
 .form-group {
   flex: 1;
   min-width: 220px;
+  max-width: 270px;
   position: relative;
 }
 
@@ -178,18 +179,25 @@
 }
 
 .password-row {
-  display: flex; /* Ensure it's a flex container */
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
-  gap: 1.5rem; /* Re-introduce gap to separate input and button */
-  /* Removed justify-content: space-between; as it's not needed with flex-grow and fixed width button */
+  gap: 1.5rem;
+  width: 100%;
 }
 
 .password-row .form-group {
-  flex: 1; /* Allow password input to grow and shrink */
-  min-width: 220px; /* Maintain minimum width as other form-groups */
-  margin-right: 0; /* Ensure no extra margin */
-  width: auto; /* Allow flex to manage width */
+  flex: 0 0 270px;
+  max-width: 270px;
+}
+
+.password-row .input-with-icon {
+  width: 100%;
+}
+
+.password-row .logout-button {
+  width: 120px;
+  margin-left: auto;
 }
 
 .logout-button {

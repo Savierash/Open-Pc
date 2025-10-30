@@ -12,6 +12,7 @@ import PersonLogo from "../assets/Person.png";
 
 const UnitStatusTechnician = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
+  const [editingField, setEditingField] = useState(null);
   const [selectedUnit, setSelectedUnit] = useState({
     name: 'ITS300-PC-002',
     os: 'Windows 11',
@@ -96,12 +97,18 @@ const UnitStatusTechnician = () => {
                 <div className="pc-card">
                   <img src={PcDisplayLogo} alt="PC Icon" className="pc-card-icon" />
                   <span>ITS300-PC-002</span>
-                  <span>Out Of Order &#x25cf;</span>
+                  <div className="status-indicator">
+                    <span>Out Of Order</span>
+                    <span className="status-dot out-of-order"></span>
+                  </div>
                 </div>
                 <div className="pc-card">
                   <img src={PcDisplayLogo} alt="PC Icon" className="pc-card-icon" />
                   <span>ITS300-PC-010</span>
-                  <span>Out Of Order &#x25cf;</span>
+                  <div className="status-indicator">
+                    <span>Out Of Order</span>
+                    <span className="status-dot out-of-order"></span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -114,54 +121,90 @@ const UnitStatusTechnician = () => {
                   type="text" 
                   value={selectedUnit.name}
                   onChange={(e) => handleUnitDetailChange('name', e.target.value)}
-                  className="info-input"
+                  className={`info-input ${editingField === 'name' ? 'editable' : ''}`}
+                  readOnly={editingField !== 'name'}
                 />
-                <img src={ClipboardLogo} alt="Edit Icon" className="edit-icon" />
+                <img 
+                  src={ClipboardLogo} 
+                  alt="Edit Icon" 
+                  className="edit-icon" 
+                  onClick={() => setEditingField(editingField === 'name' ? null : 'name')}
+                />
               </div>
               <div className="info-item">
                 <input 
                   type="text" 
                   value={selectedUnit.os}
                   onChange={(e) => handleUnitDetailChange('os', e.target.value)}
-                  className="info-input"
+                  className={`info-input ${editingField === 'os' ? 'editable' : ''}`}
+                  readOnly={editingField !== 'os'}
                 />
-                <img src={ClipboardLogo} alt="Edit Icon" className="edit-icon" />
+                <img 
+                  src={ClipboardLogo} 
+                  alt="Edit Icon" 
+                  className="edit-icon" 
+                  onClick={() => setEditingField(editingField === 'os' ? null : 'os')}
+                />
               </div>
               <div className="info-item">
                 <input 
                   type="text" 
                   value={selectedUnit.ram}
                   onChange={(e) => handleUnitDetailChange('ram', e.target.value)}
-                  className="info-input"
+                  className={`info-input ${editingField === 'ram' ? 'editable' : ''}`}
+                  readOnly={editingField !== 'ram'}
                 />
-                <img src={ClipboardLogo} alt="Edit Icon" className="edit-icon" />
+                <img 
+                  src={ClipboardLogo} 
+                  alt="Edit Icon" 
+                  className="edit-icon" 
+                  onClick={() => setEditingField(editingField === 'ram' ? null : 'ram')}
+                />
               </div>
               <div className="info-item">
                 <input 
                   type="text" 
                   value={selectedUnit.storage}
                   onChange={(e) => handleUnitDetailChange('storage', e.target.value)}
-                  className="info-input"
+                  className={`info-input ${editingField === 'storage' ? 'editable' : ''}`}
+                  readOnly={editingField !== 'storage'}
                 />
-                <img src={ClipboardLogo} alt="Edit Icon" className="edit-icon" />
+                <img 
+                  src={ClipboardLogo} 
+                  alt="Edit Icon" 
+                  className="edit-icon" 
+                  onClick={() => setEditingField(editingField === 'storage' ? null : 'storage')}
+                />
               </div>
               <div className="info-item">
                 <input 
                   type="text" 
                   value={selectedUnit.cpu}
                   onChange={(e) => handleUnitDetailChange('cpu', e.target.value)}
-                  className="info-input"
+                  className={`info-input ${editingField === 'cpu' ? 'editable' : ''}`}
+                  readOnly={editingField !== 'cpu'}
                 />
-                <img src={ClipboardLogo} alt="Edit Icon" className="edit-icon" />
+                <img 
+                  src={ClipboardLogo} 
+                  alt="Edit Icon" 
+                  className="edit-icon" 
+                  onClick={() => setEditingField(editingField === 'cpu' ? null : 'cpu')}
+                />
               </div>
               <div className="info-item">
                 <input 
                   type="text" 
                   value={selectedUnit.lastIssued}
                   onChange={(e) => handleUnitDetailChange('lastIssued', e.target.value)}
-                  className="info-input"
+                  className={`info-input ${editingField === 'lastIssued' ? 'editable' : ''}`}
+                  readOnly={editingField !== 'lastIssued'}
                 />
-                <img src={ClipboardLogo} alt="Edit Icon" className="edit-icon" />
+                <img 
+                  src={ClipboardLogo} 
+                  alt="Edit Icon" 
+                  className="edit-icon" 
+                  onClick={() => setEditingField(editingField === 'lastIssued' ? null : 'lastIssued')}
+                />
               </div>
               <div className="set-status-section">
                 <span>SET STATUS:</span>

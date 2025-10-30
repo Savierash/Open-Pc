@@ -158,10 +158,13 @@ const UnitStatusAuditor = () => {
               {filteredUnits.map(unit => (
                 <div className="auditor-pc-card" key={unit.id}>
                   <img src={PcDisplayLogo} alt="PC Icon" className="auditor-pc-card-icon" />
-                  <span>{unit.id}</span>
-                  <span className={unit.status.toLowerCase().replace(/ /g, '-')}>
-                    {unit.status} &#x25cf;
-                  </span>
+                  <div className="auditor-pc-card-content">
+                    <span>{unit.id}</span>
+                    <div className="status-indicator">
+                      <span>{unit.status}</span>
+                      <span className={`status-dot ${unit.status.toLowerCase().replace(/ /g, '-')}`}></span>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>

@@ -291,12 +291,30 @@ const ReportsAuditor = () => {
                 <img src={EditIcon} alt="Edit Icon" className="input-icon" />
               </div>
               <div className="issues-checkbox-grid-auditor">
-                <label><input type="checkbox" checked={reportIssues.ramIssue} onChange={() => setReportIssues(prev => ({...prev, ramIssue: !prev.ramIssue}))} /> Ram Issue</label>
-                <label><input type="checkbox" checked={reportIssues.osIssue} onChange={() => setReportIssues(prev => ({...prev, osIssue: !prev.osIssue}))} /> OS Issue</label>
-                <label><input type="checkbox" checked={reportIssues.cpuIssue} onChange={() => setReportIssues(prev => ({...prev, cpuIssue: !prev.cpuIssue}))} /> CPU Issue</label>
-                <label><input type="checkbox" checked={reportIssues.noInternet} onChange={() => setReportIssues(prev => ({...prev, noInternet: !prev.noInternet}))} /> No Internet</label>
-                <label><input type="checkbox" checked={reportIssues.storageIssue} onChange={() => setReportIssues(prev => ({...prev, storageIssue: !prev.storageIssue}))} /> Storage Issue</label>
-                <label><input type="checkbox" checked={reportIssues.virus} onChange={() => setReportIssues(prev => ({...prev, virus: !prev.virus}))} /> Virus</label>
+                <div>
+                  <input type="checkbox" id="ramIssue" checked={reportIssues.ramIssue} onChange={() => setReportIssues(prev => ({...prev, ramIssue: !prev.ramIssue}))} />
+                  <label htmlFor="ramIssue">Ram Issue</label>
+                </div>
+                <div>
+                  <input type="checkbox" id="osIssue" checked={reportIssues.osIssue} onChange={() => setReportIssues(prev => ({...prev, osIssue: !prev.osIssue}))} />
+                  <label htmlFor="osIssue">OS Issue</label>
+                </div>
+                <div>
+                  <input type="checkbox" id="cpuIssue" checked={reportIssues.cpuIssue} onChange={() => setReportIssues(prev => ({...prev, cpuIssue: !prev.cpuIssue}))} />
+                  <label htmlFor="cpuIssue">CPU Issue</label>
+                </div>
+                <div>
+                  <input type="checkbox" id="noInternet" checked={reportIssues.noInternet} onChange={() => setReportIssues(prev => ({...prev, noInternet: !prev.noInternet}))} />
+                  <label htmlFor="noInternet">No Internet</label>
+                </div>
+                <div>
+                  <input type="checkbox" id="storageIssue" checked={reportIssues.storageIssue} onChange={() => setReportIssues(prev => ({...prev, storageIssue: !prev.storageIssue}))} />
+                  <label htmlFor="storageIssue">Storage Issue</label>
+                </div>
+                <div>
+                  <input type="checkbox" id="virus" checked={reportIssues.virus} onChange={() => setReportIssues(prev => ({...prev, virus: !prev.virus}))} />
+                  <label htmlFor="virus">Virus</label>
+                </div>
               </div>
               <div className="other-issues-textarea-auditor">
                 <textarea 

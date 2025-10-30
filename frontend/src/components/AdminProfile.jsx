@@ -142,7 +142,7 @@ const AdminProfile = () => {
                 </div>
               </div>
 
-              <h3>Contact Email</h3>
+              <h3>Contact Information</h3>
               <div className="form-row">
                 <div className="form-group">
                   <label>Email</label>
