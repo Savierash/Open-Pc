@@ -1,4 +1,5 @@
 // src/pages/Signup.jsx
+import { useSearchParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import '../styles/Signup.css';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
@@ -18,6 +19,8 @@ const api = axios.create({
 });
 
 const Signup = () => {
+  const [searchParams] = useSearchParams();
+  const roleKey = searchParams.get('role'); // ✅ capture role from query
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -54,21 +57,18 @@ const Signup = () => {
         email,
         password,
         confirmPassword,
+        roleKey,
       });
       const { token, user } = res.data;
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
-      // navigate instead of hard reload if you want SPA behavior:
-      navigate('/dashboard', { replace: true });
-      // or use window.location.href = '/';
+      if (user.role === 'admin') navigate('/Dashboard-admin');
+      else if (user.role === 'auditor') navigate('/dashboard');
+      else if (user.role === 'technician') navigate('/Dashboard-technician');
+      else navigate('/dashboard');
     } catch (err) {
       console.error('Signup error', err);
-      // Detailed logging for network vs server errors:
-      if (!err.response) {
-        setError(`Network error: ${err.message}`);
-      } else {
-        setError(err.response?.data?.message || 'Signup failed');
-      }
+      setError(err.response?.data?.message || 'Signup failed');
     } finally {
       setLoading(false);
     }

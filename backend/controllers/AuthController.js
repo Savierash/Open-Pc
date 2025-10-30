@@ -1,13 +1,16 @@
-// backend/controllers/AuthController.js
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Role = require('../models/role');
 const User = require('../models/Users');
+const Otp = require('../models/Otp'); // ✅ NEW
+const sendEmail = require('../utils/sendEmail'); // ✅ NEW
+
+// Helper: Generate random 6-digit OTP
+const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
 
 /**
  * Register
- * Accepts: { email, username, password, confirmPassword, roleKey? }
- * Behavior: same as your existing register, but optionally attaches role by key
+ * Added: OTP creation + email sending
  */
 exports.register = async (req, res) => {
   try {
@@ -21,39 +24,43 @@ exports.register = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashed = await bcrypt.hash(password, salt);
 
-    // If a roleKey is provided, fetch the role and attach
     let assignedRole = null;
     if (roleKey) {
       assignedRole = await Role.findOne({ key: roleKey });
       if (!assignedRole) return res.status(400).json({ message: 'Invalid role' });
     }
 
-    // Keep your field naming (password) consistent with existing model
+    // create unverified user
     const user = new User({
       email,
       username,
       password: hashed,
       role: assignedRole ? assignedRole._id : undefined,
+      isVerified: false, // ✅ added
     });
 
     await user.save();
 
-    // include role key in token payload if assigned
-    const tokenPayload = { id: user._id, email: user.email };
-    if (assignedRole) tokenPayload.role = assignedRole.key;
+    // ✅ Generate and save OTP
+    const otpCode = generateOtp();
+    await Otp.create({ email, otp: otpCode });
 
-    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
+    // ✅ Send OTP email
+    const htmlContent = `
+      <div style="font-family: Arial; line-height: 1.5;">
+        <h2>Welcome to Open-PC!</h2>
+        <p>Your One-Time Password (OTP) for verification is:</p>
+        <h1 style="letter-spacing: 3px; color: #4CAF50;">${otpCode}</h1>
+        <p>This code expires in 10 minutes.</p>
+      </div>
+    `;
+    await sendEmail(email, 'Open-PC Account Verification', htmlContent);
 
-    // respond like your original register (token + user)
     res.status(201).json({
-      token,
-      user: {
-        id: user._id,
-        email: user.email,
-        username: user.username,
-        role: assignedRole ? assignedRole.key : undefined,
-      },
+      message: 'User registered successfully. Please verify your email with the OTP sent.',
+      email,
     });
+
   } catch (err) {
     console.error('Register error:', err);
     res.status(500).json({ message: 'Server error' });
@@ -61,18 +68,35 @@ exports.register = async (req, res) => {
 };
 
 /**
+ * ✅ Verify OTP
+ * Confirms OTP and marks user verified
+ */
+exports.verifyOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    const record = await Otp.findOne({ email, otp });
+    if (!record) return res.status(400).json({ message: 'Invalid or expired OTP' });
+
+    await User.updateOne({ email }, { isVerified: true });
+    await Otp.deleteMany({ email }); // delete used OTPs
+
+    res.status(200).json({ message: 'OTP verified successfully!' });
+  } catch (err) {
+    console.error('Verify OTP error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+/**
  * Login
- * Supports:
- * - { email, password }  (original)
- * - { usernameOrEmail, password } (your second variant)
- * Behavior: verify creds, set httpOnly cookie, return token + user
+ * Added check: must be verified before login
  */
 exports.login = async (req, res) => {
   try {
     const { email, password, usernameOrEmail } = req.body;
-
-    // Determine search criteria:
     let user;
+
     if (usernameOrEmail) {
       user = await User.findOne({
         $or: [{ email: usernameOrEmail }, { username: usernameOrEmail }],
@@ -84,32 +108,30 @@ exports.login = async (req, res) => {
     }
 
     if (!user) return res.status(401).json({ message: 'Invalid credentials' });
+    if (!user.isVerified) return res.status(403).json({ message: 'Please verify your email before login' });
 
     const matched = await bcrypt.compare(password, user.password);
     if (!matched) return res.status(401).json({ message: 'Invalid credentials' });
 
-    // Build token payload (include role key if populated)
     const tokenPayload = { id: user._id, email: user.email };
     if (user.role && user.role.key) tokenPayload.role = user.role.key;
 
     const token = jwt.sign(tokenPayload, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
 
-    // set cookie for session-based usage (keeps backward compatibility)
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // set true in production when using HTTPS
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+      maxAge: 1000 * 60 * 60 * 24 * 7,
     });
 
-    // Response: include token and user info (sanitized)
     res.json({
       token,
       user: {
         id: user._id,
         email: user.email,
         username: user.username,
-        role: user.role && user.role.key ? user.role.key : undefined,
+        role: user.role?.key,
       },
     });
   } catch (err) {
@@ -119,8 +141,7 @@ exports.login = async (req, res) => {
 };
 
 /**
- * GET available roles
- * Returns: { success: true, roles: [{ key, name, description }, ...] }
+ * Get available roles (unchanged)
  */
 exports.getRoles = async (req, res) => {
   try {

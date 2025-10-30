@@ -40,7 +40,6 @@ const Login = () => {
     setLoading(true);
 
     try {
-      // Use the api instance created above
       const res = await api.post('/api/auth/login', {
         usernameOrEmail,
         password,
@@ -51,25 +50,27 @@ const Login = () => {
       if (token) localStorage.setItem('token', token);
       if (user) localStorage.setItem('user', JSON.stringify(user));
 
-      // Redirect to dashboard (replace so they can't go back to login)
-      navigate('/dashboard', { replace: true });
-    } catch (err) {
-      console.error('Login error:', err);
-      const serverMsg =
-        err.response?.data?.message ||
-        err.response?.data?.error ||
-        err.response?.data?.msg ||
-        null;
-
-      if (!err.response) {
-        setError('Network error — check backend server and CORS settings.');
-      } else if (serverMsg) {
-        setError(serverMsg);
-      } else {
-        setError('Login failed — please check your credentials.');
-      }
-    } finally {
-      setLoading(false);
+      switch (user.role) {
+      case 'admin':
+        navigate('/Dashboard-admin');
+        break;
+      case 'auditor':
+        navigate('/dashboard');
+        break;
+      case 'technician':
+        navigate('/Dashboard-technician');
+        break;
+      default:
+        navigate('/dashboard');
+    }
+  } catch (err) {
+    console.error('Login error:', err);
+    setError(
+      err.response?.data?.message ||
+      'Login failed — please check your credentials.'
+    );
+  } finally {
+    setLoading(false);
     }
   };
 

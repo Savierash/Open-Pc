@@ -5,6 +5,7 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const path = require('path');
+const seedRoles = require('./seedRoles');
 
 const labsRouter = require('./routes/labs');
 const unitsRouter = require('./routes/units');
@@ -78,8 +79,9 @@ app.use((err, req, res, next) => {
 
 // Connect to Mongo and start server
 mongoose.connect(MONGO_URI)
-  .then(() => {
+  .then(async() => {
     console.log('Mongo connected');
+    await seedRoles();
     startServer();
   })
   .catch((err) => {

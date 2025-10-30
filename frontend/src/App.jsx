@@ -1,10 +1,14 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
+
+// Page Imports
 import Homepage from './pages/Homepage';  
 import Dashboard from './pages/Dashboard.jsx'; 
 import Services from './components/Services';
 import Login from './pages/login.jsx';
 import Signup from './pages/signup.jsx';
+
+// Component Imports
 import About from './components/About.jsx';
 import Inventory from './components/Inventory.jsx';
 import TotalUnits from './components/TotalUnits.jsx';
@@ -55,7 +59,7 @@ function App() {
   return (
     <Router>
       <Routes>
-          <Route path="/document" element={<Navigate to="/documents" replace />} />
+          <Route path="/document" element={<DocumentPage />} />
           <Route path="/" element={<Homepage />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/services" element={<Services />} />

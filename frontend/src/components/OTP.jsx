@@ -16,6 +16,7 @@ const OTP = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const email = location.state?.email;
 
   useEffect(() => {
     setActiveLink(location.pathname);
@@ -26,7 +27,6 @@ const OTP = () => {
 
     setOtp([...otp.map((d, idx) => (idx === index ? element.value : d))]);
 
-    // Focus next input
     if (element.nextSibling) {
       element.nextSibling.focus();
     }
@@ -37,15 +37,8 @@ const OTP = () => {
     setError('');
     setLoading(true);
     try {
-      // Here you would typically send the OTP to your backend for verification
-      // For now, let's just simulate a successful verification
       console.log('OTP submitted:', otp.join(''));
-      // if (otp.join('') === '123456') { // Example hardcoded OTP
-      //   navigate('/dashboard');
-      // } else {
-      //   setError('Invalid OTP');
-      // }
-      navigate('/'); // Redirect to homepage after successful OTP verification (placeholder)
+      navigate('/'); 
     } catch (err) {
       console.error(err);
       const msg = err.response?.data?.message || 'OTP verification failed';
