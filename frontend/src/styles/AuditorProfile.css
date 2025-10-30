@@ -1,9 +1,10 @@
 /* AuditorProfile.css */
 
 .profile-container {
-  padding: 1rem;
-  max-width: 900px;
-  margin: 0 auto;
+  padding: 2rem;
+  max-width: 100%;
+  width: 100%;
+  margin: 0;
   color: #fff;
 }
 
@@ -114,8 +115,8 @@
 
 .form-group {
   flex: 1;
-  min-width: 220px;
-  max-width: 270px;
+  min-width: 280px;
+  max-width: 450px;
   position: relative;
 }
 
@@ -187,8 +188,8 @@
 }
 
 .password-row .form-group {
-  flex: 0 0 270px;
-  max-width: 270px;
+  flex: 0 0 450px;
+  max-width: 450px;
 }
 
 .password-row .input-with-icon {
