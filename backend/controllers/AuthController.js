@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Role = require('../models/role');
 const User = require('../models/Users');
+const Otp = require('../models/Otp');
 const sendEmail = require('../utils/sendEmail'); // ✅ NEW
 
 // Helper: Generate random 6-digit OTP
@@ -55,7 +56,7 @@ exports.register = async (req, res) => {
     `;
     await sendEmail(email, 'Open-PC Account Verification', htmlContent);
 
-    res.status(201).json({
+    return res.status(200).json({
       message: 'User registered successfully. Please verify your email with the OTP sent.',
       email,
     });
@@ -70,20 +71,53 @@ exports.register = async (req, res) => {
  * ✅ Verify OTP
  * Confirms OTP and marks user verified
  */
+
 exports.verifyOtp = async (req, res) => {
   try {
+    console.log('📨 verifyOtp body:', req.body);
     const { email, otp } = req.body;
+    console.log(`📩 OTP verification request for: ${email} with code: ${otp}`);
 
-    const record = await Otp.findOne({ email, otp });
-    if (!record) return res.status(400).json({ message: 'Invalid or expired OTP' });
+    const existingOtp = await Otp.findOne({ email, otp });
+    if (!existingOtp) {
+      console.log('❌ Invalid or expired OTP');
+      return res.status(400).json({ message: 'Invalid or expired OTP' });
+    }
 
-    await User.updateOne({ email }, { isVerified: true });
-    await Otp.deleteMany({ email }); // delete used OTPs
+    // OTP valid — delete it
+    await Otp.deleteMany({ email });
 
-    res.status(200).json({ message: 'OTP verified successfully!' });
+    // Mark user as verified
+    const user = await User.findOneAndUpdate(
+      { email },
+      { isVerified: true },
+      { new: true }
+    ).populate('role');
+
+    if (!user) {
+      console.log('❌ User not found');
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const token = jwt.sign(
+      { id: user._id, role: user.role.key },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    console.log('✅ OTP verified successfully for:', user.email);
+    res.json({
+      message: 'OTP verified successfully',
+      token,
+      user: {
+        id: user._id,
+        email: user.email,
+        role: user.role.key,
+      },
+    });
   } catch (err) {
-    console.error('Verify OTP error:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error('OTP verification error:', err);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 

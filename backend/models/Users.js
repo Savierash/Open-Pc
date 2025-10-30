@@ -7,6 +7,7 @@ const UserSchema = new mongoose.Schema({
   username: { type: String, required: true, trim: true },
   password: { type: String, required: true },
   role: { type: mongoose.Schema.Types.ObjectId, ref: 'Role' },
+  isVerified: { type: Boolean, default: false }, // for email verification
   createdAt: { type: Date, default: Date.now },
   lastLoginAt: { type: Date }
   

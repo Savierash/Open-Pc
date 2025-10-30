@@ -33,18 +33,31 @@ const OTP = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    try {
-      console.log('OTP submitted:', otp.join(''));
-      navigate('/'); 
-    } catch (err) {
-      console.error(err);
-      const msg = err.response?.data?.message || 'OTP verification failed';
-      setError(msg);
-    } finally {
-      setLoading(false);
+  e.preventDefault();
+  setError('');
+  setLoading(true);
+  try {
+    const code = otp.join('');
+    console.log('📩 Submitting OTP:', code);
+
+    const res = await axios.post('http://localhost:5000/api/auth/verify-otp', {
+      email,
+      otp: code,
+    });
+
+    console.log('✅ OTP verification success:', res.data);
+    const userRole = res.data.user.role;
+
+    if (userRole === 'technician') navigate('/Dashboard-Technician');
+    else if (userRole === 'auditor') navigate('/Dashboard-Auditor');
+    else if (userRole === 'admin') navigate('/Dashboard-Admin');
+    else navigate('/');
+
+  } catch (err) {
+    console.error('❌ OTP verification failed:', err);
+    setError(err.response?.data?.message || 'OTP verification failed');
+  } finally {
+    setLoading(false);
     }
   };
 

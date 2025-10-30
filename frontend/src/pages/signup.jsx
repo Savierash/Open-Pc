@@ -59,13 +59,7 @@ const Signup = () => {
         confirmPassword,
         roleKey,
       });
-      const { token, user } = res.data;
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-      if (user.role === 'admin') navigate('/Dashboard-admin');
-      else if (user.role === 'auditor') navigate('/dashboard');
-      else if (user.role === 'technician') navigate('/Dashboard-technician');
-      else navigate('/dashboard');
+      navigate('/otp', { state: { email } });
     } catch (err) {
       console.error('Signup error', err);
       setError(err.response?.data?.message || 'Signup failed');
