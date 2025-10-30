@@ -2,7 +2,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Role = require('../models/role');
 const User = require('../models/Users');
-const Otp = require('../models/Otp'); // ✅ NEW
 const sendEmail = require('../utils/sendEmail'); // ✅ NEW
 
 // Helper: Generate random 6-digit OTP
