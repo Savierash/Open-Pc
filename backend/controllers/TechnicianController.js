@@ -1,125 +1,195 @@
 // backend/controllers/TechnicianController.js
-const Unit = require('../models/unit');      // adjust path if filename differs
+const Unit = require('../models/unit');
+const Lab = require('../models/lab');
 const Report = require('../models/report');
 const User = require('../models/Users');
 
+// ✅ Dashboard Summary
 exports.getDashboard = async (req, res) => {
   try {
-    const techId = req.user.id || req.user.userId || req.user._id;
-    const units = await Unit.find({ assignedTo: techId }).populate('lab');
-    const totalUnits = units.length;
+    // 🆕 Technician-specific filter (show only units assigned to logged-in technician if available)
+    const techId = req.user?.id || req.user?._id;
+    const filter = techId ? { assignedTo: techId } : {};
+
+    const totalUnits = await Unit.countDocuments(filter);
     const counts = {
-      functional: units.filter(u => u.status === 'functional').length,
-      maintenance: units.filter(u => u.status === 'maintenance').length,
-      outOfOrder: units.filter(u => u.status === 'out-of-order').length,
+      functional: await Unit.countDocuments({ ...filter, status: 'Functional' }),
+      maintenance: await Unit.countDocuments({ ...filter, status: 'Maintenance' }),
+      outOfOrder: await Unit.countDocuments({ ...filter, status: 'Out Of Order' }),
     };
 
-    const recentUnits = units
-      .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
-      .slice(0, 5);
+    const percentFunctional = totalUnits
+      ? Math.round((counts.functional / totalUnits) * 100)
+      : 0;
 
-    const percentFunctional = totalUnits ? Math.round((counts.functional / totalUnits) * 100) : 0;
+    const perLab = await Lab.aggregate([
+      {
+        $lookup: {
+          from: 'units',
+          localField: '_id',
+          foreignField: 'lab',
+          as: 'units',
+        },
+      },
+      {
+        $project: {
+          name: 1,
+          totalUnits: { $size: '$units' },
+          functional: {
+            $size: {
+              $filter: {
+                input: '$units',
+                as: 'u',
+                cond: { $eq: ['$$u.status', 'Functional'] },
+              },
+            },
+          },
+          maintenance: {
+            $size: {
+              $filter: {
+                input: '$units',
+                as: 'u',
+                cond: { $eq: ['$$u.status', 'Maintenance'] },
+              },
+            },
+          },
+          outOfOrder: {
+            $size: {
+              $filter: {
+                input: '$units',
+                as: 'u',
+                cond: { $eq: ['$$u.status', 'Out Of Order'] },
+              },
+            },
+          },
+        },
+      },
+    ]);
+
+    const recentUnits = await Unit.find(filter).sort({ updatedAt: -1 }).limit(5);
 
     res.json({
       totalUnits,
       counts,
       percentFunctional,
-      perLab: [], // (optional) add later
+      perLab,
       recentUnits,
-      trend: [],  // (optional) add later
+      trend: [], // optional chart data later
     });
   } catch (err) {
-    console.error('getDashboard error', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Dashboard error:', err);
+    res.status(500).json({ message: 'Failed to load dashboard', error: err.message });
   }
 };
 
+// ✅ Units List
 exports.getUnits = async (req, res) => {
   try {
-    const techId = req.user.id || req.user.userId || req.user._id;
-    const labId = req.query.labId; // optional filter
-    const query = { assignedTo: techId };
-    if (labId) query.lab = labId;
-    const units = await Unit.find(query).populate('lab');
+    const labId = req.query.labId;
+    const techId = req.user?.id || req.user?._id;
+    const filter = labId ? { lab: labId } : {};
+    if (techId) filter.assignedTo = techId; // 🆕 optional filtering by assigned technician
+
+    const units = await Unit.find(filter).populate('lab', 'name').sort({ name: 1 });
     res.json(units);
   } catch (err) {
-    console.error('getUnits error', err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Failed to load units', error: err.message });
   }
 };
 
+// ✅ Update Unit Status / Details
 exports.updateUnit = async (req, res) => {
   try {
-    const unitId = req.params.id;
-    const updates = req.body; // only accept permitted fields on front (status, notes, name etc)
-    const updated = await Unit.findByIdAndUpdate(unitId, updates, { new: true });
+    const updated = await Unit.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!updated) return res.status(404).json({ message: 'Unit not found' });
     res.json(updated);
   } catch (err) {
-    console.error('updateUnit error', err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Failed to update unit', error: err.message });
   }
 };
 
-// Reports
+// ✅ Reports
 exports.getReports = async (req, res) => {
   try {
-    const techId = req.user.id || req.user.userId || req.user._id;
-    const reports = await Report.find({ technician: techId }).populate('unit');
+    const techId = req.user?.id || req.user?._id;
+    const reports = await Report.find({ technician: techId })
+      .populate('unit', 'name status')
+      .sort({ createdAt: -1 });
     res.json(reports);
   } catch (err) {
-    console.error('getReports error', err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Failed to load reports', error: err.message });
   }
 };
 
+// 🆕 Create Report (updated to use issues + otherIssues fields from schema)
 exports.createReport = async (req, res) => {
   try {
-    const techId = req.user.id || req.user.userId || req.user._id;
-    const { unit, issues, otherIssues } = req.body;
-    if (!unit) return res.status(400).json({ message: 'Unit is required' });
-    const report = await Report.create({ unit, technician: techId, issues: issues || {}, otherIssues: otherIssues || '' });
-    res.status(201).json(report);
+    const techId = req.user?.id || req.user?._id;
+    const { unitId, issues, otherIssues, status } = req.body;
+
+    if (!unitId) {
+      return res.status(400).json({ message: 'Unit ID is required' });
+    }
+
+    const newReport = new Report({
+      technician: techId,
+      unit: unitId,
+      issues: issues || {},
+      otherIssues: otherIssues || '',
+      status: status || 'open',
+    });
+
+    const savedReport = await newReport.save();
+    res.status(201).json(savedReport);
   } catch (err) {
-    console.error('createReport error', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error('createReport error:', err);
+    res.status(500).json({ message: 'Failed to create report', error: err.message });
   }
 };
 
-// Profile
+// 🆕 Update report status
+exports.updateReportStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const updated = await Report.findByIdAndUpdate(id, { status }, { new: true });
+    if (!updated) return res.status(404).json({ message: 'Report not found' });
+    res.json(updated);
+  } catch (err) {
+    console.error('updateReportStatus error:', err);
+    res.status(500).json({ message: 'Failed to update report status', error: err.message });
+  }
+};
+
+// ✅ Technician Profile
 exports.getProfile = async (req, res) => {
   try {
-    const userId = req.user.id || req.user.userId || req.user._id;
-    const user = await User.findById(userId).select('-password').populate('role');
+    const user = await User.findById(req.user.id).select('-password');
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json(user);
   } catch (err) {
-    console.error('getProfile error', err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Failed to load profile', error: err.message });
   }
 };
 
 exports.updateProfile = async (req, res) => {
   try {
-    const userId = req.user.id || req.user.userId || req.user._id;
     const updates = req.body;
-    // don't allow password here — use a dedicated change-password route
-    delete updates.password;
-    const updated = await User.findByIdAndUpdate(userId, updates, { new: true }).select('-password');
+    const updated = await User.findByIdAndUpdate(req.user.id, updates, {
+      new: true,
+    }).select('-password');
     res.json(updated);
   } catch (err) {
-    console.error('updateProfile error', err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Failed to update profile', error: err.message });
   }
 };
 
 exports.deleteProfile = async (req, res) => {
   try {
-    const userId = req.user.id || req.user.userId || req.user._id;
-    await User.findByIdAndDelete(userId);
-    res.json({ message: 'Account deleted' });
+    await User.findByIdAndDelete(req.user.id);
+    res.json({ message: 'Profile deleted' });
   } catch (err) {
-    console.error('deleteProfile error', err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Failed to delete profile', error: err.message });
   }
 };
