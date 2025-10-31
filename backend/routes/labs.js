@@ -6,17 +6,19 @@ const mongoose = require('mongoose');
 const Lab = require('../models/lab');
 const Unit = require('../models/unit');
 
-// GET /api/labs  (list labs, include unitCount)
+/**
+ * GET /api/labs
+ * Returns labs with unitCount
+ */
 router.get('/', async (req, res) => {
   try {
-    // aggregation to include unitCount per lab
     const labs = await Lab.aggregate([
       { $sort: { name: 1 } },
       {
         $lookup: {
-          from: 'units',           // collection name
+          from: 'units',
           localField: '_id',
-          foreignField: 'lab',     // Unit.lab references Lab._id
+          foreignField: 'lab',
           as: 'units'
         }
       },
@@ -27,15 +29,14 @@ router.get('/', async (req, res) => {
       },
       {
         $project: {
-          units: 0 // remove units array from result
+          units: 0
         }
       }
     ]);
-
-    return res.json(labs);
+    res.json(labs);
   } catch (err) {
     console.error('GET /labs error', err);
-    return res.status(500).json({ message: 'Failed to fetch labs' });
+    res.status(500).json({ message: 'Failed to fetch labs' });
   }
 });
 
@@ -182,40 +183,42 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST /api/labs -> create lab
+/**
+ * POST /api/labs
+ */
 router.post('/', async (req, res) => {
-  const { name } = req.body;
-  if (!name || typeof name !== 'string' || name.trim() === '') {
-    return res.status(400).json({ message: 'name required' });
-  }
-
   try {
+    const { name } = req.body;
+    if (!name) return res.status(400).json({ message: 'name required' });
+
     const existing = await Lab.findOne({ name: name.trim() });
     if (existing) return res.status(409).json({ message: 'Lab already exists' });
 
     const lab = new Lab({ name: name.trim() });
     const saved = await lab.save();
-    return res.status(201).json(saved);
+    res.status(201).json(saved);
   } catch (err) {
-    console.error('Failed to create lab', err);
-    return res.status(500).json({ message: 'Server error', error: err.message });
+    console.error('POST /labs error', err);
+    res.status(500).json({ message: 'Failed to create lab' });
   }
 });
 
-// DELETE /api/labs/:id -> delete lab and its units
+/**
+ * DELETE /api/labs/:id - deletes lab and its units
+ */
 router.delete('/:id', async (req, res) => {
-  const id = req.params.id;
-  if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ message: 'Invalid lab id' });
-
   try {
+    const id = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ message: 'Invalid lab id' });
+
     const removed = await Lab.findByIdAndDelete(id);
     if (!removed) return res.status(404).json({ message: 'Lab not found' });
-    // remove units belonging to lab (best-effort)
-    await Unit.deleteMany({ lab: id }).catch(e => console.warn('Failed to delete units for lab', id, e));
-    return res.json({ message: 'Lab deleted', id: removed._id });
+
+    await Unit.deleteMany({ lab: id });
+    res.json({ message: 'Lab deleted', id: removed._id });
   } catch (err) {
-    console.error('Failed to delete lab', id, err);
-    return res.status(500).json({ message: 'Server error', error: err.message });
+    console.error('DELETE /labs/:id error', err);
+    res.status(500).json({ message: 'Failed to delete lab' });
   }
 });
 

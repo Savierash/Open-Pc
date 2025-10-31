@@ -252,7 +252,7 @@ const Maintenance = () => {
             </div>
 
             <div className="horizontal-card" style={{ flex: 1 }}>
-              <h3>TOTAL MAINTENANCE (Donut)</h3>
+              <h3>TOTAL MAINTENANCE</h3>
 
               {chartData.length === 0 ? (
                 <p style={{ marginTop: 12 }}>No maintenance data available.</p>
