@@ -44,14 +44,15 @@ const OTP = () => {
       email,
       otp: code,
     });
-    console.log(response.data.message);
-    alert('✅ OTP has been sent to your email.');
 
     console.log('✅ OTP verification success:', res.data);
     const userRole = res.data.user.role;
 
-    if (userRole === 'technician') navigate('/Dashboard-Technician');
-    else if (userRole === 'auditor') navigate('/Dashboard-Auditor');
+    // ✅ Alert before redirect
+    alert('✅ Your account has been successfully verified!');
+
+    if (userRole === 'technician') navigate('/Dashboard-technician');
+    else if (userRole === 'auditor') navigate('/Dashboard');
     else if (userRole === 'admin') navigate('/Dashboard-Admin');
     else navigate('/');
 

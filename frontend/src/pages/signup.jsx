@@ -59,6 +59,9 @@ const Signup = () => {
         confirmPassword,
         roleKey,
       });
+
+      alert('✅ OTP has been sent to your email.');
+
       navigate('/otp', { state: { email } });
     } catch (err) {
       console.error('Signup error', err);
