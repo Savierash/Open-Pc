@@ -1,3 +1,4 @@
+// src/pages/Maintenance.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Dashboard.css'; 
@@ -10,13 +11,24 @@ import GearLogo from '../assets/GearFill.png';
 import OctagonLogo from '../assets/XOctagonFill.png';
 import StackLogo from '../assets/Stack.png';
 import PersonLogo from '../assets/Person.png';
-import ToolsLogo from '../assets/tools_logo.png'; // Import Tools Logo
+import ToolsLogo from '../assets/tools_logo.png';
+
+import axios from 'axios';
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
+
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
+const COLORS = ['#FFF59D', '#FFEB3B', '#FFD54F', '#FFC107', '#FFB300', '#FFA000'];
+
 
 const Maintenance = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
+  const [labs, setLabs] = useState([]); // { _id, name, unitCount, maintenanceCount }
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setActiveLink(window.location.pathname);
+    fetchLabsWithMaintenance();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const navigate = useNavigate();
@@ -24,6 +36,40 @@ const Maintenance = () => {
   const handleNavClick = (path) => {
     setActiveLink(path);
     navigate(path);
+  };
+
+  // fetch labs with aggregated maintenance counts
+  const fetchLabsWithMaintenance = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`${API_BASE}/labs/with-maintenance-count`);
+      // expecting [{ _id, name, unitCount, maintenanceCount }, ...]
+      setLabs(res.data || []);
+    } catch (err) {
+      console.error('fetchLabsWithMaintenance error', err);
+      // keep UI intact: show alert and empty data
+      window.alert('Failed to load maintenance data — check console for details.');
+      setLabs([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // build chart data and totals from labs (safe defaults)
+  const chartData = labs.map(l => ({ name: l.name || 'Unknown', value: Number(l.maintenanceCount || 0) }));
+  const totalMaintenance = chartData.reduce((s, d) => s + (d.value || 0), 0);
+
+  const CustomTooltip = ({ active, payload }) => {
+    if (!active || !payload || payload.length === 0) return null;
+    const p = payload[0];
+    const percent = totalMaintenance ? ((p.value / totalMaintenance) * 100).toFixed(1) : 0;
+    return (
+      <div style={{ background: '#111', color: '#fff', padding: 8, borderRadius: 6 }}>
+        <div style={{ fontWeight: 700 }}>{p.name}</div>
+        <div>{p.value} maintenance unit(s)</div>
+        <div style={{ opacity: 0.85 }}>{percent}%</div>
+      </div>
+    );
   };
 
   return (
@@ -173,41 +219,79 @@ const Maintenance = () => {
             <h2 className="page-title" style={{ marginLeft: 'auto' }}>Maintenance Units</h2>
           </div>
 
-          <div className="new-layout-content">
-            <div className="horizontal-card">
+          <div className="new-layout-content" style={{ display: 'flex', gap: 16, alignItems: 'stretch' }}>
+            <div className="horizontal-card" style={{ flex: '0 0 220px', minWidth: 180, maxWidth: 260 }}>
               <h3>Laboratories</h3>
-              {/* Placeholder for laboratories content */}
               <div className="lab-filter-grid">
-                <div className="lab-filter-card active">ITS 300</div>
-                <div className="lab-filter-card">PTC 201</div>
-                <div className="lab-filter-card">MACLAB</div>
+                {loading ? (
+                  <div>Loading...</div>
+                ) : (
+                  labs.map(l => (
+                    <div key={l._id} className="lab-filter-card">{l.name}</div>
+                  ))
+                )}
               </div>
             </div>
 
-            <div className="horizontal-card">
+            <div className="horizontal-card" style={{ flex: '0 0 220px', minWidth: 180, maxWidth: 260 }}>
               <h3>Unit Counts</h3>
-              {/* Placeholder for unit counts content */}
-              <div className="unit-summary-item">
-                <img src={PcDisplayLogo} alt="PC Display Icon" className="menu-icon" />
-                <span>ITS 300</span>
-                <span className="count">55</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {labs.length === 0 ? <p>No data</p> : labs.map(l => (
+                  <div key={l._id} className="unit-summary-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <img src={PcDisplayLogo} alt="PC Icon" className="menu-icon" />
+                      <span style={{ fontSize: 14 }}>{l.name}</span>
+                    </span>
+                    <span className="count" style={{ fontWeight: 700 }}>{l.maintenanceCount ?? 0}</span>
+                  </div>
+                ))}
+                <p className="total-units-text" style={{ marginTop: 'auto', fontWeight: 700 }}>
+                  Total Maintenance: {totalMaintenance}
+                </p>
               </div>
-              <div className="unit-summary-item">
-                <img src={PcDisplayLogo} alt="PC Display Icon" className="menu-icon" />
-                <span>PTC 201</span>
-                <span className="count">43</span>
-              </div>
-              <div className="unit-summary-item">
-                <img src={PcDisplayLogo} alt="PC Display Icon" className="menu-icon" />
-                <span>MCLAB</span>
-                <span className="count">30</span>
-              </div>
-              <p className="total-units-text" style={{ marginTop: 'auto' }}>Total Units: 128</p>
             </div>
 
-            <div className="horizontal-card" style={{ flex: '2' }}>
-              <h3>TOTAL UNITS</h3>
-              
+            <div className="horizontal-card" style={{ flex: 1 }}>
+              <h3>TOTAL MAINTENANCE (Donut)</h3>
+
+              {chartData.length === 0 ? (
+                <p style={{ marginTop: 12 }}>No maintenance data available.</p>
+              ) : (
+                <div style={{ width: '100%', height: 360, position: 'relative' }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={chartData}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={70}
+                        outerRadius={120}
+                        paddingAngle={4}
+                        label={({ name, value }) => `${name} ${value}`}
+                        labelLine={false}
+                      >
+                        {chartData.map((entry, idx) => <Cell key={`c-${idx}`} fill={COLORS[idx % COLORS.length]} />)}
+                      </Pie>
+                      <Tooltip content={<CustomTooltip />} /> 
+                    </PieChart>
+                  </ResponsiveContainer>
+
+                  <div style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    textAlign: 'center',
+                    color: '#fff'
+                  }}>
+                    <div style={{ fontWeight: 800, fontSize: 16 }}>MAINTENANCE</div>
+                    <div style={{ fontWeight: 900, fontSize: 26 }}>{totalMaintenance}</div>
+                    <div style={{ fontSize: 12, opacity: 0.9 }}>UNITS</div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </main>
