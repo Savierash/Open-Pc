@@ -7,11 +7,13 @@ const mongoose = require('mongoose');
 const path = require('path');
 const seedRoles = require('./seedRoles');
 
+const technicianRouter = require('./routes/technician');
 const labsRouter = require('./routes/labs');
 const unitsRouter = require('./routes/units');
 const dashboardRouter = require('./routes/dashboard');
 const authRouter = require('./routes/auth');
 const forgetPasswordRouter = require('./routes/forgetPassword');
+const reportRouter = require('./routes/reports');
 
 process.on('uncaughtException', (err) => {
   console.error('UNCAUGHT EXCEPTION', err && err.stack ? err.stack : err);
@@ -35,8 +37,6 @@ app.use((req, res, next) => {
 app.use(express.json());
 
 // -- CORS --
-// For development use a specific origin (CLIENT_ORIGIN). For quick debugging you can set origin: true.
-// Make sure CLIENT_ORIGIN matches your frontend (eg http://localhost:3000 or http://localhost:5173)
 app.use(cors({
   origin: CLIENT_ORIGIN,
   credentials: true,
@@ -51,27 +51,22 @@ app.get('/', (req, res) => res.send('API up'));
 app.use('/api/auth', authRouter);
 app.use('/api/forgot-password', forgetPasswordRouter);
 app.use('/api/dashboard', dashboardRouter);
-
-// Mount units and labs — use plural to match frontend expectations
+app.use('/api/technician', technicianRouter);
+app.use('/api/reports', reportRouter);
 app.use('/api/units', unitsRouter);
 app.use('/api/labs', labsRouter);
-
-// Optional alias: accept singular '/api/lab' too (helps old clients/devs)
 app.use('/api/lab', labsRouter);
 
-// Ensure nested lab units path works: internal forward to unitsRouter
-// This sets req.query.labId and calls the unitsRouter middleware directly (no external redirect)
+
 app.get('/api/labs/:labId/units', (req, res, next) => {
   req.query.labId = req.params.labId;
   return unitsRouter(req, res, next);
 });
 
-// JSON 404 for unmatched API routes (prevents default HTML 404)
 app.use('/api', (req, res) => {
   res.status(404).json({ message: 'API route not found', path: req.originalUrl });
 });
 
-// Global error handler - returns JSON for errors
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err && err.stack ? err.stack : err);
   res.status(err.status || 500).json({ message: err.message || 'Internal server error' });

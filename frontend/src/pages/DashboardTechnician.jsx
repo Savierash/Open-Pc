@@ -1,3 +1,4 @@
+import api from '../api';
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/DashboardTechnician.css";
@@ -42,17 +43,17 @@ const DashboardTechnician = () => {
   }, []);
 
   async function fetchDashboard() {
-    setLoading(true);
-    try {
-      const res = await axios.get(`${API_BASE}/dashboard`);
-      setData(res.data || data);
-    } catch (err) {
-      console.error("fetchDashboard error:", err?.response ?? err);
-      alert("Failed to load dashboard data. See console.");
-    } finally {
-      setLoading(false);
-    }
+  setLoading(true);
+  try {
+    const res = await api.get('/technician/dashboard'); // ✅ token auto-attached
+    setData(res.data || data);
+  } catch (err) {
+    console.error("fetchDashboard error:", err?.response ?? err);
+    alert("Failed to load dashboard data. See console.");
+  } finally {
+    setLoading(false);
   }
+}
 
   const { totalUnits, counts, percentFunctional, perLab, recentUnits, trend } = data;
 
