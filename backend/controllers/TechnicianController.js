@@ -7,21 +7,24 @@ const User = require('../models/Users');
 // ✅ Dashboard Summary
 exports.getDashboard = async (req, res) => {
   try {
-    // 🆕 Technician-specific filter (show only units assigned to logged-in technician if available)
+    // 🆕 Technician-specific filter (only show units assigned to the logged-in technician)
     const techId = req.user?.id || req.user?._id;
     const filter = techId ? { assignedTo: techId } : {};
 
+    // 🧮 Normalize status queries (🆕 Added case-insensitive filters for consistency)
     const totalUnits = await Unit.countDocuments(filter);
     const counts = {
-      functional: await Unit.countDocuments({ ...filter, status: 'Functional' }),
-      maintenance: await Unit.countDocuments({ ...filter, status: 'Maintenance' }),
-      outOfOrder: await Unit.countDocuments({ ...filter, status: 'Out Of Order' }),
+      functional: await Unit.countDocuments({ ...filter, status: { $regex: /^functional$/i } }), // 🆕
+      maintenance: await Unit.countDocuments({ ...filter, status: { $regex: /^maintenance$/i } }), // 🆕
+      outOfOrder: await Unit.countDocuments({ ...filter, status: { $regex: /^out of order$/i } }), // 🆕
     };
 
+    // 🧾 Percentage of functional units
     const percentFunctional = totalUnits
       ? Math.round((counts.functional / totalUnits) * 100)
       : 0;
 
+    // 🧩 Per Lab Summary (🆕 Improved aggregation to count statuses case-insensitively)
     const perLab = await Lab.aggregate([
       {
         $lookup: {
@@ -40,7 +43,7 @@ exports.getDashboard = async (req, res) => {
               $filter: {
                 input: '$units',
                 as: 'u',
-                cond: { $eq: ['$$u.status', 'Functional'] },
+                cond: { $regexMatch: { input: '$$u.status', regex: /^functional$/i } }, // 🆕
               },
             },
           },
@@ -49,7 +52,7 @@ exports.getDashboard = async (req, res) => {
               $filter: {
                 input: '$units',
                 as: 'u',
-                cond: { $eq: ['$$u.status', 'Maintenance'] },
+                cond: { $regexMatch: { input: '$$u.status', regex: /^maintenance$/i } }, // 🆕
               },
             },
           },
@@ -58,7 +61,7 @@ exports.getDashboard = async (req, res) => {
               $filter: {
                 input: '$units',
                 as: 'u',
-                cond: { $eq: ['$$u.status', 'Out Of Order'] },
+                cond: { $regexMatch: { input: '$$u.status', regex: /^out of order$/i } }, // 🆕
               },
             },
           },
@@ -66,15 +69,36 @@ exports.getDashboard = async (req, res) => {
       },
     ]);
 
-    const recentUnits = await Unit.find(filter).sort({ updatedAt: -1 }).limit(5);
+    // 🆕 Generate Trend Data (for "System Status" section in Dashboard)
+    // This creates sample data showing how many PCs were functional per day over the past week.
+    const today = new Date();
+    const trend = [];
 
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+
+      // Simulated slight variation to visualize the trend on frontend chart
+      trend.push({
+        date: date.toLocaleDateString('en-US', { weekday: 'short' }), // e.g., Mon, Tue
+        value: Math.max(0, Math.min(100, percentFunctional - Math.floor(Math.random() * 10))), // 🆕
+      });
+    }
+
+    // ✅ Recent Units (unchanged, just added populate for lab name)
+    const recentUnits = await Unit.find(filter)
+      .sort({ updatedAt: -1 })
+      .limit(5)
+      .populate('lab', 'name'); // 🆕 Added populate to include lab name
+
+    // ✅ Send all enhanced data to frontend
     res.json({
       totalUnits,
       counts,
       percentFunctional,
       perLab,
       recentUnits,
-      trend: [], // optional chart data later
+      trend, // 🆕 Added trend for chart
     });
   } catch (err) {
     console.error('Dashboard error:', err);
@@ -121,7 +145,7 @@ exports.getReports = async (req, res) => {
   }
 };
 
-// 🆕 Create Report (updated to use issues + otherIssues fields from schema)
+// 🆕 Create Report (uses issues + otherIssues fields from schema)
 exports.createReport = async (req, res) => {
   try {
     const techId = req.user?.id || req.user?._id;
@@ -147,7 +171,7 @@ exports.createReport = async (req, res) => {
   }
 };
 
-// 🆕 Update report status
+// 🆕 Update Report Status
 exports.updateReportStatus = async (req, res) => {
   try {
     const { id } = req.params;
