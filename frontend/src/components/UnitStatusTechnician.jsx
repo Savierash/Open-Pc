@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import api from '../api';
+import axios from 'axios';
 import '../styles/Dashboard.css';
 import '../styles/UnitStatusTechnician.css';
 import ComputerLogo1 from "../assets/LOGO1.png";
@@ -23,6 +25,82 @@ const UnitStatusTechnician = () => {
     status: 'Maintenance',
   });
 
+  const [user, setUser] = useState(null);
+  const [labs, setLabs] = useState([]); // store list of labs
+  const [units, setUnits] = useState([]); // store list of units for selected lab
+  const [selectedLab, setSelectedLab] = useState(null); // currently selected lab
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+  async function fetchProfile() {
+    try {
+      const res = await api.get("/technician/profile");
+      console.log("👤 Technician profile:", res.data);
+      setProfile(res.data);
+    } catch (err) {
+      console.error("❌ fetchProfile error:", err);
+    }
+  }
+  fetchProfile();
+}, []);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        const res = await axios.get('http://localhost:5000/api/auth/me', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        setUser(res.data.user || res.data); // adjust depending on your API response
+      } catch (err) {
+        console.error('Failed to fetch user:', err);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  useEffect(() => {
+    const fetchLabsAndUnits = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const labRes = await axios.get('http://localhost:5000/api/labs', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setLabs(labRes.data);
+        if (labRes.data.length > 0) {
+          setSelectedLab(labRes.data[0]._id); // auto-select first lab
+        }
+      } catch (err) {
+        console.error('Failed to fetch labs:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLabsAndUnits();
+  }, []);
+
+  // 🆕 Fetch units when selectedLab changes
+  useEffect(() => {
+    if (!selectedLab) return;
+    const fetchUnits = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const unitRes = await axios.get(`http://localhost:5000/api/technician/units?labId=${selectedLab}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUnits(unitRes.data);
+      } catch (err) {
+        console.error('Failed to fetch units:', err);
+      }
+    };
+    fetchUnits();
+  }, [selectedLab]);
+
   const handleNavClick = (path) => {
     setActiveLink(path);
     window.location.href = path;
@@ -31,6 +109,33 @@ const UnitStatusTechnician = () => {
   const handleUnitDetailChange = (field, value) => {
     setSelectedUnit(prev => ({ ...prev, [field]: value }));
   };
+
+  const handleSelectUnit = (unit) => {
+    setSelectedUnit(unit);
+  };
+
+  // 🆕 Handle status or info save
+  const handleSave = async () => {
+    if (!selectedUnit?._id) return;
+    try {
+      setSaving(true);
+      const token = localStorage.getItem('token');
+      await axios.put(
+        `http://localhost:5000/api/technician/unit/${selectedUnit._id}`,
+        selectedUnit,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert('Unit updated successfully!');
+    } catch (err) {
+      console.error('Failed to save unit:', err);
+      alert('Error saving changes');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) return <div>Loading...</div>;
+  
 
   return (
     <div className="dashboard">
@@ -43,14 +148,16 @@ const UnitStatusTechnician = () => {
           </div>
           <nav className="nav-links-dashboard">
             <a href="/dashboard" className={`nav-link-dashboard`}>
-              Dashboard
+              Unit Status
             </a>
           </nav>
         </div>
         <div className="nav-actions">
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
-          <span className="profile-name">Kresner Leonardo</span>
-          <span className="profile-role">Technician</span>
+          <span className="profile-name">
+            {profile ? `${profile.firstname || profile.username || ""}${profile.lastname || ""}`.trim(): "Technician"}
+          </span>
+          <span className="profile-role">{profile?.role?.name || "Technician"}</span>
         </div>
       </header>
 
@@ -66,13 +173,21 @@ const UnitStatusTechnician = () => {
 
         <main className="main-content unit-status-main-content">
           <div className="unit-status-page-content">
+
+            
             {/* Left Container: Lab List */}
             <div className="unit-status-lab-panel">
               <h2 className="panel-title">Lab</h2>
               <div className="lab-list-container">
-                <div className="lab-card-new active">PTC 201</div>
-                <div className="lab-card-new">MCLAB</div>
-                <div className="lab-card-new">ITS 300</div>
+                {labs.map((lab) => (
+                  <div 
+                    key={lab._id}
+                    className={`lab-card-new ${selectedLab === lab._id ? 'active' : ''}`}
+                    onClick={() => setSelectedLab(lab._id)}
+                  >
+                    {lab.name}
+                  </div>
+                ))}
                 <div className="lab-card-new add-lab-card-unit-status">+</div>
               </div>
             </div>
@@ -80,36 +195,37 @@ const UnitStatusTechnician = () => {
             {/* Middle Container: Unit Status with Filters and PC Cards */}
             <div className="unit-status-middle-panel">
               <div className="middle-panel-header">
-                <h2 className="panel-title">ITS 300</h2>
+                <h2 className="panel-title">{labs.find(l => l._id === selectedLab)?.name || 'Select Lab'}
+                </h2>
                 <div className="status-filters">
                   <button className="status-button functional-button">Functional</button>
                   <button className="status-button out-of-order-button">Out Of Order</button>
                   <button className="status-button maintenance-button">Maintenance</button>
                 </div>
               </div>
+
               <div className="search-bar-unit-status">
                 <div className="search-input-wrapper-unit-status">
                   <img src={PersonLogo} alt="Search Icon" className="search-icon-unit-status" />
                   <input type="text" placeholder="Search..." className="search-input" />
                 </div>
               </div>
+
               <div className="unit-cards-grid">
-                <div className="pc-card">
-                  <img src={PcDisplayLogo} alt="PC Icon" className="pc-card-icon" />
-                  <span>ITS300-PC-002</span>
-                  <div className="status-indicator">
-                    <span>Out Of Order</span>
-                    <span className="status-dot out-of-order"></span>
+                {units.map((unit) => (
+                  <div
+                    key={unit._id}
+                    className={`pc-card ${selectedUnit._id === unit._id ? 'active' : ''}`}
+                    onClick={() => handleSelectUnit(unit)}
+                  >
+                    <img src={PcDisplayLogo} alt="PC Icon" className="pc-card-icon" />
+                    <span>{unit.name}</span>
+                    <div className="status-indicator">
+                      <span>{unit.status}</span>
+                      <span className={`status-dot ${unit.status.toLowerCase().replace(' ', '-')}`}></span>
+                    </div>
                   </div>
-                </div>
-                <div className="pc-card">
-                  <img src={PcDisplayLogo} alt="PC Icon" className="pc-card-icon" />
-                  <span>ITS300-PC-010</span>
-                  <div className="status-indicator">
-                    <span>Out Of Order</span>
-                    <span className="status-dot out-of-order"></span>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
 
