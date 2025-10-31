@@ -15,7 +15,6 @@
   overflow: hidden;
 }
 
-/* Background decorative logos */
 .bg-logo {
   position: absolute;
   width: 120px;
@@ -177,7 +176,6 @@
 }
 
 .signup-container .signup-form section {
-  /* dark, faded border to make each document column/section visible */
   border: 1px solid rgba(0, 0, 0, 0.35);
   background: rgba(255, 255, 255, 0.02);
   padding: 14px;
@@ -186,19 +184,16 @@
   transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
 }
 
-/* spacing between sections */
 .signup-container .signup-form section + section {
   margin-top: 12px;
 }
 
-/* subtle lift on hover for affordance */
 .signup-container .signup-form section:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.36);
   border-color: rgba(0, 0, 0, 0.5);
 }
 
-/* ensure labels and file inputs remain readable on dark background */
 .signup-container .signup-form section label {
   color: #e6e6e6;
   font-weight: 600;
