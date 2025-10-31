@@ -26,8 +26,10 @@ import {
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000/api";
 
 const DashboardTechnician = () => {
+  
   const [activeLink, setActiveLink] = useState(window.location.pathname);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(""); // ✅ ADDED
   const [data, setData] = useState({
     totalUnits: 0,
     counts: { functional: 0, maintenance: 0, outOfOrder: 0 },
@@ -37,25 +39,75 @@ const DashboardTechnician = () => {
     trend: [],
   });
 
+  const [profile, setProfile] = useState(null); // ✅ ADDED - show technician name dynamically
+
+  function normalizeCounts(counts) {
+  if (!counts) return { functional: 0, maintenance: 0, outOfOrder: 0 };
+  return {
+    functional: counts.Functional || counts.functional || 0,
+    maintenance: counts.Maintenance || counts.maintenance || 0,
+    outOfOrder: counts['Out Of Order'] || counts.outOfOrder || 0,
+  };
+}
+
+  
+
   useEffect(() => {
     setActiveLink(window.location.pathname);
     fetchDashboard();
+    fetchProfile(); // ✅ ADDED
   }, []);
+  
+  async function fetchProfile() {
+    try {
+      const res = await api.get("/technician/profile");
+      setProfile(res.data);
+    } catch (err) {
+      console.error("fetchProfile error:", err);
+    }
+  }
 
-  async function fetchDashboard() {
-  setLoading(true);
+async function fetchDashboard() {
+  console.log("📡 Fetching dashboard...");
+
   try {
-    const res = await api.get('/technician/dashboard'); // ✅ token auto-attached
-    setData(res.data || data);
+    const token = localStorage.getItem("token");
+    console.log("🔑 Token found:", token ? "✅ Yes" : "❌ No");
+
+    const res = await api.get("/technician/dashboard", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    console.log("✅ Raw response from backend:", res);
+    const backendData = res.data;
+    console.log("📦 Parsed dashboard data:", backendData);
+
+    if (!backendData || typeof backendData !== "object") {
+      throw new Error("Invalid backend response format");
+    }
+
+    // Normalize data
+    const normalizedCounts = normalizeCounts(backendData.counts);
+
+    setData({
+      totalUnits: backendData.totalUnits || 0,
+      counts: normalizedCounts,
+      percentFunctional: backendData.percentFunctional || 0,
+      perLab: backendData.perLab || [],
+      recentUnits: backendData.recentUnits || [],
+      trend: backendData.trend || [],
+    });
+
+    console.log("🎯 Dashboard state updated successfully.");
   } catch (err) {
     console.error("fetchDashboard error:", err?.response ?? err);
-    alert("Failed to load dashboard data. See console.");
+    alert(err?.response?.data?.message || "Failed to load dashboard data. Please check console.");
   } finally {
     setLoading(false);
   }
 }
 
-  const { totalUnits, counts, percentFunctional, perLab, recentUnits, trend } = data;
+const { totalUnits, counts, percentFunctional, perLab, recentUnits, trend } = data;
 
   // fallback trend data
   const mockTrend = [
@@ -115,8 +167,8 @@ const DashboardTechnician = () => {
         </div>
         <div className="nav-actions">
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
-          <span className="profile-name">Technician Name</span> {/* Example Technician Name */}
-          <span className="profile-role">Technician</span> {/* Example Technician Role */}
+          <span className="profile-name"> {profile? `${profile.firstName || profile.username || ''} ${profile.lastName || ''}`.trim(): 'Technician'}</span>
+          <span className="profile-role">{profile?.role?.name || "Technician"}</span>
         </div>
       </header>
 
@@ -134,6 +186,20 @@ const DashboardTechnician = () => {
         {/* MAIN content */}
         <main className="main-content">
           <div className="dashboard-main-content">
+            {error && (
+              <div
+                style={{
+                  background: "#ffcccc",
+                  color: "#900",
+                  padding: "8px 12px",
+                  borderRadius: 6,
+                  marginBottom: 12,
+                }}
+              >
+                ⚠️ {error}
+              </div>
+            )}
+
             <div className="dashboard-cards">
               <div className="card total-units clickable-card" onClick={() => handleNavClick('/total-units')}>
                 <div className="card-header">
