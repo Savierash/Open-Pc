@@ -1,7 +1,7 @@
 // src/pages/inventory/Inventory.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api';
 import '../styles/Inventory.css'; // Changed from Dashboard.css
 import ComputerLogo1 from '../assets/LOGO1.png';
 import HouseLogo from '../assets/HouseFill.png';
@@ -615,3 +615,4 @@ const btnPrimaryStyle = { background: '#1f7aed', color: '#fff', border: 'none', 
 const btnSecondaryStyle = { background: '#f1f1f1', color: '#222', border: 'none', padding: '8px 12px', borderRadius: 6, cursor: 'pointer' };
 
 export default Inventory;
+ 

@@ -1,5 +1,7 @@
 // src/pages/reports/ReportsTech.jsx
 import React, { useState, useEffect } from 'react';
+import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/Dashboard.css'; // Import dashboard styles

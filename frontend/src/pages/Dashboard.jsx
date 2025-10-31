@@ -1,6 +1,6 @@
 // src/pages/Dashboard.jsx
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from '../services/api';
 import "../styles/Dashboard.css";
 import ComputerLogo1 from "../assets/LOGO1.png";
 import HouseLogo from "../assets/HouseFill.png";
@@ -24,7 +24,6 @@ import {
 } from "recharts";
 import { useNavigate } from "react-router-dom";
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000/api";
 
 const Dashboard = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);

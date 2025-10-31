@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // backend/routes/reports.js
 const express = require('express');
 const mongoose = require('mongoose');
@@ -102,5 +103,20 @@ router.delete('/:id', async (req, res) => {
     return res.status(500).json({ message: 'Server error', error: err.message });
   }
 });
+=======
+const express = require('express');
+const router = express.Router();
+const ReportController = require('../controllers/ReportController');
+const { protect } = require('../middleware/authMiddleware');
+const { requireRole } = require('../middleware/roleMiddleware');
+
+router.get('/', protect, ReportController.list);
+router.get('/:id', protect, ReportController.get);
+router.post('/', protect, ReportController.create);
+// update reports: allow technicians and admins
+router.put('/:id', protect, requireRole('technician', 'admin'), ReportController.update);
+// deletes reserved for admins
+router.delete('/:id', protect, requireRole('admin'), ReportController.remove);
+>>>>>>> ed57e257b106bf09b2250133e25b52d6d62766a0
 
 module.exports = router;

@@ -1,21 +1,13 @@
 // src/pages/Login.jsx
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import '../styles/Login.css';
 import ComputerLogo1 from '../assets/LOGO1.png';
 import LockLogo from '../assets/Lock.png';
 import PersonLogo from '../assets/Person.png';
 
-// Vite env var (remember: VITE_ prefix)
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
-// Create an axios instance with credentials enabled
-const api = axios.create({
-  baseURL: API_BASE,
-  timeout: 10000,
-  withCredentials: true, // important for cookie-based login
-});
+// use shared AuthContext (AuthContext provides login/register and the centralized api client)
 
 const Login = () => {
   const [usernameOrEmail, setUsernameOrEmail] = useState('');
@@ -26,6 +18,7 @@ const Login = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const { login } = useAuth();
 
   const [activeLink, setActiveLink] = useState(location.pathname);
   useEffect(() => {
@@ -99,16 +92,13 @@ const Login = () => {
       navigate(dashboardPath, { replace: true });
     } catch (err) {
       console.error('Login error:', err);
-      const serverMsg =
-        err.response?.data?.message ||
-        err.response?.data?.error ||
-        err.response?.data?.msg ||
-        null;
-
-      if (!err.response) {
-        setError('Network error — check backend server and CORS settings.');
-      } else if (serverMsg) {
-        setError(serverMsg);
+      // prefer explicit response message when available
+      if (err.response) {
+        const serverMsg = err.response?.data?.message || err.response?.data?.error || err.response?.data?.msg || JSON.stringify(err.response?.data);
+        setError(serverMsg || 'Login failed — please check your credentials.');
+      } else if (err.request) {
+        // request made but no response
+        setError('No response from server — check backend and CORS settings.');
       } else {
         setError('Login failed — please check your credentials.');
       }

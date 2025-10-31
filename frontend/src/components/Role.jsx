@@ -1,13 +1,13 @@
 // src/pages/Role.jsx
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import '../styles/Role.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ComputerLogo1 from '../assets/LOGO1.png';
 import AuditorButton from '../assets/AUDITOR BUTTON.png';
 import TechButton from '../assets/TECH BUTTON.png';
 
-const apiBase = import.meta.env.VITE_APP_API_URL || 'http://localhost:5000';
+// centralized api client
 
 const Role = () => {
   const [activeLink, setActiveLink] = useState('');
@@ -26,7 +26,7 @@ const Role = () => {
     setLoading(true);
     setError(null);
 
-    axios.get(`${apiBase}/api/auth/roles`)
+    api.get('/auth/roles')
       .then(res => {
         if (!mounted) return;
         if (res.data && res.data.roles) {

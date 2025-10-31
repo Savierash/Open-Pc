@@ -1,7 +1,8 @@
 // src/pages/reports/ReportsAuditor.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import '../styles/Dashboard.css';
 import ComputerLogo1 from '../assets/LOGO1.png';
 import PersonLogo from '../assets/Person.png';
@@ -52,6 +53,21 @@ const ReportsAuditor = () => {
   const [saving, setSaving] = useState(false);
 
   const navigate = useNavigate();
+
+  const { user } = useAuth();
+  const [reports, setReports] = useState([]);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await api.get('/reports');
+        setReports(res.data || []);
+      } catch (err) {
+        console.error('Failed to fetch reports', err);
+      }
+    };
+    load();
+  }, []);
 
   useEffect(() => {
     setActiveLink(window.location.pathname);

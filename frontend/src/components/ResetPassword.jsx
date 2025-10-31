@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import '../styles/ResetPassword.css';
 import ComputerLogo1 from '../assets/LOGO1.png';
@@ -16,6 +16,7 @@ const ResetPassword = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const { resetPassword } = useAuth();
 
   const [activeLink, setActiveLink] = useState(location.pathname);
   useEffect(() => {
@@ -36,10 +37,17 @@ const ResetPassword = () => {
     setLoading(true);
 
     try {
-      // Here, you would send the new password to your backend for reset
-      console.log('Resetting password with new password:', newPassword);
-      // On success, navigate to a login page or success message
-      navigate('/login'); 
+      // Send reset to backend using auth context. Email and otp come from location.state
+      const email = location.state?.email;
+      const otp = location.state?.otp;
+      if (!email || !otp) {
+        setError('Missing email or OTP context. Please restart the reset flow.');
+        return;
+      }
+
+      await resetPassword({ email, otp, newPassword });
+      // On success, navigate to login
+      navigate('/login');
     } catch (err) {
       console.error('Password reset error:', err);
       const serverMsg =

@@ -22,6 +22,12 @@ const COLORS = ['#64d6f0', '#3fb4d6', '#1f91c0', '#1976a5', '#144f73', '#0f3f55'
 
 const Functional = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
+  const [labs, setLabs] = useState([]);
+  const [selectedLab, setSelectedLab] = useState(null);
+  const [units, setUnits] = useState([]);
+  const [loadingLabs, setLoadingLabs] = useState(false);
+  const [loadingUnits, setLoadingUnits] = useState(false);
+  const { user } = useAuth();
 
   const [labs, setLabs] = useState([]);
   const [selectedLabId, setSelectedLabId] = useState(null);
@@ -29,6 +35,45 @@ const Functional = () => {
   const [unitsForLab, setUnitsForLab] = useState([]); // units displayed for selected lab
   const [loadingLabs, setLoadingLabs] = useState(false);
   const [loadingUnits, setLoadingUnits] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    async function fetchLabs() {
+      setLoadingLabs(true);
+      try {
+        const res = await api.get('/lab');
+        if (!mounted) return;
+        setLabs(res.data || []);
+        if (res.data && res.data.length) setSelectedLab(res.data[0]._id);
+      } catch (err) {
+        console.error('Failed to load labs', err);
+      } finally {
+        setLoadingLabs(false);
+      }
+    }
+    fetchLabs();
+    return () => { mounted = false; };
+  }, []);
+
+  useEffect(() => {
+    if (!selectedLab) return;
+    let mounted = true;
+    async function fetchUnits() {
+      setLoadingUnits(true);
+      try {
+        const res = await api.get(`/units?labId=${selectedLab}`);
+        if (!mounted) return;
+        setUnits(res.data || []);
+      } catch (err) {
+        console.error('Failed to load units for lab', selectedLab, err);
+        setUnits([]);
+      } finally {
+        setLoadingUnits(false);
+      }
+    }
+    fetchUnits();
+    return () => { mounted = false; };
+  }, [selectedLab]);
 
   const navigate = useNavigate();
 

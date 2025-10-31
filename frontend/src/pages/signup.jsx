@@ -5,16 +5,9 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import ComputerLogo1 from '../assets/LOGO1.png';
 import PersonLogo from '../assets/Person.png';
 import LockLogo from '../assets/Lock.png';
-import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
-// create an axios instance
-const api = axios.create({
-  baseURL: API_BASE,
-  timeout: 10000,
-  // withCredentials: true, // enable if backend uses cookies
-});
+// use shared auth context via useAuth (AuthContext handles token and api)
 
 const Signup = () => {
   const [firstName, setFirstName] = useState('');
@@ -30,6 +23,7 @@ const Signup = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const { register } = useAuth();
 
   useEffect(() => {
     setActiveLink(location.pathname);
