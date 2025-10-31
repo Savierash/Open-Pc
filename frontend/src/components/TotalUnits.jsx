@@ -14,7 +14,7 @@ import PersonLogo from '../assets/Person.png';
 
 import { ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
-// centralized api client handles base URL
+// centralized api client handles base URL and auth
 
 const TotalUnits = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
@@ -30,20 +30,22 @@ const TotalUnits = () => {
   useEffect(() => {
     setActiveLink(window.location.pathname);
     fetchLabs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Fetch units whenever lab selection changes
   useEffect(() => {
     if (selectedLabId) fetchUnits(selectedLabId);
     else setUnits([]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedLabId]);
 
-  // 📦 Fetch all labs from backend
+  // 📦 Fetch all labs from backend using centralized api
   async function fetchLabs() {
     setLoadingLabs(true);
     try {
-      console.log('Fetching labs from:', `${API_BASE}/labs`);
-      const res = await axios.get(`${API_BASE}/labs`);
+      console.log('Fetching labs from api /labs');
+      const res = await api.get('/labs');
       setLabs(res.data || []);
       // auto-select first lab
       if (res.data && res.data.length > 0 && !selectedLabId) {
@@ -51,22 +53,30 @@ const TotalUnits = () => {
       }
     } catch (err) {
       console.error('fetchLabs error:', err);
-      alert('Failed to load labs — check console or backend server.');
+      window.alert('Failed to load labs — check console or backend server.');
     } finally {
       setLoadingLabs(false);
     }
   }
 
-  // 💻 Fetch units for selected lab
+  // 💻 Fetch units for selected lab via centralized api
   async function fetchUnits(labId) {
     setLoadingUnits(true);
     try {
       console.log('Fetching units for lab:', labId);
-      const res = await axios.get(`${API_BASE}/units`, { params: { labId } });
+      // server may support /labs/:id/units — prefer that if available.
+      // try that endpoint first, fallback to /units?labId=...
+      let res;
+      try {
+        res = await api.get(`/labs/${labId}/units`);
+      } catch (e) {
+        // fallback
+        res = await api.get('/units', { params: { labId } });
+      }
       setUnits(res.data || []);
     } catch (err) {
       console.error('fetchUnits error:', err);
-      alert('Failed to load units — see console.');
+      window.alert('Failed to load units — see console.');
     } finally {
       setLoadingUnits(false);
     }
@@ -74,17 +84,20 @@ const TotalUnits = () => {
 
   // ➕ Add new unit to selected lab
   async function handleAddUnit() {
-    if (!selectedLabId) return alert('Select a lab first');
+    if (!selectedLabId) return window.alert('Select a lab first');
     const name = window.prompt('Enter unit name (e.g. IT-PC-01):');
     if (!name) return;
     try {
       const res = await api.post('/units', { name: name.trim(), lab: selectedLabId });
-      setUnits(prev => [...prev, res.data]);
-      // refresh labs to update unitCount
+      // server returns created unit
+      if (res?.data) {
+        setUnits(prev => [...prev, res.data]);
+      }
+      // refresh labs to update unitCount if server stores it
       fetchLabs();
     } catch (err) {
       console.error('addUnit error:', err?.response ?? err);
-      alert(err?.response?.data?.message || 'Failed to add unit');
+      window.alert(err?.response?.data?.message || 'Failed to add unit');
     }
   }
 
@@ -98,7 +111,7 @@ const TotalUnits = () => {
       fetchLabs();
     } catch (err) {
       console.error('deleteUnit error:', err?.response ?? err);
-      alert('Failed to delete unit');
+      window.alert('Failed to delete unit');
     }
   }
 
@@ -106,6 +119,8 @@ const TotalUnits = () => {
     setActiveLink(path);
     navigate(path);
   };
+
+  const totalUnits = labs.reduce((acc, l) => acc + (Number(l.unitCount) || 0), 0);
 
   return (
     <div className="dashboard">
@@ -201,17 +216,11 @@ const TotalUnits = () => {
             <h2 className="page-title" style={{ marginLeft: 'auto' }}>Total Units</h2>
           </div>
 
-          {/*
-            NOTE: Adjusted ONLY the layout of the three columns below:
-            - new-layout-content is a horizontal flex container
-            - first two cards are narrow fixed-width side panels
-            - the chart card takes remaining space
-          */}
           <div className="new-layout-content" style={{ display: 'flex', gap: 16, alignItems: 'stretch' }}>
             {/* LAB LIST (narrow) */}
             <div className="horizontal-card" style={{ flex: '0 0 220px', minWidth: 180, maxWidth: 260 }}>
               <h3>Laboratories</h3>
-              <div className="lab-filter-grid" style={{ maxHeight: 340, }}>
+              <div className="lab-filter-grid" style={{ maxHeight: 340 }}>
                 {loadingLabs ? (
                   <div>Loading labs...</div>
                 ) : (
@@ -243,7 +252,7 @@ const TotalUnits = () => {
                   </div>
                 ))}
                 <p className="total-units-text" style={{ marginTop: 'auto', fontWeight: 700 }}>
-                  Total Units: {labs.reduce((acc, l) => acc + (l.unitCount || 0), 0)}
+                  Total Units: {totalUnits}
                 </p>
               </div>
             </div>
@@ -269,30 +278,23 @@ const TotalUnits = () => {
                         labelLine={false}
                       >
                         {labs.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={['#64d6f0', '#3fb4d6', '#1f91c0', '#1976a5', '#144f73'][index % 5]}
-                          />
+                          <Cell key={`cell-${index}`} fill={['#64d6f0', '#3fb4d6', '#1f91c0', '#1976a5', '#144f73'][index % 5]} />
                         ))}
                       </Pie>
                     </PieChart>
                   </ResponsiveContainer>
 
                   {/* Center text overlay */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      transform: 'translate(-50%, -50%)',
-                      textAlign: 'center',
-                      color: '#fff',
-                    }}
-                  >
+                  <div style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    textAlign: 'center',
+                    color: '#fff',
+                  }}>
                     <div style={{ fontWeight: 800, fontSize: 18 }}>TOTAL</div>
-                    <div style={{ fontWeight: 900, fontSize: 22 }}>
-                      {labs.reduce((acc, l) => acc + (l.unitCount || 0), 0)}
-                    </div>
+                    <div style={{ fontWeight: 900, fontSize: 22 }}>{totalUnits}</div>
                     <div style={{ fontSize: 12, opacity: 0.8 }}>UNITS</div>
                   </div>
                 </div>

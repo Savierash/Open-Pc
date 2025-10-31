@@ -27,7 +27,6 @@ const ReportsAuditor = () => {
   // data
   const [labs, setLabs] = useState([]); // { _id, name }
   const [units, setUnits] = useState([]); // [{ _id, name, status, ... }]
-  const [reports, setReports] = useState([]); // reports for selected lab
 
   // selection & UI
   const [selectedLab, setSelectedLab] = useState(null); // lab object

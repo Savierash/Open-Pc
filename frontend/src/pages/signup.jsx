@@ -6,6 +6,7 @@ import ComputerLogo1 from '../assets/LOGO1.png';
 import PersonLogo from '../assets/Person.png';
 import LockLogo from '../assets/Lock.png';
 import { useAuth } from '../context/AuthContext';
+import api from '../services/api'; // <-- IMPORTANT: import centralized api client
 
 // use shared auth context via useAuth (AuthContext handles token and api)
 
@@ -23,7 +24,7 @@ const Signup = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const { register } = useAuth();
+  const { register: registerWithContext, setAuthToken } = useAuth() || {}; // optional helpers from context
 
   useEffect(() => {
     setActiveLink(location.pathname);
@@ -44,8 +45,43 @@ const Signup = () => {
       const query = new URLSearchParams(location.search);
       const selectedRole = query.get('role') || 'user';
 
-      // include role in payload so backend can set it
-      const res = await api.post('/api/auth/register', {
+      // If your AuthContext provides a register helper, prefer using it
+      if (typeof registerWithContext === 'function') {
+        // Some register helpers return the token/user — adapt as needed
+        const result = await registerWithContext({
+          username,
+          firstName,
+          lastName,
+          phoneNumber,
+          email,
+          password,
+          confirmPassword,
+          role: selectedRole,
+        });
+
+        // If context's register returned a token/user, redirect accordingly
+        const token = result?.token || result?.data?.token;
+        const user = result?.user || result?.data?.user || null;
+        if (token && typeof setAuthToken === 'function') {
+          setAuthToken(token);
+        } else if (token) {
+          localStorage.setItem('token', token);
+        }
+        if (user) localStorage.setItem('user', JSON.stringify(user));
+
+        // decide redirect path like below
+        const userRole = (user && user.role) ? String(user.role).toLowerCase() : String(selectedRole).toLowerCase();
+        let redirectPath = '/dashboard';
+        if (userRole === 'admin') redirectPath = '/dashboard-adminpanel';
+        else if (userRole === 'auditor') redirectPath = '/dashboard-admin';
+        else if (userRole === 'tech' || userRole === 'technician') redirectPath = '/dashboard-technician';
+        navigate(redirectPath, { replace: true });
+        return;
+      }
+
+      // Fallback: call API directly using centralized `api` client.
+      // NOTE: api base already includes "/api", so call '/auth/register'
+      const res = await api.post('/auth/register', {
         username,
         firstName,
         lastName,
@@ -56,9 +92,18 @@ const Signup = () => {
         role: selectedRole,
       });
 
-      const { token, user } = res.data;
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
+      const { token, user } = res.data || {};
+      if (token) {
+        // set token in localStorage and in api client (if setAuthToken is available use it)
+        if (typeof setAuthToken === 'function') {
+          setAuthToken(token);
+        } else {
+          localStorage.setItem('token', token);
+          // also assign header for immediate requests
+          api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        }
+      }
+      if (user) localStorage.setItem('user', JSON.stringify(user));
 
       // Determine redirect path based on user.role returned from backend (fallback to selectedRole)
       const userRole = (user && user.role) ? String(user.role).toLowerCase() : String(selectedRole).toLowerCase();
@@ -66,27 +111,21 @@ const Signup = () => {
       let redirectPath = '/dashboard'; // fallback
 
       if (userRole === 'admin') {
-        // admin goes to admin panel/dashboard-adminpanel (adjust path if different in your app)
         redirectPath = '/dashboard-adminpanel';
       } else if (userRole === 'auditor') {
-        // auditor goes where your auditor dashboard lives
         redirectPath = '/dashboard-admin';
       } else if (userRole === 'tech' || userRole === 'technician') {
-        // technician/tech goes to technician dashboard
         redirectPath = '/dashboard-technician';
       } else {
-        // default fallback (regular user)
         redirectPath = '/dashboard';
       }
 
       navigate(redirectPath, { replace: true });
     } catch (err) {
       console.error('Signup error', err);
-      // Detailed logging for network vs server errors:
       if (!err.response) {
         setError(`Network error: ${err.message}`);
       } else {
-        // prefer server message if available
         setError(err.response?.data?.message || 'Signup failed');
       }
     } finally {
@@ -194,7 +233,6 @@ const Signup = () => {
               <img src={PersonLogo} alt="Email icon" className="input-icon" />
             </div>
 
-            { /* Changed password input wrapper: place toggle inside input */ }
             <div className="input-wrapper" style={{ position: 'relative' }}>
               <input
                 type={showPasswords ? 'text' : 'password'}
@@ -204,7 +242,7 @@ const Signup = () => {
                 className="input"
                 placeholder="Enter password"
                 required
-                style={{ paddingRight: 40 }} // space for the icon
+                style={{ paddingRight: 40 }}
               />
               <button
                 type="button"
@@ -219,26 +257,9 @@ const Signup = () => {
                   border: 'none',
                   cursor: 'pointer',
                   padding: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
                 }}
               >
-                {showPasswords ? (
-                  // eye-off
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M3 3L21 21" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M10.58 10.58C10.2 10.95 10 11.44 10 12C10 13.66 11.34 15 13 15c.56 0 1.05-.2 1.42-.58" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M14.12 14.12C15.06 13.18 15.6 12.13 15.6 12c0-2.21-1.79-4-4-4-.13 0-1.18.54-2.12 1.48" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M2.5 12C3.9 7.5 7.7 4 12 4c1.39 0 2.71.26 3.95.74" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                ) : (
-                  // eye
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <circle cx="12" cy="12" r="3" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                )}
+                {showPasswords ? 'Hide' : 'Show'}
               </button>
               <img src={LockLogo} alt="Password icon" className="input-icon" />
             </div>
@@ -252,7 +273,7 @@ const Signup = () => {
                 className="input"
                 placeholder="Confirm password"
                 required
-                style={{ paddingRight: 40 }} // space for the icon
+                style={{ paddingRight: 40 }}
               />
               <button
                 type="button"
@@ -267,30 +288,13 @@ const Signup = () => {
                   border: 'none',
                   cursor: 'pointer',
                   padding: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
                 }}
               >
-                {showPasswords ? (
-                  // eye-off
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M3 3L21 21" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M10.58 10.58C10.2 10.95 10 11.44 10 12C10 13.66 11.34 15 13 15c.56 0 1.05-.2 1.42-.58" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M14.12 14.12C15.06 13.18 15.6 12.13 15.6 12c0-2.21-1.79-4-4-4-.13 0-1.18.54-2.12 1.48" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M2.5 12C3.9 7.5 7.7 4 12 4c1.39 0 2.71.26 3.95.74" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                ) : (
-                  // eye
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <circle cx="12" cy="12" r="3" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                )}
+                {showPasswords ? 'Hide' : 'Show'}
               </button>
               <img src={LockLogo} alt="Confirm Password icon" className="input-icon" />
             </div>
-            
+
             {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
 
             <button type="submit" className="signup-button" disabled={loading}>

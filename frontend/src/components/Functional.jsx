@@ -1,11 +1,11 @@
 // src/pages/Functional.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api'; // centralized API client
+import { useAuth } from '../context/AuthContext'; // import your auth hook
 import '../styles/Dashboard.css';
 import ComputerLogo1 from '../assets/LOGO1.png';
 import HouseLogo from '../assets/HouseFill.png';
-import GraphLogo from '../assets/GraphUp.png';
 import PcDisplayLogo from '../assets/PcDisplayHorizontal.png';
 import ClipboardLogo from '../assets/ClipboardCheck.png';
 import GearLogo from '../assets/GearFill.png';
@@ -15,19 +15,12 @@ import PersonLogo from '../assets/Person.png';
 import ToolsLogo from '../assets/tools_logo.png';
 
 // Recharts (donut)
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
 const COLORS = ['#64d6f0', '#3fb4d6', '#1f91c0', '#1976a5', '#144f73', '#0f3f55', '#2a9d8f'];
 
 const Functional = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
-  const [labs, setLabs] = useState([]);
-  const [selectedLab, setSelectedLab] = useState(null);
-  const [units, setUnits] = useState([]);
-  const [loadingLabs, setLoadingLabs] = useState(false);
-  const [loadingUnits, setLoadingUnits] = useState(false);
-  const { user } = useAuth();
 
   const [labs, setLabs] = useState([]);
   const [selectedLabId, setSelectedLabId] = useState(null);
@@ -36,44 +29,15 @@ const Functional = () => {
   const [loadingLabs, setLoadingLabs] = useState(false);
   const [loadingUnits, setLoadingUnits] = useState(false);
 
-  useEffect(() => {
-    let mounted = true;
-    async function fetchLabs() {
-      setLoadingLabs(true);
-      try {
-        const res = await api.get('/lab');
-        if (!mounted) return;
-        setLabs(res.data || []);
-        if (res.data && res.data.length) setSelectedLab(res.data[0]._id);
-      } catch (err) {
-        console.error('Failed to load labs', err);
-      } finally {
-        setLoadingLabs(false);
-      }
-    }
-    fetchLabs();
-    return () => { mounted = false; };
-  }, []);
-
-  useEffect(() => {
-    if (!selectedLab) return;
-    let mounted = true;
-    async function fetchUnits() {
-      setLoadingUnits(true);
-      try {
-        const res = await api.get(`/units?labId=${selectedLab}`);
-        if (!mounted) return;
-        setUnits(res.data || []);
-      } catch (err) {
-        console.error('Failed to load units for lab', selectedLab, err);
-        setUnits([]);
-      } finally {
-        setLoadingUnits(false);
-      }
-    }
-    fetchUnits();
-    return () => { mounted = false; };
-  }, [selectedLab]);
+  // useAuth may provide user info; guard in case context isn't wired
+  let user = null;
+  try {
+    const auth = useAuth?.();
+    user = auth?.user ?? null;
+  } catch (e) {
+    // If useAuth isn't available at runtime, continue without user
+    user = null;
+  }
 
   const navigate = useNavigate();
 
@@ -86,9 +50,7 @@ const Functional = () => {
 
   useEffect(() => {
     if (selectedLabId) {
-      // filter the already-fetched functionalUnits by lab to show on the right
       const filtered = functionalUnits.filter(u => {
-        // u.lab may be populated object or an id string
         if (!u.lab) return false;
         if (typeof u.lab === 'object') return String(u.lab._id || u.lab.id) === String(selectedLabId);
         return String(u.lab) === String(selectedLabId);
@@ -104,11 +66,11 @@ const Functional = () => {
     navigate(path);
   };
 
-  // Fetch labs
+  // Fetch labs using centralized api client
   async function fetchLabs() {
     setLoadingLabs(true);
     try {
-      const res = await axios.get(`${API_BASE}/labs`);
+      const res = await api.get('/labs');
       const labsData = res.data || [];
       setLabs(labsData);
       if (labsData.length > 0 && !selectedLabId) {
@@ -122,15 +84,15 @@ const Functional = () => {
     }
   }
 
-  // Fetch all functional units and keep locally to build chart and quick filters
+  // Fetch all functional units (server should support status param)
   async function fetchFunctionalUnits() {
     setLoadingUnits(true);
     try {
-      const res = await axios.get(`${API_BASE}/units`, { params: { status: 'Functional' } });
+      const res = await api.get('/units', { params: { status: 'Functional' } });
       const units = res.data || [];
       setFunctionalUnits(units);
 
-      // if no selection yet, use already-fetched labs state
+      // ensure a lab is selected if not set
       if (!selectedLabId && labs.length > 0) {
         setSelectedLabId(labs[0]._id);
       }
@@ -142,18 +104,23 @@ const Functional = () => {
     }
   }
 
-  // Add a functional unit (simple client flow)
+  // Add a functional unit (client flow)
   async function handleAddUnit() {
     if (!selectedLabId) return window.alert('Select a lab first');
     const name = window.prompt('Enter unit name (e.g. IT-PC-01):');
     if (!name) return;
     try {
       const payload = { name: name.trim(), lab: selectedLabId, status: 'Functional' };
-      const res = await axios.post(`${API_BASE}/units`, payload);
+      const res = await api.post('/units', payload);
       if (res.data) {
-        // append locally and refresh filtered list
         setFunctionalUnits(prev => [...prev, res.data]);
+        // if added in current selectedLab, update unitsForLab too
+        if (String(res.data.lab) === String(selectedLabId) || (res.data.lab && res.data.lab._id && String(res.data.lab._id) === String(selectedLabId))) {
+          setUnitsForLab(prev => [...prev, res.data]);
+        }
       }
+      // optionally refresh labs counts
+      fetchLabs();
     } catch (err) {
       console.error('add unit error', err);
       window.alert(err?.response?.data?.message || 'Failed to add unit');
@@ -165,8 +132,10 @@ const Functional = () => {
     const ok = window.confirm('Delete this unit?');
     if (!ok) return;
     try {
-      await axios.delete(`${API_BASE}/units/${unitId}`);
+      await api.delete(`/units/${unitId}`);
       setFunctionalUnits(prev => prev.filter(u => u._id !== unitId));
+      setUnitsForLab(prev => prev.filter(u => u._id !== unitId));
+      fetchLabs();
     } catch (err) {
       console.error('delete unit error', err);
       window.alert('Failed to delete unit — see console.');
@@ -231,6 +200,8 @@ const Functional = () => {
         </div>
         <div className="nav-actions">
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
+          {/* show username if available */}
+          {user && <span style={{ marginLeft: 8, color: '#ccc' }}>{user.name || user.email}</span>}
         </div>
       </header>
 
@@ -271,18 +242,6 @@ const Functional = () => {
               <a href="/out-of-order" className={`sidebar-link ${activeLink === '/out-of-order' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/out-of-order'); }}>
                 <img src={OctagonLogo} alt="Octagon Icon" className="menu-icon" />
                 <span>Out of Order</span>
-              </a>
-            </li>
-            <li>
-              <a href="/reports-auditor" className={`sidebar-link ${activeLink === '/reports-auditor' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/reports-auditor'); }}>
-                <img src={ClipboardLogo} alt="Reports Icon" className="menu-icon" />
-                <span>Reports</span>
-              </a>
-            </li>
-            <li>
-              <a href="/technicians" className={`sidebar-link ${activeLink === '/technicians' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/technicians'); }}>
-                <img src={ToolsLogo} alt="Technicians Icon" className="menu-icon" />
-                <span>Technicians</span>
               </a>
             </li>
           </ul>

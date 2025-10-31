@@ -20,21 +20,12 @@ const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
 const OutOfOrder = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
   const [labs, setLabs] = useState([]);
-  const [selectedLab, setSelectedLab] = useState(null);
-  const [units, setUnits] = useState([]);
-  const [loadingLabs, setLoadingLabs] = useState(false);
-  const [loadingUnits, setLoadingUnits] = useState(false);
-  const { user } = useAuth();
-
-  // data
-  const [labs, setLabs] = useState([]);
   const [selectedLabId, setSelectedLabId] = useState(null);
   const [units, setUnits] = useState([]);
-
-  // loading / error
   const [loadingLabs, setLoadingLabs] = useState(false);
   const [loadingUnits, setLoadingUnits] = useState(false);
   const [error, setError] = useState('');
+  const { user } = useAuth();
 
   useEffect(() => {
     setActiveLink(window.location.pathname);
@@ -43,55 +34,12 @@ const OutOfOrder = () => {
   }, []);
 
   useEffect(() => {
-<<<<<<< HEAD
     if (selectedLabId) {
       fetchUnits(selectedLabId);
     } else {
       setUnits([]);
     }
   }, [selectedLabId]);
-=======
-    // fetch labs on mount
-    let mounted = true;
-    async function fetchLabs() {
-      setLoadingLabs(true);
-      try {
-        const res = await api.get('/lab');
-        if (!mounted) return;
-        setLabs(res.data || []);
-        if (res.data && res.data.length) {
-          setSelectedLab(res.data[0]._id);
-        }
-      } catch (err) {
-        console.error('Failed to load labs', err);
-      } finally {
-        setLoadingLabs(false);
-      }
-    }
-    fetchLabs();
-    return () => { mounted = false; };
-  }, []);
-
-  useEffect(() => {
-    if (!selectedLab) return;
-    let mounted = true;
-    async function fetchUnits() {
-      setLoadingUnits(true);
-      try {
-        const res = await api.get(`/units?labId=${selectedLab}`);
-        if (!mounted) return;
-        setUnits(res.data || []);
-      } catch (err) {
-        console.error('Failed to load units for lab', selectedLab, err);
-        setUnits([]);
-      } finally {
-        setLoadingUnits(false);
-      }
-    }
-    fetchUnits();
-    return () => { mounted = false; };
-  }, [selectedLab]);
->>>>>>> ed57e257b106bf09b2250133e25b52d6d62766a0
 
   const navigate = useNavigate();
 

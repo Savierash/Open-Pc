@@ -24,7 +24,6 @@ import {
 } from "recharts";
 import { useNavigate } from "react-router-dom";
 
-
 const Dashboard = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
   const [loading, setLoading] = useState(false);
@@ -48,24 +47,16 @@ const Dashboard = () => {
   /**
    * fetchDashboard
    * - fetches /labs for per-lab counts (we expect the endpoint to return unitCount per lab)
-   * - attempts to fetch recent units (GET /units?limit=8&sort=-updatedAt) — backend may ignore params
-   * - attempts to fetch all units to compute counts by status; if that endpoint is heavy you can replace with
-   *   a specialized server endpoint that returns aggregated counts.
+   * - attempts to fetch recent units (GET /units?limit=8&sort=-updatedAt)
+   * - attempts to fetch all units to compute counts by status (can be replaced by an aggregate endpoint)
    */
   async function fetchDashboard() {
     setLoading(true);
     try {
-      // 1) labs (expects aggregate unitCount included)
-      const labsPromise = axios.get(`${API_BASE}/labs`);
-
-      // 2) recent units (server should support limit / sort query; if not it'll return all units and we slice)
-      const recentPromise = axios.get(`${API_BASE}/units`, {
-        params: { limit: 8, sort: "-updatedAt" },
-      });
-
-      // 3) all units (for counts by status). If you have a server endpoint that returns the aggregated counts,
-      // replace this call with that endpoint to avoid transferring all units.
-      const allUnitsPromise = axios.get(`${API_BASE}/units`);
+      // Use centralized api instance (baseURL set in src/services/api.js)
+      const labsPromise = api.get('/labs'); // expects aggregate unitCount included
+      const recentPromise = api.get('/units', { params: { limit: 8, sort: "-updatedAt" } });
+      const allUnitsPromise = api.get('/units');
 
       const [labsRes, recentRes, allUnitsRes] = await Promise.allSettled([
         labsPromise,
@@ -89,7 +80,6 @@ const Dashboard = () => {
       // process recent units
       if (recentRes.status === "fulfilled") {
         const rec = recentRes.value.data || [];
-        // try to sort by updatedAt desc and slice 8 if server didn't apply params
         const sorted = Array.isArray(rec)
           ? rec.slice().sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)).slice(0, 8)
           : [];
@@ -109,36 +99,30 @@ const Dashboard = () => {
           else if (s === "maintenance") byStatus.maintenance += 1;
           else if (s === "outoforder" || s === "out-of-order" || s === "out of order") byStatus.outOfOrder += 1;
           else {
-            // treat anything else: if it's truthy and not functional/maintenance/outoforder, ignore or count separately
+            // ignore others for now
           }
         });
 
-        // Fallback: if perLab totals exist but statuses are zero, derive functional = total - others if possible
         const allUnitsCount = all.length;
         if (allUnitsCount > 0 && byStatus.functional === 0 && byStatus.maintenance === 0 && byStatus.outOfOrder === 0) {
-          // fallback attempt using lab.unitCount if available
-          const totalFromLabs = labsData.reduce((acc, l) => acc + (Number(l.unitCount) || 0), 0);
+          // fallback if server returns units without status normalized
           setCounts({ functional: 0, maintenance: 0, outOfOrder: 0 });
           setPercentFunctional(0);
         } else {
           setCounts(byStatus);
-          const pf = byStatus.functional + byStatus.maintenance + byStatus.outOfOrder
-            ? Math.round((byStatus.functional / (byStatus.functional + byStatus.maintenance + byStatus.outOfOrder)) * 100)
-            : 0;
+          const denom = byStatus.functional + byStatus.maintenance + byStatus.outOfOrder;
+          const pf = denom ? Math.round((byStatus.functional / denom) * 100) : 0;
           setPercentFunctional(pf);
         }
 
-        // If totalUnits is zero but we have units, set totalUnits from all length
         if (!totalUnits && allUnitsCount > 0) {
           setTotalUnits(allUnitsCount);
         }
       } else {
         console.error("all units fetch failed:", allUnitsRes.reason);
-        // keep existing counts (0)
       }
 
-      // Trend: backend might supply a trend endpoint; if not produce a simple derived trend
-      // Here we try to use labs data length as a trivial trend placeholder if none exists
+      // Trend (mock or derived)
       const trendMock = [
         { date: "Mon", value: 60 },
         { date: "Tue", value: 70 },
@@ -151,7 +135,7 @@ const Dashboard = () => {
       setTrend(trendMock);
     } catch (err) {
       console.error("fetchDashboard error:", err);
-      alert("Failed to load dashboard data. See console.");
+      window.alert("Failed to load dashboard data. See console.");
     } finally {
       setLoading(false);
     }
