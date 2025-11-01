@@ -15,7 +15,7 @@ exports.getAllReports = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-
+5
 // Get single report
 exports.getReportById = async (req, res) => {
   try {
@@ -61,6 +61,49 @@ exports.deleteReport = async (req, res) => {
     res.json({ message: 'Report deleted successfully' });
   } catch (err) {
     console.error('deleteReport error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+exports.getReportsByLab = async (req, res) => {
+  try {
+    const { labId } = req.params;
+
+    // Fetch units in this lab
+    const units = await Unit.find({ lab: labId }).select('_id name');
+
+    if (!units.length) {
+      return res.status(404).json({ message: 'No units found in this lab' });
+    }
+
+    // Get reports tied to those units
+    const reports = await Report.find({ unit: { $in: units.map(u => u._id) } })
+      .populate('unit')
+      .populate('technician', 'username email');
+
+    res.json(reports);
+  } catch (err) {
+    console.error('getReportsByLab error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// ✅ Fetch reports for a specific unit (Technician view)
+exports.getReportsByUnit = async (req, res) => {
+  try {
+    const { unitId } = req.params;
+
+    const reports = await Report.find({ unit: unitId })
+      .populate('unit')
+      .populate('technician', 'username email');
+
+    if (!reports.length) {
+      return res.status(404).json({ message: 'No reports found for this unit' });
+    }
+
+    res.json(reports);
+  } catch (err) {
+    console.error('getReportsByUnit error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
