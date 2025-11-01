@@ -160,12 +160,57 @@ const TotalUnits = () => {
         {/* SIDEBAR */}
         <aside className="sidebar">
           <ul className="sidebar-menu">
-            <li><a href="/dashboard" className={`sidebar-link ${activeLink === '/dashboard' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/dashboard'); }}><img src={HouseLogo} className="menu-icon" alt="Home" /><span>Dashboard</span></a></li>
-            <li><a href="/inventory" className={`sidebar-link ${activeLink === '/inventory' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/inventory'); }}><img src={StackLogo} className="menu-icon" alt="Inventory" /><span>Inventory</span></a></li>
-            <li><a href="/unit-status-auditor" className={`sidebar-link ${activeLink === '/unit-status-auditor' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/unit-status-auditor'); }}><img src={MenuButtonWide} className="menu-icon" alt="Unit Status" /><span>Unit Status</span></a></li>
-            <li><a href="/reports-auditor" className={`sidebar-link ${activeLink === '/reports-auditor' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/reports-auditor'); }}><img src={ClipboardX} alt="Reports Icon" className="menu-icon" /><span>Reports</span></a></li>
-            <li><a href="/technicians" className={`sidebar-link ${activeLink === '/technicians' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/technicians'); }}><img src={ToolsLogo} alt="Technicians Icon" className="menu-icon" /><span>Technicians</span></a></li>
-            <li><a href="/auditor-profile" className={`sidebar-link ${activeLink === '/auditor-profile' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/auditor-profile'); }}><img src={AccountSettingLogo} alt="Account Setting Icon" className="menu-icon" /><span>Account Setting</span></a></li>
+            <li>
+              <a
+                href="/dashboard"
+                className={`sidebar-link ${activeLink === '/dashboard' ? 'active' : ''}`}
+                onClick={(e) => { e.preventDefault(); handleNavClick('/dashboard'); }}
+              >
+                <img src={HouseLogo} className="menu-icon" alt="Home" />
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="/inventory"
+                className={`sidebar-link ${activeLink === '/inventory' ? 'active' : ''}`}
+                onClick={(e) => { e.preventDefault(); handleNavClick('/inventory'); }}
+              >
+                <img src={StackLogo} className="menu-icon" alt="Inventory" />
+                <span>Inventory</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="/total-units"
+                className={`sidebar-link ${activeLink === '/total-units' ? 'active' : ''}`}
+                onClick={(e) => { e.preventDefault(); handleNavClick('/total-units'); }}
+              >
+                <img src={PcDisplayLogo} className="menu-icon" alt="Units" />
+                <span>Total Units</span>
+              </a>
+            </li>
+            <li>
+              <a href="/functional" className={`sidebar-link ${activeLink === '/functional' ? 'active' : ''}`}
+                onClick={(e) => { e.preventDefault(); handleNavClick('/functional'); }}>
+                <img src={ClipboardLogo} alt="Clipboard Icon" className="menu-icon" />
+                <span>Functional</span>
+              </a>
+            </li>
+            <li>
+              <a href="/maintenance" className={`sidebar-link ${activeLink === '/maintenance' ? 'active' : ''}`}
+                onClick={(e) => { e.preventDefault(); handleNavClick('/maintenance'); }}>
+                <img src={GearLogo} alt="Gear Icon" className="menu-icon" />
+                <span>Maintenance</span>
+              </a>
+            </li>
+            <li>
+              <a href="/out-of-order" className={`sidebar-link ${activeLink === '/out-of-order' ? 'active' : ''}`}
+                onClick={(e) => { e.preventDefault(); handleNavClick('/out-of-order'); }}>
+                <img src={OctagonLogo} alt="Octagon Icon" className="menu-icon" />
+                <span>Out of Order</span>
+              </a>
+            </li>
           </ul>
         </aside>
 
