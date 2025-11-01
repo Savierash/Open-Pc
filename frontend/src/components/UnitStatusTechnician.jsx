@@ -32,6 +32,7 @@ const UnitStatusTechnician = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [profile, setProfile] = useState(null);
+   const [statusFilter, setStatusFilter] = useState("All");
 
   useEffect(() => {
   async function fetchProfile() {
@@ -98,21 +99,27 @@ const UnitStatusTechnician = () => {
     setSelectedUnit(unit);
   };
 
+  // 🆕 Filter units based on chosen status
+  const filteredUnits = units.filter((unit) => {
+    if (statusFilter === "All") return true;
+    return unit.status === statusFilter;
+  });
+
   // 🆕 Handle status or info save
   const handleSave = async () => {
     if (!selectedUnit?._id) return;
     try {
       setSaving(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       await axios.put(
         `http://localhost:5000/api/technician/unit/${selectedUnit._id}`,
         selectedUnit,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      alert('Unit updated successfully!');
+      alert("✅ Unit updated successfully!");
     } catch (err) {
-      console.error('Failed to save unit:', err);
-      alert('Error saving changes');
+      console.error("Failed to save unit:", err);
+      alert("❌ Error saving changes");
     } finally {
       setSaving(false);
     }
@@ -180,9 +187,9 @@ const UnitStatusTechnician = () => {
                 <h2 className="panel-title">{labs.find(l => l._id === selectedLab)?.name || 'Select Lab'}
                 </h2>
                 <div className="status-filters">
-                  <button className="status-button functional-button">Functional</button>
-                  <button className="status-button out-of-order-button">Out Of Order</button>
-                  <button className="status-button maintenance-button">Maintenance</button>
+                  <button className="status-button functional-button"onClick={() => setStatusFilter("Functional")}>Functional</button>
+                  <button className="status-button out-of-order-button"onClick={() => setStatusFilter("Maintenance")}>Out Of Order</button>
+                  <button className="status-button maintenance-button"onClick={() => setStatusFilter("Out Of Order")}>Maintenance</button>
                 </div>
               </div>
 
@@ -194,7 +201,7 @@ const UnitStatusTechnician = () => {
               </div>
 
               <div className="unit-cards-grid">
-                {units.map((unit) => (
+                {filteredUnits.map((unit) => (
                   <div
                     key={unit._id}
                     className={`pc-card ${selectedUnit._id === unit._id ? 'active' : ''}`}
@@ -304,6 +311,7 @@ const UnitStatusTechnician = () => {
                   onClick={() => setEditingField(editingField === 'lastIssued' ? null : 'lastIssued')}
                 />
               </div>
+              
               <div className="set-status-section">
                 <span>SET STATUS:</span>
                 <select 
@@ -316,7 +324,9 @@ const UnitStatusTechnician = () => {
                   <option>Out Of Order</option>
                 </select>
               </div>
-              <button className="save-button">Save</button>
+              <button className="save-button"onClick={handleSave} disabled={saving}>
+                {saving ? "Saving..." : "Save"}
+                </button>
             </div>
           </div>
         </main>
