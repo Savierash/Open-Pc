@@ -138,6 +138,7 @@ const OutOfOrder = () => {
               Dashboard
             </a>
           </nav>
+          <span className="page-title">Out of Order</span>
         </div>
         <div className="nav-actions">
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />

@@ -3,6 +3,14 @@ import '../styles/Document.css'; // <-- new import
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import ComputerLogo1 from '../assets/LOGO1.png';
 import api from '../services/api';
+import WifiLogo from '../assets/wifi_logo.png';
+import ChatLogo from '../assets/chat_logo.png';
+import BroadcastLogo from '../assets/broadcast_logo.png';
+import ToolsLogo from '../assets/tools_logo.png';
+import axios from 'axios';
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const api = axios.create({ baseURL: API_BASE, timeout: 10000 });
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
@@ -152,6 +160,12 @@ const DocumentPage = () => {
           <button className="btn-login" onClick={() => navigate('/login')}>Login</button>
         </div>
       </header>
+
+      {/* Background decorative logos */}
+      <img src={WifiLogo} alt="" className="bg-logo bg-logo-top-left" />
+      <img src={ChatLogo} alt="" className="bg-logo bg-logo-top-right" />
+      <img src={BroadcastLogo} alt="" className="bg-logo bg-logo-bottom-left" />
+      <img src={ToolsLogo} alt="" className="bg-logo bg-logo-bottom-right" />
 
       <main className="main">
         <h1 className="welcome-title">Provide documents for your account</h1>

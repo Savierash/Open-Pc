@@ -7,6 +7,8 @@ import GraphLogo from "../assets/GraphUp.png";
 import PcDisplayLogo from "../assets/PcDisplayHorizontal.png";
 import ClipboardLogo from "../assets/ClipboardCheck.png";
 import GearLogo from "../assets/GearFill.png";
+import MenuButtonWide from "../assets/menubuttonwide.png"; // Unit Status icon
+import ClipboardX from "../assets/clipboardx.png"; // Reports icon
 import OctagonLogo from "../assets/XOctagonFill.png";
 import StackLogo from "../assets/Stack.png";
 import PersonLogo from "../assets/Person.png";
@@ -105,11 +107,7 @@ const DashboardTechnician = () => {
             <span className="logo-text">OpenPC</span>
             <span className="logo-line">|</span>
           </div>
-          <nav className="nav-links-dashboard">
-            <a href="/dashboard-technician" className={`nav-link-dashboard ${activeLink === "/dashboard-technician" ? "active" : ""}`} onClick={(e) => {e.preventDefault();handleNavClick('/dashboard-technician');}}>
-              Technician Dashboard
-            </a>
-          </nav>
+          <span className="page-title">Technician Dashboard</span>
         </div>
         <div className="nav-actions">
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
@@ -123,8 +121,8 @@ const DashboardTechnician = () => {
         <aside className="sidebar">
           <ul className="sidebar-menu">
             <li><a href="/dashboard-technician" className={`sidebar-link ${activeLink === "/dashboard-technician" ? "active" : ""}`} onClick={(e) => {e.preventDefault();handleNavClick('/dashboard-technician');}}><img src={HouseLogo} className="menu-icon" alt="Home" /><span>Dashboard</span></a></li>
-            <li><a href="/unit-status-technician" className={`sidebar-link ${activeLink === "/unit-status-technician" ? "active" : ""}`} onClick={(e) => {e.preventDefault();handleNavClick('/unit-status-technician');}}><img src={PcDisplayLogo} className="menu-icon" alt="Unit Status" /><span>Unit Status</span></a></li>
-            <li><a href="/reports-tech" className={`sidebar-link ${activeLink === '/reports-tech' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/reports-tech');}}><img src={ClipboardLogo} className="menu-icon" alt="Reports Icon" /><span>Reports</span></a></li>
+            <li><a href="/unit-status-technician" className={`sidebar-link ${activeLink === "/unit-status-technician" ? "active" : ""}`} onClick={(e) => {e.preventDefault();handleNavClick('/unit-status-technician');}}><img src={MenuButtonWide} className="menu-icon" alt="Unit Status" /><span>Unit Status</span></a></li>
+            <li><a href="/reports-tech" className={`sidebar-link ${activeLink === '/reports-tech' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/reports-tech');}}><img src={ClipboardX} className="menu-icon" alt="Reports Icon" /><span>Reports</span></a></li>
             <li><a href="/technician-profile" className={`sidebar-link ${activeLink === "/technician-profile" ? "active" : ""}`} onClick={(e) => {e.preventDefault();handleNavClick('/technician-profile');}}><img src={GearLogo} className="menu-icon" alt="Account Setting" /><span>Account Setting</span></a></li>
           </ul>
         </aside>
@@ -134,36 +132,25 @@ const DashboardTechnician = () => {
           <div className="dashboard-main-content">
             <div className="dashboard-cards">
               <div className="card total-units clickable-card" onClick={() => handleNavClick('/total-units')}>
-                <div className="card-header">
-                  <img src={PcDisplayLogo} alt="PC Display Icon" className="card-icon" />
+                <img src={PcDisplayLogo} alt="PC Display Icon" className="card-icon" />
+                <div className="card-content">
                   <h3>Total Units</h3>
-                </div>
-                <div className="card-body">
                   <p className="stat-number">{loading ? "..." : totalUnits}</p>
                 </div>
               </div>
 
               <div className="card functional clickable-card" onClick={() => handleNavClick('/functional')}>
-                <div className="card-header">
-                  <img src={ClipboardLogo} alt="Clipboard Icon" className="card-icon" />
-                  <h3>Functional</h3>
-                </div>
-                <div className="card-body">
-                  <p className="stat-number">
-                    {loading ? "..." : `${counts.functional} / ${totalUnits}`}
-                  </p>
-                  <div className="progress-bar">
-                    <div className="progress-fill" style={{ width: `${percentFunctional}%` }}></div>
-                  </div>
+                <img src={ClipboardLogo} alt="Clipboard Icon" className="card-icon" />
+                <div className="card-content">
+                  <h3>Functional Units</h3>
+                  <p className="stat-number">{loading ? "..." : counts.functional}</p>
                 </div>
               </div>
 
               <div className="card maintenance clickable-card" onClick={() => handleNavClick('/maintenance')}>
-                <div className="card-header">
-                  <img src={GearLogo} alt="Gear Icon" className="card-icon" />
-                  <h3>Maintenance</h3>
-                </div>
-                <div className="card-body">
+                <img src={ToolsLogo} alt="Tools Icon" className="card-icon" />
+                <div className="card-content">
+                  <h3>Under Maintenance</h3>
                   <p className="stat-number">{loading ? "..." : counts.maintenance}</p>
                 </div>
               </div>

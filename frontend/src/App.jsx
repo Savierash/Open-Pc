@@ -31,8 +31,8 @@ import UnitStatusTechnician from './components/UnitStatusTechnician.jsx';
 import UnitStatusAuditor from './components/UnitStatusAuditor.jsx';
 import AdminTechnicians from './components/AdminTechnicians.jsx'; // Import AdminTechnicians
 import AdminTechRequests from './components/AdminTechRequests.jsx'; // Import AdminTechRequests
-
 import DocumentPage from './pages/document.jsx';
+import Pending from './components/Pending';
 
 /*STYLES*/
 import './styles/Homepage.css';
@@ -47,11 +47,12 @@ import './styles/ForgotPassword.css';
 import './styles/About.css';
 import './styles/ReportsTech.css';
 import './styles/Role.css'; 
-import './styles/AuditorProfile.css'; // Import the new AuditorProfile stylesheet
-import './styles/ReportsAuditor.css'; // Import ReportsAuditor stylesheet
+import './styles/AuditorProfile.css';
+import './styles/ReportsAuditor.css';
 import './styles/TechnicianProfile.css';
 import './styles/AdminProfile.css';
 import './styles/UnitStatusAuditor.css';
+import './styles/Pending.css';
 
 
 function App() {
@@ -86,8 +87,9 @@ function App() {
           <Route path="/dashboard-admin" element={<DashboardAdmin />} />
           <Route path="/admin-profile" element={<AdminProfile />} />
           <Route path="/unit-status-auditor" element={<UnitStatusAuditor />} />
-          <Route path="/admin-technicians" element={<AdminTechnicians />} /> {/* New Route */}
-          <Route path="/admin-tech-requests" element={<AdminTechRequests />} /> {/* New Route */}
+          <Route path="/admin-technicians" element={<AdminTechnicians />} />
+          <Route path="/admin-tech-requests" element={<AdminTechRequests />} />
+          <Route path="/pending" element={<Pending />} />
         </Routes>
       </Router>
     </AuthProvider>

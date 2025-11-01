@@ -20,7 +20,7 @@
 }
 
 .profile-card {
-  background: rgba(0, 0, 0, 0.1); /* Changed to match input field background */
+  background: rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(10px);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -70,7 +70,7 @@
 
 .profile-actions {
   display: flex;
-  flex-direction: column; /* Added to stack buttons */
+  flex-direction: column;
   gap: 8px;
 }
 
@@ -137,14 +137,14 @@
   color: #fff;
   font-size: 1rem;
   outline: none;
-  border: none; /* Remove border from input itself */
-  background-color: transparent; /* Make input background transparent */
+  border: none;
+  background-color: transparent;
 }
 
 .form-group input[type="text"]:focus,
 .form-group input[type="email"]:focus,
 .form-group input[type="password"]:focus {
-  border-color: transparent; /* Remove border-color focus for input */
+  border-color: transparent;
 }
 
 .input-with-icon {
@@ -155,42 +155,41 @@
   border-radius: 8px;
   padding: 8px 12px;
   width: 100%;
-  box-sizing: border-box; /* Ensure padding is included in width */
+  box-sizing: border-box;
 }
 
 .input-with-icon:focus-within {
-  border-color: #8a2be2; /* Apply focus border to the container */
+  border-color: #8a2be2;
 }
 
 .input-with-icon input {
   flex-grow: 1;
-  padding: 0; /* Remove internal padding from input */
-  border: none; /* Ensure no border on the input itself */
-  background: transparent; /* Ensure transparent background */
+  padding: 0;
+  border: none;
+  background: transparent;
 }
 
 .input-with-icon .input-icon {
-  position: static; /* Remove absolute positioning */
-  transform: none; /* Remove transform */
-  margin-left: 8px; /* Add some spacing between input and icon */
+  position: static;
+  transform: none;
+  margin-left: 8px;
   width: 16px;
   height: 16px;
-  filter: brightness(1.2); /* Adjust icon brightness */
+  filter: brightness(1.2);
 }
 
 .password-row {
-  display: flex; /* Ensure it's a flex container */
+  display: flex;
   align-items: center;
   margin-bottom: 1rem;
-  gap: 1.5rem; /* Re-introduce gap to separate input and button */
-  /* Removed justify-content: space-between; as it's not needed with flex-grow and fixed width button */
+  gap: 1.5rem;
 }
 
 .password-row .form-group {
-  flex: 1; /* Allow password input to grow and shrink */
-  min-width: 220px; /* Maintain minimum width as other form-groups */
-  margin-right: 0; /* Ensure no extra margin */
-  width: auto; /* Allow flex to manage width */
+  flex: 1;
+  min-width: 220px;
+  margin-right: 0;
+  width: auto;
 }
 
 .logout-button {
@@ -203,8 +202,8 @@
   font-size: 0.9rem;
   font-weight: 500;
   transition: background-color 0.3s ease;
-  flex-shrink: 0; /* Prevent button from shrinking */
-  width: 120px; /* Set a fixed width for the button */
+  flex-shrink: 0;
+  width: 120px;
   text-align: center;
 }
 
@@ -322,4 +321,5 @@
     font-size: 0.85rem;
   }
 }
+
 

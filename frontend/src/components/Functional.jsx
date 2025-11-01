@@ -10,9 +10,12 @@ import PcDisplayLogo from '../assets/PcDisplayHorizontal.png';
 import ClipboardLogo from '../assets/ClipboardCheck.png';
 import GearLogo from '../assets/GearFill.png';
 import OctagonLogo from '../assets/XOctagonFill.png';
-import StackLogo from '../assets/Stack.png';
+import StackLogo from '../assets/icon_6.png'; // Inventory icon
+import MenuButtonWide from '../assets/menubuttonwide.png'; // Unit Status icon
+import ClipboardX from '../assets/clipboardx.png'; // Reports icon
 import PersonLogo from '../assets/Person.png';
 import ToolsLogo from '../assets/tools_logo.png';
+import AccountSettingLogo from '../assets/GearFill.png'; // Account Setting icon
 
 // Recharts (donut)
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
@@ -197,6 +200,7 @@ const Functional = () => {
               Dashboard
             </a>
           </nav>
+          <span className="page-title">Functional Units</span>
         </div>
         <div className="nav-actions">
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
@@ -221,27 +225,55 @@ const Functional = () => {
               </a>
             </li>
             <li>
-              <a href="/total-units" className={`sidebar-link ${activeLink === '/total-units' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/total-units'); }}>
-                <img src={PcDisplayLogo} className="menu-icon" alt="Units" />
-                <span>Total Units</span>
+              <a 
+                href="/unit-status-auditor" 
+                className={`sidebar-link ${activeLink === '/unit-status-auditor' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/unit-status-auditor');
+                }}
+              >
+                <img src={MenuButtonWide} alt="Unit Status Icon" className="menu-icon" />
+                <span>Unit Status</span>
               </a>
             </li>
             <li>
-              <a href="/functional" className={`sidebar-link ${activeLink === '/functional' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/functional'); }}>
-                <img src={ClipboardLogo} alt="Clipboard Icon" className="menu-icon" />
-                <span>Functional</span>
+              <a 
+                href="/reports-auditor" 
+                className={`sidebar-link ${activeLink === '/reports-auditor' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/reports-auditor');
+                }}
+              >
+                <img src={ClipboardX} alt="Reports Icon" className="menu-icon" />
+                <span>Reports</span>
               </a>
             </li>
             <li>
-              <a href="/maintenance" className={`sidebar-link ${activeLink === '/maintenance' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/maintenance'); }}>
-                <img src={GearLogo} alt="Gear Icon" className="menu-icon" />
-                <span>Maintenance</span>
+              <a 
+                href="/technicians" 
+                className={`sidebar-link ${activeLink === '/technicians' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/technicians');
+                }}
+              >
+                <img src={ToolsLogo} alt="Technicians Icon" className="menu-icon" />
+                <span>Technicians</span>
               </a>
             </li>
             <li>
-              <a href="/out-of-order" className={`sidebar-link ${activeLink === '/out-of-order' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/out-of-order'); }}>
-                <img src={OctagonLogo} alt="Octagon Icon" className="menu-icon" />
-                <span>Out of Order</span>
+              <a 
+                href="/auditor-profile" 
+                className={`sidebar-link ${activeLink === '/auditor-profile' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/auditor-profile');
+                }}
+              >
+                <img src={AccountSettingLogo} alt="Account Setting Icon" className="menu-icon" />
+                <span>Account Setting</span>
               </a>
             </li>
           </ul>

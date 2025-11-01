@@ -3,7 +3,7 @@
   flex: 1;
   position: relative;
   z-index: 2;
-  padding: 0 0 0 20px; /* Added left padding */
+  padding: 0 0 0 20px;
   overflow: hidden;
   min-height: calc(100vh - 70px);
 }
@@ -141,7 +141,7 @@
 .inventory-middle-panel-header {
   display: flex;
   align-items: center;
-  gap: 10px; /* Reduced gap for a tighter look */
+  gap: 10px;
   margin-bottom: 20px;
   padding-bottom: 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
@@ -153,29 +153,29 @@
   border-bottom: none;
   text-align: left;
   padding-left: 0;
-  flex-shrink: 0; /* Prevent title from shrinking */
-  margin-right: 10px; /* Adjust space between title and button */
+  flex-shrink: 0;
+  margin-right: 10px;
 }
 
 .inventory-add-unit-button {
   background-color: #8a2be2;
   color: white;
   border: none;
-  padding: 8px 12px; /* Adjusted padding for button */
+  padding: 8px 12px;
   border-radius: 8px;
   cursor: pointer;
   font-size: 0.9rem;
   font-weight: 500;
   transition: background-color 0.3s ease;
-  align-self: center; /* Vertically align with title */
-  margin-right: auto; /* Push search bar to the right */
+  align-self: center; 
+  margin-right: auto;
 }
 
 .inventory-search-bar {
-  flex-grow: 1; /* Allow search bar to take remaining space */
+  flex-grow: 1;
   margin-bottom: 0px;
   position: relative;
-  padding-top: 0; /* Removed top padding */
+  padding-top: 0;
 }
 
 .inventory-search-input-wrapper {
@@ -302,7 +302,6 @@
   background-color: #9b48f9;
 }
 
-/* Responsive adjustments */
 @media (max-width: 1024px) {
   .inventory-page-content {
     flex-direction: column;

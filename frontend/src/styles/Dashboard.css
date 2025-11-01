@@ -36,17 +36,17 @@
 
 .top-bar-dashboard {
   display: flex;
-  justify-content: space-between; /* Space out items */
+  justify-content: space-between;
   align-items: center;
-  padding: 15px 30px; /* Adjust padding */
-  background: rgba(0, 0, 0, 0.4); /* Darker, more transparent background */
-  backdrop-filter: blur(15px); /* Stronger blur effect */
+  padding: 15px 30px;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(15px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   color: white;
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Add a subtle shadow */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .logo-and-nav {
@@ -74,7 +74,7 @@
 
 .logo-line {
   font-size: 1.8rem;
-  color: #8a2be2; /* Purple color for the separator line */
+  color: #8a2be2;
   margin: 0 8px;
   font-weight: 300;
 }
@@ -129,7 +129,7 @@
   height: 38px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #8a2be2; /* Purple border for profile icon */
+  border: 2px solid #8a2be2;
 }
 
 .profile-name {
@@ -141,7 +141,7 @@
 .profile-role {
   font-size: 0.9rem;
   color: #c0c0c0;
-  background-color: rgba(138, 43, 226, 0.2); /* Light purple background for role */
+  background-color: rgba(138, 43, 226, 0.2);
   padding: 5px 10px;
   border-radius: 20px;
   margin-left: 5px;
@@ -183,8 +183,8 @@
   position: relative;
   z-index: 2;
   padding: 10px;
-  overflow: hidden; /* Prevent scrolling of the main layout */
-  min-height: calc(100vh - 70px); /* Explicitly set height based on viewport height minus top-bar height */
+  overflow: hidden;
+  min-height: calc(100vh - 70px);
 }
 
 .sidebar {
@@ -300,6 +300,9 @@
   position: relative;
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
 }
 
 .clickable-card {
@@ -313,31 +316,31 @@
   border-color: #8a2be2;
 }
 
-.card-header {
+.card-content {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
 }
 
 .card-icon {
-  height: 24px;
-  width: 24px;
+  height: 60px;
+  width: 60px;
   filter: brightness(1.2) saturate(0.8);
   flex-shrink: 0;
 }
 
-.card-header h3 {
+.card-content h3 {
   margin: 0;
-  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  font-size: 1rem;
   color: #fff;
   font-weight: 600;
 }
 
 .stat-number {
-  font-size: clamp(1.5rem, 5vw, 2rem);
+  font-size: 2rem;
   font-weight: bold;
-  margin: 0 0 1rem 0;
+  margin: 0;
   color: #ffffff;
 }
 
@@ -1027,7 +1030,6 @@
   padding-top: 1rem;
 }
 
-/* Responsive adjustments for new layout */
 @media (max-width: 768px) {
   .new-layout-content {
     flex-direction: column;
@@ -1048,41 +1050,41 @@
   display: flex;
   gap: 20px;
   width: 100%;
-  height: 100%; /* Set explicit height */
-  padding: 0; /* Removed padding to make panels flush with parent */
-  margin: 0; /* Removed horizontal margin as main-content now has it */
-  flex-grow: 1; /* Allows it to take remaining vertical space */
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
 }
 
 .technicians-search-panel {
-  flex: 2; /* Made search panel bigger */
-  background: rgba(0, 0, 0, 0.3); /* Changed to match sidebar */
-  backdrop-filter: blur(10px); /* Reintroduced backdrop-filter */
-  border-radius: 12px; /* Reintroduced border-radius */
-  border: 1px solid rgba(255, 255, 255, 0.1); /* Reintroduced border */
-  padding: 20px; /* Reintroduced padding */
-  display: flex; /* Added flex to manage internal scrolling */
-  flex-direction: column; /* Added flex-direction */
-  overflow-y: auto; /* Make the search panel scrollable */
+  flex: 2;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
 }
 
 .technicians-info-panel {
-  flex: 1; /* Made info panel smaller */
-  background: rgba(0, 0, 0, 0.3); /* Changed to match sidebar */
-  backdrop-filter: blur(10px); /* Reintroduced backdrop-filter */
-  border-radius: 12px; /* Reintroduced border-radius */
-  border: 1px solid rgba(255, 255, 255, 0.1); /* Reintroduced border */
-  padding: 20px; /* Reintroduced padding */
-  display: flex; /* Added flex to manage internal scrolling */
-  flex-direction: column; /* Added flex-direction */
-  overflow-y: auto; /* Changed to auto to allow scrolling */
+  flex: 1;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
 }
 
 .search-bar-container {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  flex-shrink: 0; /* Prevent shrinking search bar */
+  flex-shrink: 0;
 }
 
 .search-bar-container h2 {
@@ -1098,7 +1100,7 @@
 
 .search-input {
   width: 100%;
-  padding: 10px 15px 10px 40px; /* Adjust padding for icon */
+  padding: 10px 15px 10px 40px;
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   background-color: rgba(255, 255, 255, 0.1);
@@ -1122,7 +1124,7 @@
 
 .technicians-list {
   flex-grow: 1;
-  overflow-y: auto; /* Keep scroll for the list itself */
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -1130,7 +1132,7 @@
 
 .technician-list-item {
   display: flex;
-  justify-content: space-between; /* Added to push items to opposite ends */
+  justify-content: space-between;
   align-items: center;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
@@ -1152,8 +1154,8 @@
 
 .technician-name-and-id {
   display: flex;
-  flex-grow: 1; /* Allows it to take up available space */
-  justify-content: space-between; /* Pushes name and ID to opposite ends */
+  flex-grow: 1;
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -1165,7 +1167,6 @@
 .technician-id {
   font-size: 0.9rem;
   color: rgba(255, 255, 255, 0.7);
-  /* margin-left: auto; Removed as space-between handles it */
 }
 
 .technicians-info-panel {
@@ -1194,7 +1195,7 @@
   display: flex;
   flex-direction: column;
   gap: 15px;
-  flex-shrink: 0; /* Prevent shrinking detail card */
+  flex-shrink: 0;
 }
 
 .technician-profile-header {
@@ -1231,14 +1232,13 @@
 .input-with-icon-wrapper {
   position: relative;
   flex-grow: 1;
-  width: 50%; /* Set width to 50% */
-  flex-grow: 0; /* Override flex-grow from parent */
+  width: 50%;
+  flex-grow: 0;
 }
 
 .detail-label {
   font-size: 0.9rem;
   color: rgba(255, 255, 255, 0.7);
-  /* width: 100px; Remove fixed width for labels */
   flex-shrink: 0;
 }
 
@@ -1246,13 +1246,13 @@
   font-weight: bold;
   font-size: 1.1rem;
   color: #fff;
-  margin-top: 15px; /* Add some space above */
+  margin-top: 15px;
 }
 
 .detail-input {
-  width: 100%; /* Ensure input takes full width of its wrapper */
+  width: 100%;
   padding: 8px 12px;
-  padding-right: 50px; /* Increased padding to make more space for the icon */
+  padding-right: 50px;
   border-radius: 6px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   background-color: rgba(255, 255, 255, 0.1);
@@ -1266,16 +1266,16 @@
 }
 
 .copy-icon {
-  position: absolute; /* Position the icon absolutely */
-  right: 8px; /* Adjusted right position */
+  position: absolute;
+  right: 8px;
   top: 50%;
   transform: translateY(-50%);
-  width: 24px; /* Adjusted width */
-  height: 24px; /* Adjusted height */
-  background-color: rgba(255, 255, 255, 0.1); /* Reintroduced background */
-  border: 1px solid rgba(255, 255, 255, 0.2); /* Reintroduced border */
-  border-radius: 4px; /* Reintroduced border-radius */
-  display: flex; /* Reintroduced flex properties for centering */
+  width: 24px;
+  height: 24px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
@@ -1283,7 +1283,6 @@
   filter: invert(1);
 }
 
-/* Responsive adjustments for technicians page */
 @media (max-width: 768px) {
   .technicians-page-content {
     flex-direction: column;
@@ -1320,47 +1319,47 @@
 
 .search-bar-container-top {
   display: flex;
-  justify-content: flex-start; /* Changed to flex-start */
+  justify-content: flex-start;
   align-items: center;
   width: 100%;
-  padding: 10px 20px; /* Reintroduced horizontal padding */
-  background: rgba(0, 0, 0, 0.3); /* Changed to match sidebar */
-  border-radius: 12px; /* Reintroduced border-radius */
-  margin-bottom: 0; /* Removed margin-bottom as gap handles it */
-  flex-shrink: 0; /* Prevent shrinking */
+  padding: 10px 20px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  margin-bottom: 0;
+  flex-shrink: 0;
 }
 
 .search-bar-container-top h2.page-title {
   font-size: 1.8rem;
   font-weight: bold;
   color: #fff;
-  margin-left: auto; /* Push technicians title to the right */
+  margin-left: auto;
 }
 
 .search-bar-container-top .search-text {
   font-size: 1.8rem;
   font-weight: bold;
   color: #fff;
-  margin-right: 10px; /* Reduced space between text and search bar */
+  margin-right: 10px;
 }
 
 .search-bar-container-top .search-input-wrapper {
-  flex-grow: 0; /* Remove flex-grow */
-  max-width: 400px; /* Keep a reasonable max-width */
-  width: 100%; /* Ensure it takes full width within its flex context */
+  flex-grow: 0;
+  max-width: 400px;
+  width: 100%;
 }
 
 @media (max-width: 768px) {
   .search-bar-container-top {
-    flex-direction: row; /* Changed to row for mobile */
+    flex-direction: row;
     align-items: center;
-    padding: 10px; /* Keep some padding for mobile */
+    padding: 10px;
   }
 
   .search-bar-container-top h2.page-title,
   .search-bar-container-top .search-text {
-    margin-bottom: 0; /* Changed to 0 */
-    margin-right: 10px; /* Keep some margin for mobile */
+    margin-bottom: 0;
+    margin-right: 10px;
   }
 
   .search-bar-container-top .search-input-wrapper {
@@ -1373,13 +1372,13 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 20px; /* Gap between top search bar and bottom panels */
+  gap: 20px;
   position: relative;
   z-index: 3;
   margin-left: 20px;
   background: transparent;
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
-  padding: 0 20px; /* Added horizontal padding */
+  padding: 0 20px;
   overflow: hidden;
 }

@@ -6,6 +6,12 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import ComputerLogo1 from '../assets/LOGO1.png';
 import AuditorButton from '../assets/AUDITOR BUTTON.png';
 import TechButton from '../assets/TECH BUTTON.png';
+import AuditorButton from '../assets/AUDITOR BUTTON.png'; // Import Auditor image
+import TechButton from '../assets/TECH BUTTON.png';     // Import Tech image
+import WifiLogo from '../assets/wifi_logo.png';
+import ChatLogo from '../assets/chat_logo.png';
+import BroadcastLogo from '../assets/broadcast_logo.png';
+import ToolsLogo from '../assets/tools_logo.png';
 
 // centralized api client
 
@@ -98,6 +104,12 @@ const Role = () => {
           </nav>
         </div>
       </header>
+
+      {/* Background decorative logos */}
+      <img src={WifiLogo} alt="" className="bg-logo bg-logo-top-left" />
+      <img src={ChatLogo} alt="" className="bg-logo bg-logo-top-right" />
+      <img src={BroadcastLogo} alt="" className="bg-logo bg-logo-bottom-left" />
+      <img src={ToolsLogo} alt="" className="bg-logo bg-logo-bottom-right" />
 
       <main className="main-role">
         <h1 className="welcome-title-role">Get started with your role</h1>

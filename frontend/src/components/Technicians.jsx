@@ -11,9 +11,11 @@ import PcDisplayLogo from '../assets/PcDisplayHorizontal.png';
 import ClipboardLogo from '../assets/ClipboardCheck.png';
 import GearLogo from '../assets/GearFill.png';
 import OctagonLogo from '../assets/XOctagonFill.png';
-import StackLogo from '../assets/Stack.png';
+import StackLogo from '../assets/icon_6.png'; // Inventory icon
 import ToolsLogo from '../assets/tools_logo.png';
-import CopyIcon from '../assets/ClipboardCheck.png'; // Added CopyIcon import
+import CopyIcon from '../assets/copypaste.png'; // Copy icon for input fields
+import MenuButtonWide from '../assets/menubuttonwide.png'; // Unit Status icon
+import ClipboardX from '../assets/clipboardx.png'; // Reports icon
 
 const Technicians = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
@@ -54,18 +56,7 @@ const Technicians = () => {
             <span className="logo-text">OpenPC</span>
             <span className="logo-line">|</span>
           </div>
-          <nav className="nav-links-dashboard">
-            <a 
-              href="/dashboard" 
-              className={`nav-link-dashboard active`}
-              onClick={(e) => {
-                e.preventDefault();
-                handleNavClick('/dashboard');
-              }}
-            >
-              Dashboard
-            </a>
-          </nav>
+          <span className="page-title">Technicians</span>
         </div>
         <div className="nav-actions">
           <img 
@@ -116,7 +107,7 @@ const Technicians = () => {
                   handleNavClick('/unit-status-auditor');
                 }}
               >
-                <img src={PcDisplayLogo} alt="Unit Status Icon" className="menu-icon" />
+                <img src={MenuButtonWide} alt="Unit Status Icon" className="menu-icon" />
                 <span>Unit Status</span>
               </a>
             </li>
@@ -129,7 +120,7 @@ const Technicians = () => {
                   handleNavClick('/reports-auditor');
                 }}
               >
-                <img src={ClipboardLogo} alt="Reports Icon" className="menu-icon" />
+                <img src={ClipboardX} alt="Reports Icon" className="menu-icon" />
                 <span>Reports</span>
               </a>
             </li>

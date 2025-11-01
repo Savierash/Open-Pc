@@ -10,11 +10,13 @@ import GraphLogo from '../assets/GraphUp.png';
 import ClipboardLogo from '../assets/ClipboardCheck.png';
 import GearLogo from '../assets/GearFill.png';
 import OctagonLogo from '../assets/XOctagonFill.png';
-import StackLogo from '../assets/Stack.png';
+import StackLogo from '../assets/icon_6.png'; // Inventory icon
 import ComputerLabImage from '../assets/BACKGROUND 2.png';
 import PersonLogo from '../assets/Person.png';
 import ToolsLogo from '../assets/tools_logo.png';
 import PcDisplayLogo from "../assets/PcDisplayHorizontal.png"; // Added for unit cards
+import MenuButtonWide from "../assets/menubuttonwide.png"; // Unit Status icon
+import ClipboardX from "../assets/clipboardx.png"; // Reports icon
 
 // Use Vite env style and ensure no trailing slash
 const RAW_API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
@@ -252,28 +254,7 @@ const Inventory = () => {
             <span className="logo-text">OpenPC</span>
             <span className="logo-line">|</span>
           </div>
-          <nav className="nav-links-dashboard">
-            <a
-              href="/dashboard"
-              className={`nav-link-dashboard ${activeLink === '/dashboard-admin' ? 'active' : ''}`}
-              onClick={(e) => {
-                e.preventDefault();
-                handleNavClick('/dashboard-admin');
-              }}
-            >
-              Dashboard
-            </a>
-            <a
-              href="/inventory"
-              className="nav-link-dashboard active"
-              onClick={(e) => {
-                e.preventDefault();
-                handleNavClick('/inventory');
-              }}
-            >
-              Inventory
-            </a>
-          </nav>
+          <span className="page-title">Inventory</span>
         </div>
         <div className="nav-actions">
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
@@ -312,6 +293,19 @@ const Inventory = () => {
               </a>
             </li>
             <li>
+              <a 
+                href="/unit-status-auditor" 
+                className={`sidebar-link ${activeLink === '/unit-status-auditor' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/unit-status-auditor');
+                }}
+              >
+                <img src={MenuButtonWide} alt="Unit Status Icon" className="menu-icon" />
+                <span>Unit Status</span>
+              </a>
+            </li>
+            <li>
               <a
                 href="/reports-auditor"
                 className={`sidebar-link ${activeLink === '/reports-auditor' ? 'active' : ''}`}
@@ -320,7 +314,7 @@ const Inventory = () => {
                   handleNavClick('/reports-auditor');
                 }}
               >
-                <img src={ClipboardLogo} alt="Reports Icon" className="menu-icon" />
+                <img src={ClipboardX} alt="Reports Icon" className="menu-icon" />
                 <span>Reports</span>
               </a>
             </li>

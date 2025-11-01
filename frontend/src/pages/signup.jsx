@@ -7,6 +7,12 @@ import PersonLogo from '../assets/Person.png';
 import LockLogo from '../assets/Lock.png';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api'; // <-- IMPORTANT: import centralized api client
+import PhoneIcon from '../assets/Telephone.png';
+import WifiLogo from '../assets/wifi_logo.png';
+import ChatLogo from '../assets/chat_logo.png';
+import BroadcastLogo from '../assets/broadcast_logo.png';
+import ToolsLogo from '../assets/tools_logo.png';
+import axios from 'axios';
 
 // use shared auth context via useAuth (AuthContext handles token and api)
 
@@ -174,6 +180,12 @@ const Signup = () => {
         </div>
       </header>
 
+      {/* Background decorative logos */}
+      <img src={WifiLogo} alt="" className="bg-logo bg-logo-top-left" />
+      <img src={ChatLogo} alt="" className="bg-logo bg-logo-top-right" />
+      <img src={BroadcastLogo} alt="" className="bg-logo bg-logo-bottom-left" />
+      <img src={ToolsLogo} alt="" className="bg-logo bg-logo-bottom-right" />
+
       <main className="main">
         <h1 className="welcome-title">Get started with your account</h1>
 
@@ -217,7 +229,7 @@ const Signup = () => {
                 placeholder="Phone number"
                 required
               />
-              <img src={PersonLogo} alt="Phone Number icon" className="input-icon" />
+              <img src={PhoneIcon} alt="Phone Number icon" className="input-icon" />
             </div>
 
             <div className="input-wrapper">

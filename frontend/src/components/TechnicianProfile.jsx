@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from '../context/AuthContext';
 import "../styles/TechnicianProfile.css";
 import PersonCircle from "../assets/PersonCircle.png";
-import Lock from "../assets/Lock.png";
+import PencilSquare from "../assets/pencilsquare.png"; // Edit icon
 import GearFill from "../assets/GearFill.png";
 import ComputerLogo1 from "../assets/LOGO1.png";
 import HouseLogo from "../assets/HouseFill.png";
@@ -10,6 +10,8 @@ import StackLogo from "../assets/Stack.png";
 import ClipboardLogo from "../assets/ClipboardCheck.png";
 import ToolsLogo from "../assets/tools_logo.png";
 import PcDisplayLogo from "../assets/PcDisplayHorizontal.png";
+import MenuButtonWide from "../assets/menubuttonwide.png"; // Unit Status icon
+import ClipboardX from "../assets/clipboardx.png"; // Reports icon
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const TechnicianProfile = () => {
@@ -72,8 +74,8 @@ const TechnicianProfile = () => {
                 <span>Dashboard</span>
               </a>
             </li>
-            <li><a href="/unit-status-technician" className={`sidebar-link ${activeLink === "/unit-status-technician" ? "active" : ""}`} onClick={(e) => {e.preventDefault();handleNavClick('/unit-status-technician');}}><img src={PcDisplayLogo} className="menu-icon" alt="Unit Status" /><span>Unit Status</span></a></li>
-            <li><a href="/reports-tech" className={`sidebar-link ${activeLink === '/reports-tech' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/reports-tech');}}><img src={ClipboardLogo} className="menu-icon" alt="Reports Icon" /><span>Reports</span></a></li>
+            <li><a href="/unit-status-technician" className={`sidebar-link ${activeLink === "/unit-status-technician" ? "active" : ""}`} onClick={(e) => {e.preventDefault();handleNavClick('/unit-status-technician');}}><img src={MenuButtonWide} className="menu-icon" alt="Unit Status" /><span>Unit Status</span></a></li>
+            <li><a href="/reports-tech" className={`sidebar-link ${activeLink === '/reports-tech' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/reports-tech');}}><img src={ClipboardX} className="menu-icon" alt="Reports Icon" /><span>Reports</span></a></li>
             <li>
               <a href="/technician-profile" className={`sidebar-link ${activeLink === "/technician-profile" ? "active" : ""}`} onClick={(e) => {e.preventDefault();handleNavClick('/technician-profile');}}>
                 <img src={GearFill} className="menu-icon" alt="Account Setting" />
@@ -112,20 +114,27 @@ const TechnicianProfile = () => {
                 <div className="form-group">
                   <label>Full name</label>
                   <div className="input-with-icon">
-                    <input type="text" value={profile?.username?.split(' ')[0] || ''} readOnly />
-                    <img src={Lock} alt="Lock Icon" className="input-icon" />
+                    <input type="text" value="Kresner" readOnly />
+                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
                   </div>
                 </div>
                 <div className="form-group">
                   <label>Last Name</label>
                   <div className="input-with-icon">
-                    <input type="text" value={profile?.username?.split(' ')[1] || ''} readOnly />
-                    <img src={Lock} alt="Lock Icon" className="input-icon" />
+                    <input type="text" value="Leonardo" readOnly />
+                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>Tech ID</label>
+                  <div className="input-with-icon">
+                    <input type="text" value="01593" readOnly />
+                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
                   </div>
                 </div>
               </div>
 
-              <h3>Contact Email</h3>
+              <h3>Contact Information</h3>
               <div className="form-row">
                 <div className="form-group">
                   <label>Email</label>
@@ -155,7 +164,7 @@ const TechnicianProfile = () => {
                 <div className="form-group">
                   <div className="input-with-icon">
                     <input type="password" value="........." readOnly />
-                    <img src={Lock} alt="Lock Icon" className="input-icon" />
+                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
                   </div>
                 </div>
                 <button className="logout-button" onClick={handleLogout}>LOGOUT</button>

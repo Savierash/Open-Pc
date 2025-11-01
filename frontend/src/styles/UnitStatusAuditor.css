@@ -1,17 +1,15 @@
-/* styles/UnitStatusAuditor.css */
-
 .unit-status-auditor-main-content {
     display: flex;
     flex-direction: column;
-    padding: 0px 20px 20px 20px; /* Removed top padding */
-    background: transparent; /* Made background transparent */
-    -webkit-backdrop-filter: none; /* Removed backdrop filter */
-    backdrop-filter: none; /* Removed backdrop filter */
-    border-radius: 20px; /* Consistent with main-content */
-    margin-left: 10px; /* Consistent with main-content */
+    padding: 0px 20px 20px 20px;
+    background: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-radius: 20px;
+    margin-left: 10px;
     flex-grow: 1;
     overflow: auto;
-    width: 100%; /* Ensure it takes full width */
+    width: 100%;
 }
 
 .auditor-main-content-header {
@@ -19,48 +17,44 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    background: rgba(0, 0, 0, 0.2); /* Lighter background for header */
-    border-radius: 12px; /* Consistent with other cards/panels */
-    border: 1px solid rgba(255, 255, 255, 0.1); /* Consistent border */
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     padding: 10px 20px;
-    width: 100%; /* Ensure header takes full width */
-    gap: 20px; /* Added gap between the two main sections */
+    width: 100%;
+    gap: 20px;
 }
 
 .auditor-status-filters-and-search {
     display: flex;
     align-items: center;
-    gap: 10px; /* Space between filter buttons and search bar */
-    flex-grow: 1; /* Allow filters and search to take more space */
+    gap: 10px;
+    flex-grow: 1;
 }
 
 .auditor-panel-title {
-    color: #fff; /* Consistent color */
-    font-size: 1.8rem; /* Consistent size */
+    color: #fff;
+    font-size: 1.8rem;
     font-weight: bold;
 }
 
 .auditor-status-filters {
     display: flex;
-    gap: 10px; /* Space between individual buttons */
+    gap: 10px;
     overflow: hidden;
 }
 
 .auditor-status-button {
-    padding: 10px 20px; /* Adjusted padding */
+    padding: 10px 20px;
     border: none;
     cursor: pointer;
     font-weight: 500;
     color: #fff;
-    background-color: rgba(0, 0, 0, 0.2); /* Consistent with card backgrounds */
-    border: 1px solid rgba(255, 255, 255, 0.1); /* Individual button border */
-    border-radius: 8px; /* Individual button border-radius */
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
     white-space: nowrap;
     transition: background-color 0.3s ease, border-color 0.3s ease;
-}
-
-.auditor-status-button:not(:last-child) {
-    /* Removed border-right to separate buttons */
 }
 
 .auditor-status-button:hover {
@@ -68,33 +62,33 @@
 }
 
 .auditor-status-button.active {
-    background-color: #8a2be2; /* Primary purple color for active */
+    background-color: #8a2be2;
     border-color: #8a2be2;
 }
 
 .auditor-functional-button.active {
-    background-color: #28a745; /* Green for active functional */
+    background-color: #28a745;
 }
 
 .auditor-out-of-order-button.active {
-    background-color: #dc3545; /* Red for active out of order */
+    background-color: #dc3545;
 }
 
 .auditor-maintenance-button.active {
-    background-color: #ffc107; /* Yellow for active maintenance */
+    background-color: #ffc107;
 }
 
 .auditor-search-bar-unit-status {
     position: relative;
-    margin-left: 10px; /* Adjusted margin */
-    flex-grow: 1; /* Allow search bar to take remaining space */
+    margin-left: 10px;
+    flex-grow: 1;
 }
 
 .auditor-search-input-wrapper-unit-status {
     position: relative;
     display: flex;
     align-items: center;
-    width: 100%; /* Ensure wrapper takes full width */
+    width: 100%;
 }
 
 .auditor-search-icon-unit-status {
@@ -102,102 +96,107 @@
     left: 10px;
     width: 20px;
     height: 20px;
-    filter: invert(1); /* Consistent icon styling */
-}
+    filter: invert(1);
 
 .auditor-search-input {
-    width: 100%; /* Ensure input takes full width of its container */
+    width: 100%;
     padding: 10px 10px 10px 40px;
-    border-radius: 8px; /* Consistent border-radius */
+    border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.2); /* Consistent input background */
+    background: rgba(0, 0, 0, 0.2);
     color: #fff;
     font-size: 1rem;
 }
 
 .auditor-search-input::placeholder {
-    color: rgba(255, 255, 255, 0.6); /* Consistent placeholder color */
+    color: rgba(255, 255, 255, 0.6);
 }
 
 .auditor-pc-cards-container {
-    background: rgba(0, 0, 0, 0.2); /* Consistent with card backgrounds */
+    background: rgba(0, 0, 0, 0.2);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
-    border-radius: 12px; /* Consistent border-radius */
-    border: 1px solid rgba(255, 255, 255, 0.1); /* Consistent border */
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     padding: 20px;
-    flex-grow: 1; /* Allow it to take up remaining space */
-    overflow-y: auto; /* Enable scrolling if content overflows */
-    width: 100%; /* Ensure it takes full width */
+    flex-grow: 1;
+    overflow-y: auto;
+    width: 100%;
 }
 
 .auditor-unit-cards-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 20px;
-    padding-right: 5px; /* Add some padding for scrollbar */
+    padding-right: 5px;
 }
 
 .auditor-pc-card {
-    background: rgba(0, 0, 0, 0.2); /* Consistent with card backgrounds */
+    background: rgba(0, 0, 0, 0.2);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
-    border-radius: 12px; /* Consistent border-radius */
+    border-radius: 12px;
     padding: 15px;
     display: flex;
     flex-direction: column;
     align-items: center;
     color: #fff;
     text-align: center;
-    border: 1px solid rgba(255, 255, 255, 0.1); /* Consistent border */
+    border: 1px solid rgba(255, 255, 255, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
 }
 
 .auditor-pc-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(138, 43, 226, 0.2); /* Consistent hover effect */
+    box-shadow: 0 10px 25px rgba(138, 43, 226, 0.2);
 }
 
 .auditor-pc-card-icon {
     width: 50px;
     height: 50px;
     margin-bottom: 10px;
-    filter: invert(1); /* Consistent icon styling */
+    filter: brightness(0) invert(1);
 }
 
-.auditor-pc-card span:first-of-type {
+.auditor-pc-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.auditor-pc-card-content > span {
     font-weight: 600;
     margin-bottom: 5px;
     font-size: 1.1rem;
     color: #fff;
 }
 
-.auditor-pc-card span:last-of-type {
+.status-indicator {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
     font-size: 0.9rem;
-    color: #a5b3c2; /* Consistent detail color */
+    color: #a5b3c2;
 }
 
-.auditor-pc-card span:last-of-type::before {
-    content: '';
+.status-dot {
     width: 8px;
     height: 8px;
     border-radius: 50%;
     display: inline-block;
 }
 
-.auditor-pc-card span:last-of-type.functional::before {
+.status-dot.functional {
     background-color: #28a745;
 }
 
-.auditor-pc-card span:last-of-type.out-of-order::before {
+.status-dot.out-of-order {
     background-color: #dc3545;
 }
 
-.auditor-pc-card span:last-of-type.maintenance::before {
+.status-dot.maintenance {
     background-color: #ffc107;
 }
 
@@ -206,20 +205,20 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.1); /* Added border */
-    border-radius: 8px; /* Consistent border-radius */
-    padding: 8px 15px; /* Added padding */
-    background: rgba(0, 0, 0, 0.2); /* Added background */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 8px 15px;
+    background: rgba(0, 0, 0, 0.2);
 }
 
 .change-lab-container .auditor-panel-title {
-    font-size: 1.1rem; /* Adjusted font size */
+    font-size: 1.1rem;
     margin: 0;
     color: #fff;
 }
 
 .change-lab-dropdown-toggle {
-    background-color: #8a2be2; /* Primary purple color */
+    background-color: #8a2be2;
     color: white;
     padding: 8px 15px;
     border-radius: 8px;
@@ -227,18 +226,18 @@
     cursor: pointer;
     transition: background-color 0.3s ease;
     font-weight: 500;
-    margin-left: 10px; /* Spacing from lab name */
+    margin-left: 10px;
 }
 
 .change-lab-dropdown-toggle:hover {
-    background-color: #9b48f9; /* Lighter purple on hover */
+    background-color: #9b48f9;
 }
 
 .lab-dropdown-menu {
     position: absolute;
     top: 100%;
     right: 0;
-    background-color: rgba(0, 0, 0, 0.8); /* Darker background for dropdown */
+    background-color: rgba(0, 0, 0, 0.8);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
@@ -258,7 +257,7 @@
 }
 
 .lab-dropdown-item:hover {
-    background-color: rgba(138, 43, 226, 0.2); /* Light purple hover */
+    background-color: rgba(138, 43, 226, 0.2);
 }
 
 .lab-name {
@@ -279,4 +278,5 @@
 
 .lab-open-button:hover {
     background-color: #9b48f9;
+}
 }

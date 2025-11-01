@@ -4,6 +4,10 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import '../styles/ResetPassword.css';
 import ComputerLogo1 from '../assets/LOGO1.png';
 import LockLogo from '../assets/Lock.png';
+import WifiLogo from '../assets/wifi_logo.png';
+import ChatLogo from '../assets/chat_logo.png';
+import BroadcastLogo from '../assets/broadcast_logo.png';
+import ToolsLogo from '../assets/tools_logo.png';
 
 const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -103,6 +107,12 @@ const ResetPassword = () => {
           
         </div>
       </header>
+
+      {/* Background decorative logos */}
+      <img src={WifiLogo} alt="" className="bg-logo bg-logo-top-left" />
+      <img src={ChatLogo} alt="" className="bg-logo bg-logo-top-right" />
+      <img src={BroadcastLogo} alt="" className="bg-logo bg-logo-bottom-left" />
+      <img src={ToolsLogo} alt="" className="bg-logo bg-logo-bottom-right" />
 
       <main className="main">
         <h1 className="welcome-title">Reset your password</h1>

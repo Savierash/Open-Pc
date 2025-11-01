@@ -10,7 +10,10 @@ import ClipboardLogo from "../assets/ClipboardCheck.png";
 import ToolsLogo from "../assets/tools_logo.png";
 import AccountSettingLogo from "../assets/GearFill.png";
 import PcDisplayLogo from "../assets/PcDisplayHorizontal.png";
+import MenuButtonWide from "../assets/menubuttonwide.png"; // Unit Status icon
+import ClipboardX from "../assets/clipboardx.png"; // Reports icon
 import PersonLogo from "../assets/Person.png";
+import PcDisplayIcon from "../assets/pcdisplay.png"; // PC card icon
 
 // API base (Vite)
 const RAW_API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
@@ -26,10 +29,20 @@ const UnitStatusTechnician = () => {
   const [filteredUnits, setFilteredUnits] = useState([]);
 
   // selected unit form
-  const [selectedUnit, setSelectedUnitState] = useState(null);
+  const [selectedUnitState, setSelectedUnitState] = useState(null);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
   const [searchQ, setSearchQ] = useState('');
+  const [editingField, setEditingField] = useState(null);
+  const [selectedUnit, setSelectedUnit] = useState({
+    name: 'ITS300-PC-002',
+    os: 'Windows 11',
+    ram: '16GB',
+    storage: '128GB SSD',
+    cpu: 'Core i3 10th Gen',
+    lastIssued: 'September 12, 2025',
+    status: 'Maintenance',
+  });
 
   const handleNavClick = (path) => {
     setActiveLink(path);
@@ -82,7 +95,7 @@ const UnitStatusTechnician = () => {
       setUnits(list);
       setFilteredUnits(list);
       // auto-select first unit if none selected
-      if (list.length > 0 && (!selectedUnit || selectedUnit.lab?._id !== labId)) {
+      if (list.length > 0 && (!selectedUnitState || selectedUnitState.lab?._id !== labId)) {
         setSelectedUnitState(list[0]);
       } else if (list.length === 0) {
         setSelectedUnitState(null);
@@ -165,6 +178,7 @@ const UnitStatusTechnician = () => {
           <nav className="nav-links-dashboard">
             <a href="/dashboard" className={`nav-link-dashboard`}>Dashboard</a>
           </nav>
+          <span className="page-title">Unit Status</span>
         </div>
         <div className="nav-actions">
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
@@ -176,26 +190,10 @@ const UnitStatusTechnician = () => {
       <div className="main-layout three-column">
         <aside className="sidebar">
           <ul className="sidebar-menu">
-            <li>
-              <a href="/dashboard-technician" className={`sidebar-link ${activeLink === "/dashboard-technician" ? "active" : ""}`}>
-                <img src={HouseLogo} className="menu-icon" alt="Home" /><span>Dashboard</span>
-              </a>
-            </li>
-            <li>
-              <a href="/unit-status-technician" className={`sidebar-link ${activeLink === "/unit-status" ? "active" : ""}`}>
-                <img src={PcDisplayLogo} className="menu-icon" alt="Unit Status" /><span>Unit Status</span>
-              </a>
-            </li>
-            <li>
-              <a href="/reports-tech" className={`sidebar-link ${activeLink === '/reports-tech' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/reports-tech'); }}>
-                <img src={ClipboardLogo} alt="Reports Icon" className="menu-icon" /><span>Reports</span>
-              </a>
-            </li>
-            <li>
-              <a href="/technician-profile" className={`sidebar-link ${activeLink === '/technician-profile' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/technician-profile'); }}>
-                <img src={AccountSettingLogo} alt="Account Setting Icon" className="menu-icon" /><span>Account Setting</span>
-              </a>
-            </li>
+            <li><a href="/dashboard-technician" className={`sidebar-link ${activeLink === "/dashboard-technician" ? "active" : ""}`}><img src={HouseLogo} className="menu-icon" alt="Home" /><span>Dashboard</span></a></li>
+            <li><a href="/unit-status-technician" className={`sidebar-link ${activeLink === "/unit-status" ? "active" : ""}`}><img src={MenuButtonWide} className="menu-icon" alt="Unit Status" /><span>Unit Status</span></a></li>
+            <li><a href="/reports-tech" className={`sidebar-link ${activeLink === '/reports-tech' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/reports-tech');}}><img src={ClipboardX} alt="Reports Icon" className="menu-icon" /><span>Reports</span></a></li>
+            <li><a href="/technician-profile" className={`sidebar-link ${activeLink === '/technician-profile' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/technician-profile');}}><img src={AccountSettingLogo} alt="Account Setting Icon" className="menu-icon" /><span>Account Setting</span></a></li>
           </ul>
         </aside>
 
@@ -261,70 +259,131 @@ const UnitStatusTechnician = () => {
               </div>
 
               <div className="unit-cards-grid">
-                {filteredUnits.length === 0 ? <div className="placeholder">No units</div> : (
-                  filteredUnits.map(unit => (
-                    <div key={unit._id} className="pc-card" onClick={() => handleUnitClick(unit)} style={{ cursor: 'pointer', border: selectedUnit && selectedUnit._id === unit._id ? '2px solid #2B6CB0' : undefined }}>
-                      <img src={PcDisplayLogo} alt="PC Icon" className="pc-card-icon" />
-                      <span>{unit.name}</span>
-                      <span>{unit.status} &#x25cf;</span>
-                    </div>
-                  ))
-                )}
+                <div className="pc-card">
+                  <img src={PcDisplayIcon} alt="PC Icon" className="pc-card-icon" />
+                  <span>ITS300-PC-002</span>
+                  <div className="status-indicator">
+                    <span>Out Of Order</span>
+                    <span className="status-dot out-of-order"></span>
+                  </div>
+                </div>
+                <div className="pc-card">
+                  <img src={PcDisplayIcon} alt="PC Icon" className="pc-card-icon" />
+                  <span>ITS300-PC-010</span>
+                  <div className="status-indicator">
+                    <span>Out Of Order</span>
+                    <span className="status-dot out-of-order"></span>
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* Right: info panel */}
             <div className="unit-status-info-panel">
               <h2 className="panel-title">INFORMATION</h2>
-
-              {!selectedUnit ? (
-                <div>Select a unit to view details</div>
-              ) : (
-                <>
-                  <div className="info-item">
-                    <input type="text" value={selectedUnit.name || ''} onChange={(e) => handleUnitDetailChange('name', e.target.value)} className="info-input" />
-                    <img src={ClipboardLogo} alt="Edit Icon" className="edit-icon" />
-                  </div>
-
-                  <div className="info-item">
-                    <input type="text" value={selectedUnit.os || ''} onChange={(e) => handleUnitDetailChange('os', e.target.value)} className="info-input" />
-                    <img src={ClipboardLogo} alt="Edit Icon" className="edit-icon" />
-                  </div>
-
-                  <div className="info-item">
-                    <input type="text" value={selectedUnit.ram || ''} onChange={(e) => handleUnitDetailChange('ram', e.target.value)} className="info-input" />
-                    <img src={ClipboardLogo} alt="Edit Icon" className="edit-icon" />
-                  </div>
-
-                  <div className="info-item">
-                    <input type="text" value={selectedUnit.storage || ''} onChange={(e) => handleUnitDetailChange('storage', e.target.value)} className="info-input" />
-                    <img src={ClipboardLogo} alt="Edit Icon" className="edit-icon" />
-                  </div>
-
-                  <div className="info-item">
-                    <input type="text" value={selectedUnit.cpu || ''} onChange={(e) => handleUnitDetailChange('cpu', e.target.value)} className="info-input" />
-                    <img src={ClipboardLogo} alt="Edit Icon" className="edit-icon" />
-                  </div>
-
-                  <div className="info-item">
-                    <input type="text" value={selectedUnit.lastIssued || ''} onChange={(e) => handleUnitDetailChange('lastIssued', e.target.value)} className="info-input" />
-                    <img src={ClipboardLogo} alt="Edit Icon" className="edit-icon" />
-                  </div>
-
-                  <div className="set-status-section">
-                    <span>SET STATUS:</span>
-                    <select className="status-dropdown" value={selectedUnit.status || ''} onChange={(e) => handleUnitDetailChange('status', e.target.value)}>
-                      <option>Maintenance</option>
-                      <option>Functional</option>
-                      <option>Out Of Order</option>
-                    </select>
-                  </div>
-
-                  <button className="save-button" onClick={saveUnit} disabled={saving}>
-                    {saving ? 'SAVING...' : 'Save'}
-                  </button>
-                </>
-              )}
+              <div className="info-item">
+                <input 
+                  type="text" 
+                  value={selectedUnit.name}
+                  onChange={(e) => handleUnitDetailChange('name', e.target.value)}
+                  className={`info-input ${editingField === 'name' ? 'editable' : ''}`}
+                  readOnly={editingField !== 'name'}
+                />
+                <img 
+                  src={ClipboardLogo} 
+                  alt="Edit Icon" 
+                  className="edit-icon" 
+                  onClick={() => setEditingField(editingField === 'name' ? null : 'name')}
+                />
+              </div>
+              <div className="info-item">
+                <input 
+                  type="text" 
+                  value={selectedUnit.os}
+                  onChange={(e) => handleUnitDetailChange('os', e.target.value)}
+                  className={`info-input ${editingField === 'os' ? 'editable' : ''}`}
+                  readOnly={editingField !== 'os'}
+                />
+                <img 
+                  src={ClipboardLogo} 
+                  alt="Edit Icon" 
+                  className="edit-icon" 
+                  onClick={() => setEditingField(editingField === 'os' ? null : 'os')}
+                />
+              </div>
+              <div className="info-item">
+                <input 
+                  type="text" 
+                  value={selectedUnit.ram}
+                  onChange={(e) => handleUnitDetailChange('ram', e.target.value)}
+                  className={`info-input ${editingField === 'ram' ? 'editable' : ''}`}
+                  readOnly={editingField !== 'ram'}
+                />
+                <img 
+                  src={ClipboardLogo} 
+                  alt="Edit Icon" 
+                  className="edit-icon" 
+                  onClick={() => setEditingField(editingField === 'ram' ? null : 'ram')}
+                />
+              </div>
+              <div className="info-item">
+                <input 
+                  type="text" 
+                  value={selectedUnit.storage}
+                  onChange={(e) => handleUnitDetailChange('storage', e.target.value)}
+                  className={`info-input ${editingField === 'storage' ? 'editable' : ''}`}
+                  readOnly={editingField !== 'storage'}
+                />
+                <img 
+                  src={ClipboardLogo} 
+                  alt="Edit Icon" 
+                  className="edit-icon" 
+                  onClick={() => setEditingField(editingField === 'storage' ? null : 'storage')}
+                />
+              </div>
+              <div className="info-item">
+                <input 
+                  type="text" 
+                  value={selectedUnit.cpu}
+                  onChange={(e) => handleUnitDetailChange('cpu', e.target.value)}
+                  className={`info-input ${editingField === 'cpu' ? 'editable' : ''}`}
+                  readOnly={editingField !== 'cpu'}
+                />
+                <img 
+                  src={ClipboardLogo} 
+                  alt="Edit Icon" 
+                  className="edit-icon" 
+                  onClick={() => setEditingField(editingField === 'cpu' ? null : 'cpu')}
+                />
+              </div>
+              <div className="info-item">
+                <input 
+                  type="text" 
+                  value={selectedUnit.lastIssued}
+                  onChange={(e) => handleUnitDetailChange('lastIssued', e.target.value)}
+                  className={`info-input ${editingField === 'lastIssued' ? 'editable' : ''}`}
+                  readOnly={editingField !== 'lastIssued'}
+                />
+                <img 
+                  src={ClipboardLogo} 
+                  alt="Edit Icon" 
+                  className="edit-icon" 
+                  onClick={() => setEditingField(editingField === 'lastIssued' ? null : 'lastIssued')}
+                />
+              </div>
+              <div className="set-status-section">
+                <span>SET STATUS:</span>
+                <select 
+                  className="status-dropdown"
+                  value={selectedUnit.status}
+                  onChange={(e) => handleUnitDetailChange('status', e.target.value)}
+                >
+                  <option>Maintenance</option>
+                  <option>Functional</option>
+                  <option>Out Of Order</option>
+                </select>
+              </div>
+              <button className="save-button">Save</button>
             </div>
           </div>
         </main>

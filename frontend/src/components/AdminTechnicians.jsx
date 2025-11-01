@@ -11,7 +11,8 @@ import GearLogo from '../assets/GearFill.png';
 import OctagonLogo from '../assets/XOctagonFill.png';
 import StackLogo from '../assets/Stack.png';
 import ToolsLogo from '../assets/tools_logo.png';
-import CopyIcon from '../assets/ClipboardCheck.png'; // Added CopyIcon import
+import CopyIcon from '../assets/copypaste.png'; // Copy icon for input fields
+import EnvelopeCheck from '../assets/envelopecheck.png'; // Tech Requests icon
 
 const AdminTechnicians = () => { // Renamed component
   const [activeLink, setActiveLink] = useState(window.location.pathname);
@@ -36,18 +37,7 @@ const AdminTechnicians = () => { // Renamed component
             <span className="logo-text">OpenPC</span>
             <span className="logo-line">|</span>
           </div>
-          <nav className="nav-links-dashboard">
-            <a 
-              href="/dashboard" 
-              className={`nav-link-dashboard active`}
-              onClick={(e) => {
-                e.preventDefault();
-                handleNavClick('/dashboard');
-              }}
-            >
-              Dashboard
-            </a>
-          </nav>
+          <span className="page-title">Technicians</span>
         </div>
         <div className="nav-actions">
           <img 
@@ -111,7 +101,7 @@ const AdminTechnicians = () => { // Renamed component
                   handleNavClick('/admin-tech-requests');
                 }}
               >
-                <img src={ClipboardLogo} alt="Tech Requests Icon" className="menu-icon" />
+                <img src={EnvelopeCheck} alt="Tech Requests Icon" className="menu-icon" />
                 <span>Tech Requests</span>
               </a>
             </li>

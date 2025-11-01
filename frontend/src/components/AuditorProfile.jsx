@@ -2,14 +2,16 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from '../context/AuthContext';
 import "../styles/AuditorProfile.css";
 import PersonCircle from "../assets/PersonCircle.png";
-import Lock from "../assets/Lock.png";
+import PencilSquare from "../assets/pencilsquare.png"; // Edit icon
 import GearFill from "../assets/GearFill.png";
 import ComputerLogo1 from "../assets/LOGO1.png";
 import HouseLogo from "../assets/HouseFill.png";
-import StackLogo from "../assets/Stack.png";
+import StackLogo from "../assets/icon_6.png"; // Inventory icon
 import ClipboardLogo from "../assets/ClipboardCheck.png";
 import ToolsLogo from "../assets/tools_logo.png";
 import PcDisplayLogo from "../assets/PcDisplayHorizontal.png"; // Added PcDisplayLogo
+import MenuButtonWide from "../assets/menubuttonwide.png"; // Unit Status icon
+import ClipboardX from "../assets/clipboardx.png"; // Reports icon
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const AuditorProfile = () => {
@@ -57,7 +59,7 @@ const AuditorProfile = () => {
             <img src={ComputerLogo1} alt="PC LOGO" className="computer-logo" />
             <span className="logo-text">OpenPC</span>
             <span className="logo-line">|</span>
-            <span className="logo-text">Accout Setting</span>
+            <span className="logo-text">Account Setting</span>
           </div>
         </div>
         <div className="nav-actions">
@@ -84,13 +86,13 @@ const AuditorProfile = () => {
             </li>
             <li>
               <a href="/unit-status-auditor" className="sidebar-link">
-                <img src={PcDisplayLogo} className="menu-icon" alt="Unit Status" />
+                <img src={MenuButtonWide} className="menu-icon" alt="Unit Status" />
                 <span>Unit Status</span>
               </a>
             </li>
             <li>
               <a href="/reports-auditor" className="sidebar-link">
-                <img src={ClipboardLogo} className="menu-icon" alt="Reports" />
+                <img src={ClipboardX} className="menu-icon" alt="Reports" />
                 <span>Reports</span>
               </a>
             </li>
@@ -151,7 +153,7 @@ const AuditorProfile = () => {
                 </div>
               </div>
 
-              <h3>Contact Email</h3>
+              <h3>Contact Information</h3>
               <div className="form-row">
                 <div className="form-group">
                   <label>Email</label>
@@ -181,7 +183,7 @@ const AuditorProfile = () => {
                 <div className="form-group">
                   <div className="input-with-icon">
                     <input type="password" value="........." readOnly />
-                    <img src={Lock} alt="Lock Icon" className="input-icon" />
+                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
                   </div>
                 </div>
                 <button className="logout-button" onClick={handleLogout}>LOGOUT</button>
