@@ -60,7 +60,7 @@ const ReportsTech = () => {
     const fetchUnits = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`http://localhost:5000/api/units/by-lab/${selectedLab}`);
+        const res = await axios.get(`http://localhost:5000/api/units?labId=${selectedLab}`);
         setUnits(res.data);
         setSelectedUnit(res.data[0]?._id || null); // Auto-select first unit in the lab
       } catch (err) {
