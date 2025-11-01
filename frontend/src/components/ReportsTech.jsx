@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios'; // ✅ NEW: To make API calls
 import '../styles/Dashboard.css'; // Import dashboard styles
 import '../styles/ReportsTech.css';
 import ComputerLogo1 from '../assets/LOGO1.png';
@@ -11,6 +12,15 @@ import AccountSettingLogo from "../assets/GearFill.png";
 
 const ReportsTech = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
+  const [labs, setLabs] = useState([]); // ✅ NEW
+  const [units, setUnits] = useState([]); // ✅ NEW
+  const [reports, setReports] = useState([]); // ✅ NEW
+  const [selectedLab, setSelectedLab] = useState(null); // ✅ NEW
+  const [selectedUnit, setSelectedUnit] = useState(null); // ✅ NEW
+  const [selectedReport, setSelectedReport] = useState(null); // ✅ NEW
+  const [loading, setLoading] = useState(false); // ✅ NEW
+  const [error, setError] = useState(null); // ✅ NEW
+
   const [reportIssues, setReportIssues] = useState({
     ramIssue: true,
     osIssue: true,
@@ -30,6 +40,63 @@ const ReportsTech = () => {
     setActiveLink(path);
     navigate(path);
   };
+
+  // ✅ NEW: Fetch all labs on mount
+  useEffect(() => {
+    const fetchLabs = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get("http://localhost:5000/api/labs");
+        setLabs(res.data);
+        setSelectedLab(res.data[0]?._id || null); // Auto-select first lab
+      } catch (err) {
+        setError("Unable to fetch labs");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLabs();
+  }, []);
+
+  // ✅ NEW: Fetch units when selectedLab changes
+  useEffect(() => {
+    if (!selectedLab) return;
+
+    const fetchUnits = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(`http://localhost:5000/api/units/by-lab/${selectedLab}`);
+        setUnits(res.data);
+      } catch (err) {
+        setError("Unable to fetch units");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUnits();
+  }, [selectedLab]);
+
+  // ✅ NEW: Fetch reports when selectedUnit changes
+  useEffect(() => {
+    if (!selectedUnit) return;
+
+    const fetchReports = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(`http://localhost:5000/api/reports/technician/unit/${selectedUnit}`);
+        setReports(res.data);
+        setSelectedReport(res.data[0] || null); // Show latest report
+      } catch (err) {
+        setError("Unable to fetch reports");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchReports();
+  }, [selectedUnit]);
 
   const handleIssueChange = (issueName) => {
     setReportIssues(prevIssues => ({
