@@ -1,3 +1,4 @@
+// src/pages/ReportsTech.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios'; // ✅ NEW: To make API calls
@@ -12,29 +13,22 @@ import AccountSettingLogo from "../assets/GearFill.png";
 
 const ReportsTech = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
-  const [labs, setLabs] = useState([]); // ✅ NEW
-  const [units, setUnits] = useState([]); // ✅ NEW
-  const [reports, setReports] = useState([]); // ✅ NEW
-  const [selectedLab, setSelectedLab] = useState(null); // ✅ NEW
-  const [selectedUnit, setSelectedUnit] = useState(null); // ✅ NEW
-  const [selectedReport, setSelectedReport] = useState(null); // ✅ NEW
-  const [loading, setLoading] = useState(false); // ✅ NEW
-  const [error, setError] = useState(null); // ✅ NEW
+  
+  // ✅ NEW: Dynamic states
+  const [labs, setLabs] = useState([]);
+  const [units, setUnits] = useState([]);
+  const [reports, setReports] = useState([]);
+  const [selectedLab, setSelectedLab] = useState(null);
+  const [selectedUnit, setSelectedUnit] = useState(null);
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const [reportIssues, setReportIssues] = useState({
-    ramIssue: true,
-    osIssue: true,
-    cpuIssue: false,
-    noInternet: true,
-    storageIssue: false,
-    virus: false,
-  });
+  const navigate = useNavigate();
 
   useEffect(() => {
     setActiveLink(window.location.pathname);
   }, []);
-
-  const navigate = useNavigate();
 
   const handleNavClick = (path) => {
     setActiveLink(path);
@@ -48,7 +42,7 @@ const ReportsTech = () => {
         setLoading(true);
         const res = await axios.get("http://localhost:5000/api/labs");
         setLabs(res.data);
-        setSelectedLab(res.data[0]?._id || null); // Auto-select first lab
+        setSelectedLab(res.data[0]?._id || null);
       } catch (err) {
         setError("Unable to fetch labs");
         console.error(err);
@@ -68,6 +62,7 @@ const ReportsTech = () => {
         setLoading(true);
         const res = await axios.get(`http://localhost:5000/api/units/by-lab/${selectedLab}`);
         setUnits(res.data);
+        setSelectedUnit(res.data[0]?._id || null); // Auto-select first unit in the lab
       } catch (err) {
         setError("Unable to fetch units");
         console.error(err);
@@ -87,7 +82,7 @@ const ReportsTech = () => {
         setLoading(true);
         const res = await axios.get(`http://localhost:5000/api/reports/technician/unit/${selectedUnit}`);
         setReports(res.data);
-        setSelectedReport(res.data[0] || null); // Show latest report
+        setSelectedReport(res.data[0] || null);
       } catch (err) {
         setError("Unable to fetch reports");
         console.error(err);
@@ -97,13 +92,6 @@ const ReportsTech = () => {
     };
     fetchReports();
   }, [selectedUnit]);
-
-  const handleIssueChange = (issueName) => {
-    setReportIssues(prevIssues => ({
-      ...prevIssues,
-      [issueName]: !prevIssues[issueName]
-    }));
-  };
 
   return (
     <div className="dashboard">
@@ -115,20 +103,13 @@ const ReportsTech = () => {
             <span className="logo-line">|</span>
           </div>
           <nav className="nav-links-dashboard">
-            <a 
-              href="/dashboard" 
-              className={`nav-link-dashboard`}
-            >
+            <a href="/dashboard" className={`nav-link-dashboard`}>
               Dashboard
             </a>
           </nav>
         </div>
         <div className="nav-actions">
-          <img 
-            src={PersonLogo} 
-            alt="Profile Icon" 
-            className="profile-icon-dashboard"
-          />
+          <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
           <span className="profile-name">Kresner Leonardo</span>
           <span className="profile-role">Technician</span>
         </div>
@@ -146,89 +127,86 @@ const ReportsTech = () => {
 
         <main className="main-content reports-tech-main-content">
           <div className="reports-tech-page-content">
-            {/* Left Container: Lab List */}
+            
+            {/* ✅ UPDATED: Lab List (Left Container) */}
             <div className="reports-tech-lab-panel">
               <button className="add-lab-button-reports">ADD LAB</button>
               <div className="lab-list-container-reports">
-                <div className="lab-card-reports">PTC 201</div>
-                <div className="lab-card-reports">MCLAB</div>
-                <div className="lab-card-reports active">ITS 300</div>
+                {labs.map((lab) => (
+                  <div key={lab._id} className={`lab-card-reports ${lab._id === selectedLab ? 'active' : ''}`}
+                    onClick={() => setSelectedLab(lab._id)}
+                  >
+                    {lab.name}
+                  </div>
+                ))}
                 <div className="lab-card-reports add-lab-card-reports">+</div>
               </div>
             </div>
 
-            {/* Middle Container: PC Reports List */}
+            {/* ✅ UPDATED: Units List (Middle Container) */}
             <div className="reports-tech-middle-panel">
               <div className="middle-panel-header-reports">
-                <h2 className="panel-title">ITS 300</h2>
+                <h2 className="panel-title">
+                  {labs.find(l => l._id === selectedLab)?.name || "Loading..."}
+                </h2>
                 <div className="search-bar-reports">
                   <div className="search-input-wrapper-reports">
                     <img src={PersonLogo} alt="Search Icon" className="search-icon-reports" />
-                    <input type="text" placeholder="" className="search-input" />
+                    <input type="text" placeholder="Search units..." className="search-input" />
                   </div>
                 </div>
               </div>
               <div className="report-cards-grid">
-                <div className="report-card">
-                  <span>ITS300-PC-002</span>
-                  <span className="status-tag out-of-order">Out Of Order</span>
-                </div>
-                <div className="report-card">
-                  <span>ITS300-PC-010</span>
-                  <span className="status-tag out-of-order">Out Of Order</span>
-                </div>
+                {units.map((unit) => (
+                  <div key={unit._id} className={`report-card ${unit._id === selectedUnit ? 'selected' : ''}`}
+                    onClick={() => setSelectedUnit(unit._id)}
+                  >
+                    <span>{unit.name}</span>
+                    <span className={`status-tag ${unit.status === 'out-of-order' ? 'out-of-order' : 'functional'}`}>
+                      {unit.status}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* Right Container: Report Details */}
+            {/* ✅ UPDATED: Report Details (Right Container) */}
             <div className="reports-tech-info-panel">
               <h2 className="panel-title">REPORTS</h2>
-              <div className="report-detail-card-header">
-                <span>ITS300-PC-002</span>
-                <span className="status-tag out-of-order">Out Of Order</span>
-              </div>
-              <div className="info-item-reports">
-                <span>Technician ID: 01593</span>
-              </div>
-              <div className="info-item-reports">
-                <span>Date Issued: October 22, 2025</span>
-              </div>
-              <div className="info-item-reports">
-                <span>Last Issued: September 1, 2025</span>
-              </div>
-              <div className="issues-checkbox-grid">
-                <div>
-                  <input type="checkbox" id="ramIssue" checked={reportIssues.ramIssue} onChange={() => handleIssueChange('ramIssue')} disabled />
-                  <label htmlFor="ramIssue">Ram Issue</label>
-                </div>
-                <div>
-                  <input type="checkbox" id="osIssue" checked={reportIssues.osIssue} onChange={() => handleIssueChange('osIssue')} disabled />
-                  <label htmlFor="osIssue">OS Issue</label>
-                </div>
-                <div>
-                  <input type="checkbox" id="cpuIssue" checked={reportIssues.cpuIssue} onChange={() => handleIssueChange('cpuIssue')} disabled />
-                  <label htmlFor="cpuIssue">CPU Issue</label>
-                </div>
-                <div>
-                  <input type="checkbox" id="noInternet" checked={reportIssues.noInternet} onChange={() => handleIssueChange('noInternet')} disabled />
-                  <label htmlFor="noInternet">No Internet</label>
-                </div>
-                <div>
-                  <input type="checkbox" id="storageIssue" checked={reportIssues.storageIssue} onChange={() => handleIssueChange('storageIssue')} disabled />
-                  <label htmlFor="storageIssue">Storage Issue</label>
-                </div>
-                <div>
-                  <input type="checkbox" id="virus" checked={reportIssues.virus} onChange={() => handleIssueChange('virus')} disabled />
-                  <label htmlFor="virus">Virus</label>
-                </div>
-              </div>
-              <div className="other-issues-textarea">
-                <textarea 
-                  value="No Signal on the monitor"
-                  readOnly
-                ></textarea>
-              </div>
+              {selectedReport ? (
+                <>
+                  <div className="report-detail-card-header">
+                    <span>{selectedReport.unit.name}</span>
+                    <span className={`status-tag ${selectedReport.unit.status === 'out-of-order' ? 'out-of-order' : 'functional'}`}>
+                      {selectedReport.unit.status}
+                    </span>
+                  </div>
+                  <div className="info-item-reports">
+                    <span>Technician: {selectedReport.technician?.username || "N/A"}</span>
+                  </div>
+                  <div className="info-item-reports">
+                    <span>Date Issued: {new Date(selectedReport.createdAt).toLocaleDateString()}</span>
+                  </div>
+                  <div className="info-item-reports">
+                    <span>Status: {selectedReport.status}</span>
+                  </div>
+                  <div className="issues-checkbox-grid">
+                    {Object.entries(selectedReport.issues).map(([key, value]) => (
+                      <div key={key}>
+                        <input type="checkbox" checked={value} disabled />
+                        <label>{key.replace(/([A-Z])/g, ' $1')}</label>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="other-issues-textarea">
+                    <textarea value={selectedReport.otherIssues || "No other issues"} readOnly />
+                  </div>
+                </>
+              ) : (
+                <p>Select a report to view details</p>
+              )}
             </div>
+
           </div>
         </main>
       </div>
