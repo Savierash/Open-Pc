@@ -20,8 +20,6 @@ import EditIcon from '../assets/GearFill.png';
 // API base (Vite)
 const RAW_API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
 const API_BASE = RAW_API_BASE.replace(/\/+$/, '');
-import SearchIcon from '../assets/Person.png'; // Assuming Person.png is used as a search icon as in ReportsTech.jsx
-import EditIcon from '../assets/GearFill.png'; // Using GearFill.png as an edit icon
 import MenuButtonWide from '../assets/menubuttonwide.png'; // Unit Status icon
 import ClipboardX from '../assets/clipboardx.png'; // Reports icon
 

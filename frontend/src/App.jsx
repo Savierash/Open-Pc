@@ -53,6 +53,12 @@ import './styles/TechnicianProfile.css';
 import './styles/AdminProfile.css';
 import './styles/UnitStatusAuditor.css';
 import './styles/Pending.css';
+import './styles/UnitStatusTechnician.css';
+import './styles/Inventory.css';  
+import './styles/UnitStatusTechnician.css';
+import './styles/AdminTechnicians.css';
+import './styles/AdminTechRequests.css';
+import './styles/Document.css';
 
 
 function App() {
@@ -89,6 +95,7 @@ function App() {
           <Route path="/unit-status-auditor" element={<UnitStatusAuditor />} />
           <Route path="/admin-technicians" element={<AdminTechnicians />} />
           <Route path="/admin-tech-requests" element={<AdminTechRequests />} />
+          <Route path="/document" element={<DocumentPage />} />
           <Route path="/pending" element={<Pending />} />
         </Routes>
       </Router>

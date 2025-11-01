@@ -1,16 +1,13 @@
+// src/pages/Document.jsx
 import React, { useState, useEffect, useRef } from 'react';
-import '../styles/Document.css'; // <-- new import
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import '../styles/Document.css';
+import { useNavigate, useLocation } from 'react-router-dom';
 import ComputerLogo1 from '../assets/LOGO1.png';
 import api from '../services/api';
 import WifiLogo from '../assets/wifi_logo.png';
 import ChatLogo from '../assets/chat_logo.png';
 import BroadcastLogo from '../assets/broadcast_logo.png';
 import ToolsLogo from '../assets/tools_logo.png';
-import axios from 'axios';
-
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-const api = axios.create({ baseURL: API_BASE, timeout: 10000 });
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
@@ -34,9 +31,10 @@ const DocumentPage = () => {
   useEffect(() => {
     setActiveLink(location.pathname);
     return () => {
-      resumePreview && URL.revokeObjectURL(resumePreview);
-      birthPreview && URL.revokeObjectURL(birthPreview);
-      idPreview && URL.revokeObjectURL(idPreview);
+      // cleanup object URLs
+      if (resumePreview) URL.revokeObjectURL(resumePreview);
+      if (birthPreview) URL.revokeObjectURL(birthPreview);
+      if (idPreview) URL.revokeObjectURL(idPreview);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
@@ -44,7 +42,6 @@ const DocumentPage = () => {
   const validateAndPreview = (file) => {
     if (!file) return { ok: false, msg: 'No file' };
     if (file.size > MAX_FILE_SIZE) return { ok: false, msg: 'File must be ≤ 5MB' };
-    // allow images and PDF/Word for resume
     return { ok: true };
   };
 
@@ -94,10 +91,8 @@ const DocumentPage = () => {
   const openPreview = (previewUrl, file) => {
     if (previewUrl) window.open(previewUrl, '_blank', 'noopener,noreferrer');
     else if (file) {
-      // for non-image (pdf) use object URL
       const url = URL.createObjectURL(file);
       window.open(url, '_blank', 'noopener,noreferrer');
-      // revoke after short delay
       setTimeout(() => URL.revokeObjectURL(url), 2000);
     }
   };
@@ -127,13 +122,14 @@ const DocumentPage = () => {
       form.append('birthCertificate', birthFile);
       form.append('validId', idFile);
 
+      // use centralized api client (src/services/api)
       await api.post('/documents/upload', form, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
       navigate('/documents', { replace: true });
     } catch (err) {
-      console.error(err);
+      console.error('Document upload error:', err);
       if (!err.response) setError('Network error - try again.');
       else setError(err.response?.data?.message || 'Upload failed.');
     } finally {
@@ -161,7 +157,6 @@ const DocumentPage = () => {
         </div>
       </header>
 
-      {/* Background decorative logos */}
       <img src={WifiLogo} alt="" className="bg-logo bg-logo-top-left" />
       <img src={ChatLogo} alt="" className="bg-logo bg-logo-top-right" />
       <img src={BroadcastLogo} alt="" className="bg-logo bg-logo-bottom-left" />
@@ -175,7 +170,13 @@ const DocumentPage = () => {
             <label style={{ display: 'block', textAlign: 'left' }}>Resume</label>
             <section>
               <div className="file-row">
-                <input ref={resumeRef} type="file" accept="image/*,application/pdf" style={{ width: '100%' }} onChange={(e) => handleFileChange('resume', e.target.files[0])} />
+                <input
+                  ref={resumeRef}
+                  type="file"
+                  accept="image/*,application/pdf"
+                  style={{ width: '100%' }}
+                  onChange={(e) => handleFileChange('resume', e.target.files[0])}
+                />
                 {resumePreview ? (
                   <>
                     <img src={resumePreview} alt="resume" />
@@ -202,7 +203,13 @@ const DocumentPage = () => {
             <label style={{ display: 'block', textAlign: 'left' }}>Birth Certificate</label>
             <section>
               <div className="file-row">
-                <input ref={birthRef} type="file" accept="image/*,application/pdf" style={{ width: '100%' }} onChange={(e) => handleFileChange('birth', e.target.files[0])} />
+                <input
+                  ref={birthRef}
+                  type="file"
+                  accept="image/*,application/pdf"
+                  style={{ width: '100%' }}
+                  onChange={(e) => handleFileChange('birth', e.target.files[0])}
+                />
                 {birthPreview ? (
                   <>
                     <img src={birthPreview} alt="birth" />
@@ -229,7 +236,13 @@ const DocumentPage = () => {
             <label style={{ display: 'block', textAlign: 'left' }}>Valid ID</label>
             <section>
               <div className="file-row">
-                <input ref={idRef} type="file" accept="image/*,application/pdf" style={{ width: '100%' }} onChange={(e) => handleFileChange('id', e.target.files[0])} />
+                <input
+                  ref={idRef}
+                  type="file"
+                  accept="image/*,application/pdf"
+                  style={{ width: '100%' }}
+                  onChange={(e) => handleFileChange('id', e.target.files[0])}
+                />
                 {idPreview ? (
                   <>
                     <img src={idPreview} alt="id" />

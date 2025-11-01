@@ -23,7 +23,6 @@ import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend } from 'recha
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
 const COLORS = ['#FFF59D', '#FFEB3B', '#FFD54F', '#FFC107', '#FFB300', '#FFA000'];
 
-import ToolsLogo from '../assets/tools_logo.png'; // Import Tools Logo
 import AccountSettingLogo from '../assets/GearFill.png'; // Account Setting icon
 
 const Maintenance = () => {
