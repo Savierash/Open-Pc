@@ -24,7 +24,8 @@ import MenuButtonWide from '../assets/menubuttonwide.png'; // Unit Status icon
 import ClipboardX from '../assets/clipboardx.png'; // Reports icon
 
 const ReportsAuditor = () => {
-  const [activeLink, setActiveLink] = useState(window.location.pathname);
+  const navigate = useNavigate();
+  const [activeLink, setActiveLink] = useState(window.location.pathname || '/reports-auditor');
 
   // data
   const [labs, setLabs] = useState([]); // { _id, name }
@@ -52,8 +53,6 @@ const ReportsAuditor = () => {
   // loading & error
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-
-  const navigate = useNavigate();
 
   const { user } = useAuth();
   const [reports, setReports] = useState([]);

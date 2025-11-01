@@ -37,8 +37,6 @@ const Login = () => {
 
     const roles = [];
 
-    // Common shapes:
-    // user.role: 'admin'   OR user.role: { key: 'admin' } OR user.roles: ['admin'] OR user.roles: [{key:'auditor'}]
     if (typeof user.role === 'string') roles.push(user.role.toLowerCase());
     if (user.role && typeof user.role === 'object') {
       if (user.role.key) roles.push(String(user.role.key).toLowerCase());
@@ -54,22 +52,20 @@ const Login = () => {
       });
     }
 
-    // Some backends put role info inside user.roleKey or user.roleName
     if (user.roleKey) roles.push(String(user.roleKey).toLowerCase());
     if (user.roleName) roles.push(String(user.roleName).toLowerCase());
 
-    return Array.from(new Set(roles)); // dedupe
+    return Array.from(new Set(roles));
   };
 
   // --- Map roles to pages (priority-aware) ---
-  // Priority: admin > auditor > tech > default
   const getDashboardPath = (roles) => {
     if (!roles || roles.length === 0) return '/dashboard';
 
     const lower = roles.map(r => String(r).toLowerCase());
 
     if (lower.includes('admin') || lower.includes('administrator')) return '/dashboard-admin';
-    if (lower.includes('auditor')) return '/inventory'; // <-- per your request auditor -> /inventory
+    if (lower.includes('auditor')) return '/inventory';
     if (lower.includes('tech') || lower.includes('technician')) return '/dashboard-tech';
 
     return '/dashboard';
@@ -82,26 +78,23 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const res = await api.post('/api/auth/login', { usernameOrEmail, password });
+      // Use AuthContext.login (it internally uses the centralized api client)
+      const result = await login({ usernameOrEmail, password });
+      // result may include token and user depending on your backend shape
+      const user = result?.user || result?.data?.user || result?.userData || null;
 
-      const { token, user } = res.data || {};
-
-      if (token) localStorage.setItem('token', token);
-      if (user) localStorage.setItem('user', JSON.stringify(user));
-
-      // extract roles and redirect accordingly
-      const userRoles = extractRoles(user);
-      const dashboardPath = getDashboardPath(userRoles);
+      // if login() already saved token/user to localStorage in AuthContext, we can rely on that
+      // Extract roles and redirect accordingly
+      const roles = extractRoles(user);
+      const dashboardPath = getDashboardPath(roles);
 
       navigate(dashboardPath, { replace: true });
     } catch (err) {
       console.error('Login error:', err);
-      // prefer explicit response message when available
-      if (err.response) {
+      if (err?.response) {
         const serverMsg = err.response?.data?.message || err.response?.data?.error || err.response?.data?.msg || JSON.stringify(err.response?.data);
         setError(serverMsg || 'Login failed — please check your credentials.');
-      } else if (err.request) {
-        // request made but no response
+      } else if (err?.request) {
         setError('No response from server — check backend and CORS settings.');
       } else {
         setError('Login failed — please check your credentials.');
@@ -156,7 +149,6 @@ const Login = () => {
               <img src={PersonLogo} alt="User icon" className="input-icon" />
             </div>
 
-            {/* password input with toggle placed inside the input */}
             <div className="input-wrapper" style={{ position: 'relative' }}>
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -166,7 +158,7 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 className="input"
                 required
-                style={{ paddingRight: 40 }} // space for the toggle
+                style={{ paddingRight: 40 }}
               />
               <button
                 type="button"
@@ -219,4 +211,3 @@ const Login = () => {
 };
 
 export default Login;
-  
