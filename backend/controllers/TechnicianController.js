@@ -145,6 +145,20 @@ exports.getReports = async (req, res) => {
   }
 };
 
+exports.getReportsByUnit = async (req, res) => {
+  try {
+    const { unitId } = req.params;
+    const reports = await Report.find({ unit: unitId })
+      .populate('unit technician', 'name username status')
+      .sort({ createdAt: -1 }); // latest first
+
+    res.json(reports);
+  } catch (err) {
+    console.error('Error fetching unit reports:', err);
+    res.status(500).json({ message: 'Error fetching reports' });
+  }
+};
+
 // 🆕 Create Report (uses issues + otherIssues fields from schema)
 exports.createReport = async (req, res) => {
   try {

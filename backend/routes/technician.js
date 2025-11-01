@@ -16,6 +16,9 @@ router.put('/units/:id', protect, requireRole('technician'), TechnicianControlle
 router.get('/reports', protect, requireRole('technician'), TechnicianController.getReports);
 router.post('/reports', protect, requireRole('technician'), TechnicianController.createReport);
 
+// ✅ NEW: Get reports by unit for technician
+router.get('/reports/unit/:unitId', protect, requireRole('technician'), TechnicianController.getReportsByUnit);
+
 // Profile
 router.get('/profile', protect, requireRole('technician'), TechnicianController.getProfile);
 router.put('/profile', protect, requireRole('technician'), TechnicianController.updateProfile);
