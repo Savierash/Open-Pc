@@ -46,23 +46,7 @@ const UnitStatusTechnician = () => {
   fetchProfile();
 }, []);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) return;
 
-        const res = await axios.get('http://localhost:5000/api/auth/me', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        setUser(res.data.user || res.data); // adjust depending on your API response
-      } catch (err) {
-        console.error('Failed to fetch user:', err);
-      }
-    };
-    fetchUser();
-  }, []);
 
   useEffect(() => {
     const fetchLabsAndUnits = async () => {
@@ -134,9 +118,6 @@ const UnitStatusTechnician = () => {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
-  
-
   return (
     <div className="dashboard">
       <header className="top-bar-dashboard">
@@ -155,6 +136,7 @@ const UnitStatusTechnician = () => {
         <div className="nav-actions">
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
           <span className="profile-name">
+            {/* To get the users acc to integrate with interface with Async profile in line 37*/}
             {profile ? `${profile.firstname || profile.username || ""}${profile.lastname || ""}`.trim(): "Technician"}
           </span>
           <span className="profile-role">{profile?.role?.name || "Technician"}</span>
