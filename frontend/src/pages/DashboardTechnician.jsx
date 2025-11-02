@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from '../services/api';
 import "../styles/DashboardTechnician.css";
 import ComputerLogo1 from "../assets/LOGO1.png";
 import HouseLogo from "../assets/HouseFill.png";
@@ -22,7 +22,6 @@ import {
   Tooltip,
 } from "recharts";
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000/api";
 
 const DashboardTechnician = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
@@ -44,8 +43,8 @@ const DashboardTechnician = () => {
   async function fetchDashboard() {
     setLoading(true);
     try {
-      const res = await axios.get(`${API_BASE}/dashboard`);
-      setData(res.data || data);
+  const res = await api.get('/dashboard');
+  setData(res.data || data);
     } catch (err) {
       console.error("fetchDashboard error:", err?.response ?? err);
       alert("Failed to load dashboard data. See console.");
@@ -114,6 +113,8 @@ const DashboardTechnician = () => {
         </div>
         <div className="nav-actions">
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
+          <span className="profile-name">Technician Name</span> {/* Example Technician Name */}
+          <span className="profile-role">Technician</span> {/* Example Technician Role */}
         </div>
       </header>
 

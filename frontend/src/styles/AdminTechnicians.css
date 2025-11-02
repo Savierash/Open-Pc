@@ -1,4 +1,4 @@
-/* AdminProfile.css */
+/* AdminTechnicians.css */
 
 .profile-container {
   padding: 1rem;
@@ -55,6 +55,7 @@
 .user-info .user-detail {
   font-size: 0.8rem;
   color: #a5b3c2;
+  margin-bottom: 0;
 }
 
 .contact-info {
@@ -163,7 +164,6 @@
 
 .input-with-icon input {
   flex-grow: 1;
-  color:#fff;
   padding: 0; /* Remove internal padding from input */
   border: none; /* Ensure no border on the input itself */
   background: transparent; /* Ensure transparent background */

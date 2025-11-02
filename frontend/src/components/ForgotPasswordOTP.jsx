@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import '../styles/ForgotPasswordOTP.css';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import ComputerLogo1 from '../assets/LOGO1.png';
@@ -37,10 +36,11 @@ const ForgotPasswordOTP = () => {
     setError('');
     setLoading(true);
     try {
-      console.log('OTP submitted for Forgot Password:', otp.join(''));
-      // Here, integrate with your backend to verify the OTP for password reset
-      // On success, navigate to the ResetPassword page
-      navigate('/reset-password'); 
+      const code = otp.join('');
+      console.log('OTP submitted for Forgot Password:', code);
+      // Forward OTP and email to reset-password page
+      const email = location.state?.email;
+      navigate('/reset-password', { state: { email, otp: code } });
     } catch (err) {
       console.error(err);
       const msg = err.response?.data?.message || 'OTP verification failed';

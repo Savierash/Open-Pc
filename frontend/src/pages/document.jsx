@@ -2,10 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import '../styles/Document.css'; // <-- new import
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import ComputerLogo1 from '../assets/LOGO1.png';
-import axios from 'axios';
-
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-const api = axios.create({ baseURL: API_BASE, timeout: 10000 });
+import api from '../services/api';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
@@ -122,7 +119,7 @@ const DocumentPage = () => {
       form.append('birthCertificate', birthFile);
       form.append('validId', idFile);
 
-      await api.post('/api/documents/upload', form, {
+      await api.post('/documents/upload', form, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 

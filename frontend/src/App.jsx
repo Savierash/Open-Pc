@@ -1,7 +1,8 @@
 import React from 'react';
+import { AuthProvider } from './context/AuthContext';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
-import Homepage from './pages/Homepage';  
-import Dashboard from './pages/Dashboard.jsx'; 
+import Homepage from './pages/Homepage';
+import Dashboard from './pages/Dashboard.jsx';
 import Services from './components/Services';
 import Login from './pages/login.jsx';
 import Signup from './pages/signup.jsx';
@@ -17,6 +18,8 @@ import ResetPassword from './components/ResetPassword.jsx';
 import ForgotPassword from './components/ForgotPassword.jsx';
 import ReportsAuditor from './components/ReportsAuditor.jsx'
 import ReportsTech from './components/ReportsTech.jsx';
+import PrivateRoute from './components/PrivateRoute';
+import RoleRoute from './components/RoleRoute';
 import Role from './components/Role.jsx';
 import Technicians from './components/Technicians.jsx';
 import AuditorProfile from './components/AuditorProfile.jsx';
@@ -25,6 +28,9 @@ import DashboardAdmin from './pages/DashboardAdmin.jsx';
 import TechnicianProfile from './components/TechnicianProfile.jsx';
 import AdminProfile from './components/AdminProfile.jsx';
 import UnitStatusTechnician from './components/UnitStatusTechnician.jsx';
+import UnitStatusAuditor from './components/UnitStatusAuditor.jsx';
+import AdminTechnicians from './components/AdminTechnicians.jsx'; // Import AdminTechnicians
+import AdminTechRequests from './components/AdminTechRequests.jsx'; // Import AdminTechRequests
 
 import DocumentPage from './pages/document.jsx';
 
@@ -45,15 +51,17 @@ import './styles/AuditorProfile.css'; // Import the new AuditorProfile styleshee
 import './styles/ReportsAuditor.css'; // Import ReportsAuditor stylesheet
 import './styles/TechnicianProfile.css';
 import './styles/AdminProfile.css';
+import './styles/UnitStatusAuditor.css';
 
 
 function App() {
   return (
-    <Router>
-      <Routes>
+    <AuthProvider>
+      <Router>
+        <Routes>
           <Route path="/document" element={<Navigate to="/documents" replace />} />
           <Route path="/" element={<Homepage />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/services" element={<Services />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
@@ -67,8 +75,8 @@ function App() {
           <Route path="/functional" element={<Functional />} />
           <Route path="/maintenance" element={<Maintenance />} />
           <Route path="/out-of-order" element={<OutOfOrder />} />
-          <Route path="/reports-tech" element={<ReportsTech />} />
-          <Route path="/reports-auditor" element={<ReportsAuditor />} />
+          <Route path="/reports-tech" element={<RoleRoute allowed={["technician","admin"]}><ReportsTech /></RoleRoute>} />
+          <Route path="/reports-auditor" element={<RoleRoute allowed={["auditor","admin"]}><ReportsAuditor /></RoleRoute>} />
           <Route path="/role" element={<Role />} /> 
           <Route path="/technicians" element={<Technicians />} /> 
           <Route path="/auditor-profile" element={<AuditorProfile />} />
@@ -77,8 +85,12 @@ function App() {
           <Route path="/technician-profile" element={<TechnicianProfile />} />
           <Route path="/dashboard-admin" element={<DashboardAdmin />} />
           <Route path="/admin-profile" element={<AdminProfile />} />
+          <Route path="/unit-status-auditor" element={<UnitStatusAuditor />} />
+          <Route path="/admin-technicians" element={<AdminTechnicians />} /> {/* New Route */}
+          <Route path="/admin-tech-requests" element={<AdminTechRequests />} /> {/* New Route */}
         </Routes>
-    </Router>
+      </Router>
+    </AuthProvider>
   );
 }
 

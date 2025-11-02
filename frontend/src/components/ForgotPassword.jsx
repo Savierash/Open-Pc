@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 import '../styles/ForgotPassword.css';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import ComputerLogo1 from '../assets/LOGO1.png';
@@ -16,6 +16,7 @@ const ForgotPassword = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const { sendOtp } = useAuth();
 
   useEffect(() => {
     setActiveLink(location.pathname);
@@ -27,14 +28,12 @@ const ForgotPassword = () => {
   setLoading(true);
 
   try {
-    // Send request to backend to send OTP
-    const response = await axios.post(`${apiBase}/api/forgot-password/send-otp`, { email });
-
-    console.log(response.data.message);
-    alert('✅ OTP has been sent to your email.');
-
-    // Navigate to the OTP page (you can pass email to verify later)
-    navigate('/forgot-password-otp', { state: { email } });
+  // Send request to backend to send OTP
+  const response = await sendOtp(email);
+  console.log(response);
+  alert('✅ OTP has been sent to your email.');
+  // Navigate to the OTP page (you can pass email to verify later)
+  navigate('/forgot-password-otp', { state: { email } });
   } catch (err) {
     console.error(err);
     const msg = err.response?.data?.message || 'Password reset request failed';
