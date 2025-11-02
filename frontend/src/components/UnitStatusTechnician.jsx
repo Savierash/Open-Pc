@@ -75,7 +75,7 @@ const UnitStatusTechnician = () => {
     const fetchUnits = async () => {
       try {
         const token = localStorage.getItem('token');
-        const unitRes = await axios.get(`http://localhost:5000/api/technician/units?labId=${selectedLab}`, {
+        const unitRes = await axios.get(`http://localhost:5000/api/units?labId=${selectedLab}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUnits(unitRes.data);
@@ -102,7 +102,7 @@ const UnitStatusTechnician = () => {
   // 🆕 Filter units based on chosen status
   const filteredUnits = units.filter((unit) => {
     if (statusFilter === "All") return true;
-    return unit.status === statusFilter;
+    return unit.status.toLowerCase() === statusFilter.toLowerCase();
   });
 
   // 🆕 Handle status or info save
@@ -112,7 +112,7 @@ const UnitStatusTechnician = () => {
       setSaving(true);
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:5000/api/technician/unit/${selectedUnit._id}`,
+        `http://localhost:5000/api/unit/${selectedUnit._id}`,
         selectedUnit,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -144,7 +144,7 @@ const UnitStatusTechnician = () => {
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
           <span className="profile-name">
             {/* To get the users acc to integrate with interface with Async profile in line 37*/}
-            {profile ? `${profile.firstname || profile.username || ""}${profile.lastname || ""}`.trim(): "Technician"}
+            {profile ? `${profile.firstName || profile.username || ""} ${profile.lastName || ""}`.trim() : "Technician"}
           </span>
           <span className="profile-role">{profile?.role?.name || "Technician"}</span>
         </div>
@@ -154,7 +154,7 @@ const UnitStatusTechnician = () => {
         <aside className="sidebar">
           <ul className="sidebar-menu">
             <li><a href="/dashboard-technician" className={`sidebar-link ${activeLink === "/dashboard-technician" ? "active" : ""}`}><img src={HouseLogo} className="menu-icon" alt="Home" /><span>Dashboard</span></a></li>
-            <li><a href="/unit-status-technician" className={`sidebar-link ${activeLink === "/unit-status" ? "active" : ""}`}><img src={PcDisplayLogo} className="menu-icon" alt="Unit Status" /><span>Unit Status</span></a></li>
+            <li><a href="/unit-status-technician" className={`sidebar-link ${activeLink === "/unit-status-technician" ? "active" : ""}`}><img src={PcDisplayLogo} className="menu-icon" alt="Unit Status" /><span>Unit Status</span></a></li>
             <li><a href="/reports-tech" className={`sidebar-link ${activeLink === '/reports-tech' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/reports-tech');}}><img src={ClipboardLogo} alt="Reports Icon" className="menu-icon" /><span>Reports</span></a></li>
             <li><a href="/technician-profile" className={`sidebar-link ${activeLink === '/technician-profile' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/technician-profile');}}><img src={AccountSettingLogo} alt="Account Setting Icon" className="menu-icon" /><span>Account Setting</span></a></li>
           </ul>
@@ -187,9 +187,9 @@ const UnitStatusTechnician = () => {
                 <h2 className="panel-title">{labs.find(l => l._id === selectedLab)?.name || 'Select Lab'}
                 </h2>
                 <div className="status-filters">
-                  <button className="status-button functional-button"onClick={() => setStatusFilter("Functional")}>Functional</button>
-                  <button className="status-button out-of-order-button"onClick={() => setStatusFilter("Maintenance")}>Out Of Order</button>
-                  <button className="status-button maintenance-button"onClick={() => setStatusFilter("Out Of Order")}>Maintenance</button>
+                  <button className="status-button functional-button" onClick={() => setStatusFilter("functional")}>Functional</button>
+                  <button className="status-button maintenance-button" onClick={() => setStatusFilter("maintenance")}>Maintenance</button>
+                  <button className="status-button out-of-order-button" onClick={() => setStatusFilter("outOfOrder")}>Out Of Order</button>
                 </div>
               </div>
 

@@ -1,103 +1,109 @@
+// backend/controllers/authController.js
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Role = require('../models/role');
 const User = require('../models/Users');
 const Otp = require('../models/Otp');
-const sendEmail = require('../utils/sendEmail'); // ✅ NEW
+const sendEmail = require('../utils/sendEmail');
 
-// Helper: Generate random 6-digit OTP
+// ✅ Generate random 6-digit OTP
 const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
+
+// ✅ Generate unique technician ID (e.g. TECH-XYZ123)
+const generateTechId = () => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let randomPart = '';
+  for (let i = 0; i < 6; i++) {
+    randomPart += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return `${randomPart}`;
+};
 
 /**
  * Register
- * Added: OTP creation + email sending
+ * 🚀 Creates user and sends OTP to email
  */
 exports.register = async (req, res) => {
   try {
-    const { email, username, password, confirmPassword, roleKey } = req.body;
-    if (!email || !username || !password) return res.status(400).json({ message: 'Missing fields' });
-    if (password !== confirmPassword) return res.status(400).json({ message: 'Passwords do not match' });
+    const { email, username, password, confirmPassword, roleKey, firstName, lastName, gender , contactNumber } = req.body;
+
+    if (!email || !username || !password || !firstName || !lastName || !gender)
+      return res.status(400).json({ message: 'Missing required fields' });
+
+    if (password !== confirmPassword)
+      return res.status(400).json({ message: 'Passwords do not match' });
 
     const exists = await User.findOne({ email });
-    if (exists) return res.status(409).json({ message: 'Email already registered' });
+    if (exists)
+      return res.status(409).json({ message: 'Email already registered' });
 
     const salt = await bcrypt.genSalt(10);
     const hashed = await bcrypt.hash(password, salt);
 
-    let assignedRole = null;
-    if (roleKey) {
-      assignedRole = await Role.findOne({ key: roleKey });
-      if (!assignedRole) return res.status(400).json({ message: 'Invalid role' });
-    }
+    const role = await Role.findOne({ key: roleKey });
+    if (!role) return res.status(400).json({ message: 'Invalid role' });
 
-    // create unverified user
     const user = new User({
       email,
       username,
       password: hashed,
-      role: assignedRole ? assignedRole._id : undefined,
-      isVerified: false, // ✅ added
+      role: role._id,
+      isVerified: false,
+      firstName,
+      lastName,
+      gender,
+      contactNumber, // ✅ Save it here
     });
+
+    if (role.key === 'technician') {
+      user.techId = generateTechId();
+    }
 
     await user.save();
 
-    // ✅ Generate and save OTP
     const otpCode = generateOtp();
     await Otp.create({ email, otp: otpCode });
 
-    // ✅ Send OTP email
+    // ✅ Email template
     const htmlContent = `
-      <div style="font-family: Arial; line-height: 1.5;">
-        <h2>Welcome to Open-PC!</h2>
-        <p>Your One-Time Password (OTP) for verification is:</p>
-        <h1 style="letter-spacing: 3px; color: #4CAF50;">${otpCode}</h1>
-        <p>This code expires in 10 minutes.</p>
-      </div>
+      <h2>Welcome to Open-PC!</h2>
+      <p>Please verify your email using the OTP below:</p>
+      <h1>${otpCode}</h1>
+      <p>Expires in 10 minutes.</p>
     `;
     await sendEmail(email, 'Open-PC Account Verification', htmlContent);
 
     return res.status(200).json({
-      message: 'User registered successfully. Please verify your email with the OTP sent.',
+      message: 'Registered successfully. Check your email for OTP.',
       email,
     });
 
   } catch (err) {
     console.error('Register error:', err);
-    res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: 'Server error during registration' });
   }
 };
 
 /**
- * ✅ Verify OTP
- * Confirms OTP and marks user verified
+ * ✅ Verify OTP and activate account
  */
-
 exports.verifyOtp = async (req, res) => {
   try {
-    console.log('📨 verifyOtp body:', req.body);
     const { email, otp } = req.body;
-    console.log(`📩 OTP verification request for: ${email} with code: ${otp}`);
 
     const existingOtp = await Otp.findOne({ email, otp });
-    if (!existingOtp) {
-      console.log('❌ Invalid or expired OTP');
+    if (!existingOtp)
       return res.status(400).json({ message: 'Invalid or expired OTP' });
-    }
 
-    // OTP valid — delete it
     await Otp.deleteMany({ email });
 
-    // Mark user as verified
     const user = await User.findOneAndUpdate(
       { email },
       { isVerified: true },
       { new: true }
     ).populate('role');
 
-    if (!user) {
-      console.log('❌ User not found');
-      return res.status(404).json({ message: 'User not found' });
-    }
+    if (!user) return res.status(404).json({ message: 'User not found' });
 
     const token = jwt.sign(
       { id: user._id, role: user.role.key },
@@ -105,25 +111,26 @@ exports.verifyOtp = async (req, res) => {
       { expiresIn: '7d' }
     );
 
-    console.log('✅ OTP verified successfully for:', user.email);
-    res.json({
+    return res.json({
       message: 'OTP verified successfully',
       token,
       user: {
         id: user._id,
         email: user.email,
+        username: user.username,
         role: user.role.key,
       },
     });
+
   } catch (err) {
     console.error('OTP verification error:', err);
-    res.status(500).json({ message: 'Internal server error' });
+    return res.status(500).json({ message: 'Email verification error' });
   }
 };
 
 /**
  * Login
- * Added check: must be verified before login
+ * 🚪 Only verified users can log in
  */
 exports.login = async (req, res) => {
   try {
@@ -137,51 +144,47 @@ exports.login = async (req, res) => {
     } else if (email) {
       user = await User.findOne({ email }).populate('role');
     } else {
-      return res.status(400).json({ message: 'Missing fields' });
+      return res.status(400).json({ message: 'Missing login fields' });
     }
 
     if (!user) return res.status(401).json({ message: 'Invalid credentials' });
-    if (!user.isVerified) return res.status(403).json({ message: 'Please verify your email before login' });
+    if (!user.isVerified)
+      return res.status(403).json({ message: 'Please verify your email first' });
 
     const matched = await bcrypt.compare(password, user.password);
-    if (!matched) return res.status(401).json({ message: 'Invalid credentials' });
+    if (!matched)
+      return res.status(401).json({ message: 'Invalid credentials' });
 
-    const tokenPayload = { id: user._id, email: user.email };
-    if (user.role && user.role.key) tokenPayload.role = user.role.key;
+    const token = jwt.sign(
+      { id: user._id, role: user.role.key },
+      process.env.JWT_SECRET || 'secret',
+      { expiresIn: '7d' }
+    );
 
-    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
-
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 1000 * 60 * 60 * 24 * 7,
-    });
-
-    res.json({
+    return res.json({
       token,
       user: {
         id: user._id,
         email: user.email,
         username: user.username,
-        role: user.role?.key,
+        role: user.role.key,
       },
     });
+
   } catch (err) {
     console.error('Login error:', err);
-    res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: 'Server login error' });
   }
 };
 
 /**
- * Get available roles (unchanged)
+ * ✅ Get available roles
  */
 exports.getRoles = async (req, res) => {
   try {
     const roles = await Role.find().select('key name description').lean();
-    res.status(200).json({ success: true, roles });
+    return res.status(200).json({ success: true, roles });
   } catch (err) {
-    console.error('Get Roles Error:', err);
-    res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: 'Server error fetching roles' });
   }
 };

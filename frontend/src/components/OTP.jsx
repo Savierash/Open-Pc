@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import api from '../api';
 import axios from 'axios';
 import '../styles/OTP.css';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import ComputerLogo1 from '../assets/LOGO1.png';
-import PersonLogo from '../assets/Person.png';
-import LockLogo from '../assets/Lock.png';
 
 const apiBase = import.meta.env.VITE_APP_API_URL || 'http://localhost:5000';
 
@@ -36,33 +35,44 @@ const OTP = () => {
   e.preventDefault();
   setError('');
   setLoading(true);
-  try {
-    const code = otp.join('');
-    console.log('📩 Submitting OTP:', code);
 
-    const res = await axios.post('http://localhost:5000/api/auth/verify-otp', {
-      email,
-      otp: code,
-    });
+  const code = otp.join('');
+
+  try {
+    const res = await axios.post(`${apiBase}/api/auth/verify-otp`, { email, otp: code });
+
 
     console.log('✅ OTP verification success:', res.data);
-    const userRole = res.data.user.role;
 
-    // ✅ Alert before redirect
+    // ✅ Save token + user object
+    const { token, user } = res.data;
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(user));
+
     alert('✅ Your account has been successfully verified!');
 
-    if (userRole === 'technician') navigate('/Dashboard-technician');
-    else if (userRole === 'auditor') navigate('/Dashboard');
-    else if (userRole === 'admin') navigate('/Dashboard-Admin');
-    else navigate('/');
+    // Redirect based on user role
+    switch (user.role) {
+      case 'technician':
+        navigate('/Dashboard-technician');
+        break;
+      case 'auditor':
+        navigate('/Dashboard');
+        break;
+      case 'admin':
+        navigate('/Dashboard-Admin');
+        break;
+      default:
+        navigate('/');
+    }
 
   } catch (err) {
     console.error('❌ OTP verification failed:', err);
     setError(err.response?.data?.message || 'OTP verification failed');
   } finally {
     setLoading(false);
-    }
-  };
+  }
+};
 
   const handleNavClick = (path) => {
     navigate(path);
@@ -98,9 +108,7 @@ const OTP = () => {
             </a>
           </nav>
         </div>
-        <div className="nav-actions">
-          
-        </div>
+        <div className="nav-actions"></div>
       </header>
 
       <main className="main">
@@ -109,22 +117,20 @@ const OTP = () => {
         <div className="otp-container">
           <form onSubmit={handleSubmit} className="otp-form">
             <div className="otp-input-fields">
-              {otp.map((data, index) => {
-                return (
-                  <input
-                    type="text"
-                    name="otp"
-                    maxLength="1"
-                    key={index}
-                    value={data}
-                    onChange={(e) => handleOtpChange(e.target, index)}
-                    onFocus={(e) => e.target.select()}
-                    className="otp-input"
-                  />
-                );
-              })}
+              {otp.map((data, index) => (
+                <input
+                  type="text"
+                  name="otp"
+                  maxLength="1"
+                  key={index}
+                  value={data}
+                  onChange={(e) => handleOtpChange(e.target, index)}
+                  onFocus={(e) => e.target.select()}
+                  className="otp-input"
+                />
+              ))}
             </div>
-            <p className="otp-instruction">Check Your Email for the verification code</p>
+            <p className="otp-instruction">Check your email for the verification code</p>
 
             {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
 

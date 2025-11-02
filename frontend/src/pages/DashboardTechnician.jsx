@@ -1,5 +1,6 @@
 import api from '../api';
 import React, { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import "../styles/DashboardTechnician.css";
 
 // 🖼️ Assets
@@ -68,7 +69,7 @@ const DashboardTechnician = () => {
       setLoading(true);
       const token = localStorage.getItem("token");
 
-      const res = await api.get("/technician/dashboard", {
+      const res = await api.get("/dashboard", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -129,9 +130,11 @@ const DashboardTechnician = () => {
     </div>
   );
 
+  const navigate = useNavigate();
+
   const handleNavClick = (path) => {
     setActiveLink(path);
-    window.location.href = path;
+    navigate(path);
   };
 
   // 🧾 Destructure data

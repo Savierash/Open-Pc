@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 const path = require('path');
 const seedRoles = require('./seedRoles');
 
-// ✅ Auth middlewares
+// ✅ Middlewares
 const { protect } = require('./middleware/authMiddleware');
 const { requireRole } = require('./middleware/roleMiddleware');
 
@@ -19,13 +19,15 @@ const dashboardRouter = require('./routes/dashboard');
 const authRouter = require('./routes/auth');
 const forgetPasswordRouter = require('./routes/forgetPassword');
 const reportRouter = require('./routes/reports');
+const userRoutes = require('./routes/userRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
-// ✅ Global error safety
+// ✅ Safety logs
 process.on('uncaughtException', (err) => {
-  console.error('UNCAUGHT EXCEPTION', err && err.stack ? err.stack : err);
+  console.error('\n UNCAUGHT EXCEPTION\n', err.stack);
 });
 process.on('unhandledRejection', (reason) => {
-  console.error('UNHANDLED REJECTION', reason && reason.stack ? reason.stack : reason);
+  console.error('\n UNHANDLED REJECTION\n', reason);
 });
 
 const app = express();
@@ -33,27 +35,23 @@ const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/openpc';
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
 
-// ✅ Request logger
-app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
-  next();
-});
+// ✅ Static folder for uploaded files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ✅ Middleware
 app.use(express.json());
 
-// ✅ CORS
+// ✅ CORS setup
 app.use(cors({
   origin: [CLIENT_ORIGIN, 'http://localhost:5173'],
   credentials: true,
-  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization','X-Requested-With']
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
 }));
 
-// ✅ Simple test route
-app.get('/', (req, res) => res.send('API up'));
+// ✅ Root Route
+app.get('/', (req, res) => res.send('API up ✔'));
 
-// ✅ Route mounting
+// ✅ API Routes
 app.use('/api/auth', authRouter);
 app.use('/api/forgot-password', forgetPasswordRouter);
 app.use('/api/dashboard', dashboardRouter);
@@ -61,38 +59,40 @@ app.use('/api/technician', technicianRouter);
 app.use('/api/reports', reportRouter);
 app.use('/api/units', unitsRouter);
 app.use('/api/labs', labsRouter);
+app.use('/api/users', userRoutes);
+app.use('/api/admin', adminRoutes);
 
-// ✅ Nested route for lab units
+// ✅ Nested Lab --> Units Route
 app.get('/api/labs/:labId/units', (req, res, next) => {
   req.query.labId = req.params.labId;
   return unitsRouter(req, res, next);
 });
 
-// ✅ 404 handler
+// ✅ 404 Handler
 app.use('/api', (req, res) => {
   res.status(404).json({ message: 'API route not found', path: req.originalUrl });
 });
 
-// ✅ Global error handler
+// ✅ Global Error Handler
 app.use((err, req, res, next) => {
-  console.error('Unhandled error:', err && err.stack ? err.stack : err);
+  console.error('Unhandled error:', err.stack || err);
   res.status(err.status || 500).json({ message: err.message || 'Internal server error' });
 });
 
-// ✅ Connect to MongoDB and start server
+// ✅ MongoDB Connect + Seed Roles
 mongoose.connect(MONGO_URI)
   .then(async () => {
-    console.log('Mongo connected');
+    console.log('✅ MongoDB connected');
     await seedRoles();
     startServer();
   })
   .catch((err) => {
-    console.error('Mongo connection error (starting server anyway):', err && err.stack ? err.stack : err);
+    console.error('❌ MongoDB connection error:', err.stack || err);
     startServer();
   });
 
 function startServer() {
   app.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}`);
+    console.log(`🚀 Server listening on port ${PORT}`);
   });
 }
