@@ -1,14 +1,26 @@
-// roleMiddleware.js
-// Simple role-based access control using the `role` field present on JWT payload.
-// The AuthController signs tokens with `role` set to the role key (string) when available.
+// backend/middleware/roleMiddleware.js
 
-const requireRole = (...allowed) => (req, res, next) => {
-  const userRole = req.user && req.user.role;
-  if (!userRole) return res.status(403).json({ message: 'Role required' });
+exports.requireRole = (requiredRole) => {
+  return (req, res, next) => {
+    try {
+      if (!req.user || !req.user.role) {
+        return res.status(403).json({ message: 'Access denied. No role assigned.' });
+      }
 
-  if (allowed.includes(userRole)) return next();
+      // ✅ Match role by name (string)
+      if (req.user.role.name && req.user.role.name.toLowerCase() === requiredRole.toLowerCase()) {
+        return next();
+      }
 
-  return res.status(403).json({ message: 'Forbidden: insufficient role' });
+      // ✅ OR match directly if stored as string (e.g., "technician")
+      if (typeof req.user.role === 'string' && req.user.role.toLowerCase() === requiredRole.toLowerCase()) {
+        return next();
+      }
+
+      return res.status(403).json({ message: `Access denied. ${requiredRole} role required.` });
+    } catch (err) {
+      console.error('Role middleware error:', err);
+      res.status(500).json({ message: 'Role check failed', error: err.message });
+    }
+  };
 };
-
-module.exports = { requireRole };

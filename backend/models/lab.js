@@ -2,13 +2,9 @@
 const mongoose = require('mongoose');
 
 const LabSchema = new mongoose.Schema({
-  name: { type: String, required: true, unique: true, trim: true },
-  location: { type: String, default: '' },
-  createdAt: { type: Date, default: Date.now },
-}, {
-  toJSON: { virtuals: true },
-  toObject: { virtuals: true }
-});
+  name: { type: String, required: true, trim: true, unique: true },
+  description: { type: String, default: '' },
+}, { timestamps: true });
 
 // virtual unitCount (calculated at query time using populate or aggregation)
 LabSchema.virtual('unitCount', {

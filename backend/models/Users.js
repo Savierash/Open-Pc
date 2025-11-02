@@ -11,8 +11,11 @@ const UserSchema = new mongoose.Schema({
   otp: { type: String, default: null },
   otpExpires: { type: Date, default: null },
   role: { type: mongoose.Schema.Types.ObjectId, ref: 'Role' },
+  isVerified: { type: Boolean, default: false }, // for email verification
   createdAt: { type: Date, default: Date.now },
   lastLoginAt: { type: Date }
+  
+  
 });
 
 module.exports = mongoose.model('User', UserSchema);

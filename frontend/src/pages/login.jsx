@@ -78,29 +78,40 @@ const Login = () => {
     setLoading(true);
 
     try {
-      // Use AuthContext.login (it internally uses the centralized api client)
-      const result = await login({ usernameOrEmail, password });
-      // result may include token and user depending on your backend shape
-      const user = result?.user || result?.data?.user || result?.userData || null;
+      const res = await api.post('/api/auth/login', {
+        usernameOrEmail,
+        password,
+      });
 
       // if login() already saved token/user to localStorage in AuthContext, we can rely on that
       // Extract roles and redirect accordingly
       const roles = extractRoles(user);
       const dashboardPath = getDashboardPath(roles);
 
-      navigate(dashboardPath, { replace: true });
-    } catch (err) {
-      console.error('Login error:', err);
-      if (err?.response) {
-        const serverMsg = err.response?.data?.message || err.response?.data?.error || err.response?.data?.msg || JSON.stringify(err.response?.data);
-        setError(serverMsg || 'Login failed — please check your credentials.');
-      } else if (err?.request) {
-        setError('No response from server — check backend and CORS settings.');
-      } else {
-        setError('Login failed — please check your credentials.');
-      }
-    } finally {
-      setLoading(false);
+      if (token) localStorage.setItem('token', token);
+      if (user) localStorage.setItem('user', JSON.stringify(user));
+
+      switch (user.role) {
+      case 'admin':
+        navigate('/Dashboard-admin');
+        break;
+      case 'auditor':
+        navigate('/dashboard');
+        break;
+      case 'technician':
+        navigate('/Dashboard-technician');
+        break;
+      default:
+        navigate('/dashboard');
+    }
+  } catch (err) {
+    console.error('Login error:', err);
+    setError(
+      err.response?.data?.message ||
+      'Login failed — please check your credentials.'
+    );
+  } finally {
+    setLoading(false);
     }
   };
 

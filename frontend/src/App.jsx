@@ -1,11 +1,15 @@
 import React from 'react';
 import { AuthProvider } from './context/AuthContext';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
-import Homepage from './pages/Homepage';
-import Dashboard from './pages/Dashboard.jsx';
+
+// Page Imports
+import Homepage from './pages/Homepage';  
+import Dashboard from './pages/Dashboard.jsx'; 
 import Services from './components/Services';
 import Login from './pages/login.jsx';
 import Signup from './pages/signup.jsx';
+
+// Component Imports
 import About from './components/About.jsx';
 import Inventory from './components/Inventory.jsx';
 import TotalUnits from './components/TotalUnits.jsx';
@@ -66,7 +70,7 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
-          <Route path="/document" element={<Navigate to="/documents" replace />} />
+          <Route path="/document" element={<DocumentPage replace />} />
           <Route path="/" element={<Homepage />} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/services" element={<Services />} />

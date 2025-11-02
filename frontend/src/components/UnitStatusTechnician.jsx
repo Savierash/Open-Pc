@@ -1,5 +1,6 @@
 // src/pages/unit-status/UnitStatusTechnician.jsx
 import React, { useState, useEffect } from 'react';
+import api from '../api';
 import axios from 'axios';
 import '../styles/Dashboard.css';
 import '../styles/UnitStatusTechnician.css';
@@ -21,18 +22,6 @@ const API_BASE = RAW_API_BASE.replace(/\/+$/, '');
 
 const UnitStatusTechnician = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
-
-  // data
-  const [labs, setLabs] = useState([]); // { _id, name }
-  const [selectedLab, setSelectedLab] = useState(null); // lab object
-  const [units, setUnits] = useState([]); // units of selected lab
-  const [filteredUnits, setFilteredUnits] = useState([]);
-
-  // selected unit form
-  const [selectedUnitState, setSelectedUnitState] = useState(null);
-  const [saving, setSaving] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [searchQ, setSearchQ] = useState('');
   const [editingField, setEditingField] = useState(null);
   const [selectedUnit, setSelectedUnit] = useState({
     name: 'ITS300-PC-002',
@@ -43,6 +32,67 @@ const UnitStatusTechnician = () => {
     lastIssued: 'September 12, 2025',
     status: 'Maintenance',
   });
+
+  const [user, setUser] = useState(null);
+  const [labs, setLabs] = useState([]); // store list of labs
+  const [units, setUnits] = useState([]); // store list of units for selected lab
+  const [selectedLab, setSelectedLab] = useState(null); // currently selected lab
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [profile, setProfile] = useState(null);
+   const [statusFilter, setStatusFilter] = useState("All");
+
+  useEffect(() => {
+  async function fetchProfile() {
+    try {
+      const res = await api.get("/technician/profile");
+      console.log("👤 Technician profile:", res.data);
+      setProfile(res.data);
+    } catch (err) {
+      console.error("❌ fetchProfile error:", err);
+    }
+  }
+  fetchProfile();
+}, []);
+
+
+
+  useEffect(() => {
+    const fetchLabsAndUnits = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const labRes = await axios.get('http://localhost:5000/api/labs', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setLabs(labRes.data);
+        if (labRes.data.length > 0) {
+          setSelectedLab(labRes.data[0]._id); // auto-select first lab
+        }
+      } catch (err) {
+        console.error('Failed to fetch labs:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLabsAndUnits();
+  }, []);
+
+  // 🆕 Fetch units when selectedLab changes
+  useEffect(() => {
+    if (!selectedLab) return;
+    const fetchUnits = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const unitRes = await axios.get(`http://localhost:5000/api/technician/units?labId=${selectedLab}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUnits(unitRes.data);
+      } catch (err) {
+        console.error('Failed to fetch units:', err);
+      }
+    };
+    fetchUnits();
+  }, [selectedLab]);
 
   const handleNavClick = (path) => {
     setActiveLink(path);
@@ -87,85 +137,36 @@ const UnitStatusTechnician = () => {
     }
   };
 
-  const fetchUnits = async (labId) => {
-    setLoading(true);
-    try {
-      const res = await axios.get(`${API_BASE}/units?labId=${labId}`);
-      const list = res.data || [];
-      setUnits(list);
-      setFilteredUnits(list);
-      // auto-select first unit if none selected
-      if (list.length > 0 && (!selectedUnitState || selectedUnitState.lab?._id !== labId)) {
-        setSelectedUnitState(list[0]);
-      } else if (list.length === 0) {
-        setSelectedUnitState(null);
-      }
-    } catch (err) {
-      console.error('fetchUnits error', err);
-      window.alert('Failed to load units — check backend. See console.');
-    } finally {
-      setLoading(false);
-    }
+  const handleSelectUnit = (unit) => {
+    setSelectedUnit(unit);
   };
 
-  const fetchUnitById = async (id) => {
-    try {
-      const res = await axios.get(`${API_BASE}/units/${id}`);
-      return res.data;
-    } catch (err) {
-      console.error('fetchUnitById error', err);
-      return null;
-    }
-  };
+  // 🆕 Filter units based on chosen status
+  const filteredUnits = units.filter((unit) => {
+    if (statusFilter === "All") return true;
+    return unit.status === statusFilter;
+  });
 
-  const saveUnit = async () => {
-    if (!selectedUnit || !selectedUnit._id) return window.alert('No unit selected');
-    setSaving(true);
+  // 🆕 Handle status or info save
+  const handleSave = async () => {
+    if (!selectedUnit?._id) return;
     try {
-      // prepare payload: match backend unit schema keys
-      const payload = {
-        name: selectedUnit.name,
-        os: selectedUnit.os,
-        ram: selectedUnit.ram,
-        storage: selectedUnit.storage,
-        cpu: selectedUnit.cpu,
-        lastIssued: selectedUnit.lastIssued,
-        status: selectedUnit.status
-      };
-      const res = await axios.put(`${API_BASE}/units/${selectedUnit._id}`, payload);
-      // update local list with returned unit
-      const updated = res.data;
-      setUnits(prev => prev.map(u => (String(u._id) === String(updated._id) ? updated : u)));
-      setFilteredUnits(prev => prev.map(u => (String(u._id) === String(updated._id) ? updated : u)));
-      setSelectedUnitState(updated);
-      window.alert('Saved');
+      setSaving(true);
+      const token = localStorage.getItem("token");
+      await axios.put(
+        `http://localhost:5000/api/technician/unit/${selectedUnit._id}`,
+        selectedUnit,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert("✅ Unit updated successfully!");
     } catch (err) {
-      console.error('saveUnit error', err);
-      const msg = err?.response?.data?.message || err?.message || 'Failed to save';
-      window.alert(msg);
+      console.error("Failed to save unit:", err);
+      alert("❌ Error saving changes");
     } finally {
       setSaving(false);
     }
   };
 
-  // ---------- helpers ----------
-  const handleUnitClick = async (unit) => {
-    // ensure full unit data (if list is partial)
-    if (!unit.os && unit._id) {
-      const full = await fetchUnitById(unit._id);
-      if (full) {
-        setSelectedUnitState(full);
-        return;
-      }
-    }
-    setSelectedUnitState(unit);
-  };
-
-  const handleUnitDetailChange = (field, value) => {
-    setSelectedUnitState(prev => ({ ...prev, [field]: value }));
-  };
-
-  // ---------- render ----------
   return (
     <div className="dashboard">
       <header className="top-bar-dashboard">
@@ -176,14 +177,19 @@ const UnitStatusTechnician = () => {
             <span className="logo-line">|</span>
           </div>
           <nav className="nav-links-dashboard">
-            <a href="/dashboard" className={`nav-link-dashboard`}>Dashboard</a>
+            <a href="/dashboard" className={`nav-link-dashboard`}>
+              Unit Status
+            </a>
           </nav>
           <span className="page-title">Unit Status</span>
         </div>
         <div className="nav-actions">
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
-          <span className="profile-name">Kresner Leonardo</span>
-          <span className="profile-role">Technician</span>
+          <span className="profile-name">
+            {/* To get the users acc to integrate with interface with Async profile in line 37*/}
+            {profile ? `${profile.firstname || profile.username || ""}${profile.lastname || ""}`.trim(): "Technician"}
+          </span>
+          <span className="profile-role">{profile?.role?.name || "Technician"}</span>
         </div>
       </header>
 
@@ -199,55 +205,34 @@ const UnitStatusTechnician = () => {
 
         <main className="main-content unit-status-main-content">
           <div className="unit-status-page-content">
-            {/* Left: lab list */}
+
+            
+            {/* Left Container: Lab List */}
             <div className="unit-status-lab-panel">
               <h2 className="panel-title">Lab</h2>
               <div className="lab-list-container">
-                {loading ? <div>Loading labs...</div> : (
-                  <>
-                    {labs.map(l => (
-                      <div
-                        key={l._id}
-                        className={`lab-card-new ${selectedLab && selectedLab._id === l._id ? 'active' : ''}`}
-                        onClick={() => { setSelectedLab(l); }}
-                      >
-                        {l.name}
-                      </div>
-                    ))}
-                    <div
-                      className="lab-card-new add-lab-card-unit-status"
-                      onClick={async () => {
-                        const name = window.prompt('New lab name');
-                        if (!name) return;
-                        try {
-                          setLoading(true);
-                          const res = await axios.post(`${API_BASE}/labs`, { name: name.trim() });
-                          setLabs(prev => [...prev, res.data]);
-                          setSelectedLab(res.data);
-                        } catch (err) {
-                          console.error('create lab err', err);
-                          window.alert(err?.response?.data?.message || 'Failed to create lab');
-                        } finally {
-                          setLoading(false);
-                        }
-                      }}
-                    >
-                      +
-                    </div>
-                  </>
-                )}
+                {labs.map((lab) => (
+                  <div 
+                    key={lab._id}
+                    className={`lab-card-new ${selectedLab === lab._id ? 'active' : ''}`}
+                    onClick={() => setSelectedLab(lab._id)}
+                  >
+                    {lab.name}
+                  </div>
+                ))}
+                <div className="lab-card-new add-lab-card-unit-status">+</div>
               </div>
             </div>
 
             {/* Middle: units */}
             <div className="unit-status-middle-panel">
               <div className="middle-panel-header">
-                <h2 className="panel-title">{selectedLab ? selectedLab.name : 'Select a lab'}</h2>
+                <h2 className="panel-title">{labs.find(l => l._id === selectedLab)?.name || 'Select Lab'}
+                </h2>
                 <div className="status-filters">
-                  <button className="status-button functional-button" onClick={() => setFilteredUnits(units.filter(u => u.status === 'Functional'))}>Functional</button>
-                  <button className="status-button out-of-order-button" onClick={() => setFilteredUnits(units.filter(u => u.status === 'Out Of Order'))}>Out Of Order</button>
-                  <button className="status-button maintenance-button" onClick={() => setFilteredUnits(units.filter(u => u.status === 'Maintenance'))}>Maintenance</button>
-                  <button className="status-button" onClick={() => setFilteredUnits(units)}>All</button>
+                  <button className="status-button functional-button"onClick={() => setStatusFilter("Functional")}>Functional</button>
+                  <button className="status-button out-of-order-button"onClick={() => setStatusFilter("Maintenance")}>Out Of Order</button>
+                  <button className="status-button maintenance-button"onClick={() => setStatusFilter("Out Of Order")}>Maintenance</button>
                 </div>
               </div>
 
@@ -259,22 +244,20 @@ const UnitStatusTechnician = () => {
               </div>
 
               <div className="unit-cards-grid">
-                <div className="pc-card">
-                  <img src={PcDisplayIcon} alt="PC Icon" className="pc-card-icon" />
-                  <span>ITS300-PC-002</span>
-                  <div className="status-indicator">
-                    <span>Out Of Order</span>
-                    <span className="status-dot out-of-order"></span>
+                {filteredUnits.map((unit) => (
+                  <div
+                    key={unit._id}
+                    className={`pc-card ${selectedUnit._id === unit._id ? 'active' : ''}`}
+                    onClick={() => handleSelectUnit(unit)}
+                  >
+                    <img src={PcDisplayLogo} alt="PC Icon" className="pc-card-icon" />
+                    <span>{unit.name}</span>
+                    <div className="status-indicator">
+                      <span>{unit.status}</span>
+                      <span className={`status-dot ${unit.status.toLowerCase().replace(' ', '-')}`}></span>
+                    </div>
                   </div>
-                </div>
-                <div className="pc-card">
-                  <img src={PcDisplayIcon} alt="PC Icon" className="pc-card-icon" />
-                  <span>ITS300-PC-010</span>
-                  <div className="status-indicator">
-                    <span>Out Of Order</span>
-                    <span className="status-dot out-of-order"></span>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
 
@@ -371,6 +354,7 @@ const UnitStatusTechnician = () => {
                   onClick={() => setEditingField(editingField === 'lastIssued' ? null : 'lastIssued')}
                 />
               </div>
+              
               <div className="set-status-section">
                 <span>SET STATUS:</span>
                 <select 
@@ -383,7 +367,9 @@ const UnitStatusTechnician = () => {
                   <option>Out Of Order</option>
                 </select>
               </div>
-              <button className="save-button">Save</button>
+              <button className="save-button"onClick={handleSave} disabled={saving}>
+                {saving ? "Saving..." : "Save"}
+                </button>
             </div>
           </div>
         </main>

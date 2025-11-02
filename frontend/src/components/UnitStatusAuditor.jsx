@@ -205,19 +205,18 @@ const UnitStatusAuditor = () => {
 
           <div className="auditor-pc-cards-container">
             <div className="auditor-unit-cards-grid">
-              {filteredUnits.length === 0 ? (
-                <div className="placeholder" style={{ padding: 16 }}>{loading ? 'Loading units...' : 'No units'}</div>
-              ) : (
-                filteredUnits.map(unit => (
-                  <div className="auditor-pc-card" key={unit._id}>
-                    <img src={PcDisplayLogo} alt="PC Icon" className="auditor-pc-card-icon" />
+              {filteredUnits.map(unit => (
+                <div className="auditor-pc-card" key={unit.id}>
+                  <img src={PcDisplayLogo} alt="PC Icon" className="auditor-pc-card-icon" />
+                  <div className="auditor-pc-card-content">
                     <span>{unit.id}</span>
-                    <span className={unit.status.toLowerCase().replace(/ /g, '-')}>
-                      {unit.status} &#x25cf;
-                    </span>
+                    <div className="status-indicator">
+                      <span>{unit.status}</span>
+                      <span className={`status-dot ${unit.status.toLowerCase().replace(/ /g, '-')}`}></span>
+                    </div>
                   </div>
-                ))
-              )}
+                </div>
+              ))}
             </div>
           </div>
         </main>

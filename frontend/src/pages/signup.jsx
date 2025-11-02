@@ -1,22 +1,19 @@
 // src/pages/Signup.jsx
+import { useSearchParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import '../styles/Signup.css';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import ComputerLogo1 from '../assets/LOGO1.png';
 import PersonLogo from '../assets/Person.png';
 import LockLogo from '../assets/Lock.png';
-import { useAuth } from '../context/AuthContext';
-import api from '../services/api'; // <-- IMPORTANT: import centralized api client
 import PhoneIcon from '../assets/Telephone.png';
-import WifiLogo from '../assets/wifi_logo.png';
-import ChatLogo from '../assets/chat_logo.png';
-import BroadcastLogo from '../assets/broadcast_logo.png';
-import ToolsLogo from '../assets/tools_logo.png';
 import axios from 'axios';
 
 // use shared auth context via useAuth (AuthContext handles token and api)
 
 const Signup = () => {
+  const [searchParams] = useSearchParams();
+  const roleKey = searchParams.get('role'); // ✅ capture role from query
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -95,45 +92,15 @@ const Signup = () => {
         email,
         password,
         confirmPassword,
-        role: selectedRole,
+        roleKey,
       });
 
-      const { token, user } = res.data || {};
-      if (token) {
-        // set token in localStorage and in api client (if setAuthToken is available use it)
-        if (typeof setAuthToken === 'function') {
-          setAuthToken(token);
-        } else {
-          localStorage.setItem('token', token);
-          // also assign header for immediate requests
-          api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        }
-      }
-      if (user) localStorage.setItem('user', JSON.stringify(user));
+      alert('✅ OTP has been sent to your email.');
 
-      // Determine redirect path based on user.role returned from backend (fallback to selectedRole)
-      const userRole = (user && user.role) ? String(user.role).toLowerCase() : String(selectedRole).toLowerCase();
-
-      let redirectPath = '/dashboard'; // fallback
-
-      if (userRole === 'admin') {
-        redirectPath = '/dashboard-adminpanel';
-      } else if (userRole === 'auditor') {
-        redirectPath = '/dashboard-admin';
-      } else if (userRole === 'tech' || userRole === 'technician') {
-        redirectPath = '/dashboard-technician';
-      } else {
-        redirectPath = '/dashboard';
-      }
-
-      navigate(redirectPath, { replace: true });
+      navigate('/otp', { state: { email } });
     } catch (err) {
       console.error('Signup error', err);
-      if (!err.response) {
-        setError(`Network error: ${err.message}`);
-      } else {
-        setError(err.response?.data?.message || 'Signup failed');
-      }
+      setError(err.response?.data?.message || 'Signup failed');
     } finally {
       setLoading(false);
     }

@@ -1,19 +1,16 @@
+import api from '../api';
 import React, { useState, useEffect } from "react";
-import api from '../services/api';
 import "../styles/DashboardTechnician.css";
+
+// 🖼️ Assets
 import ComputerLogo1 from "../assets/LOGO1.png";
 import HouseLogo from "../assets/HouseFill.png";
-import GraphLogo from "../assets/GraphUp.png";
 import PcDisplayLogo from "../assets/PcDisplayHorizontal.png";
 import ClipboardLogo from "../assets/ClipboardCheck.png";
 import GearLogo from "../assets/GearFill.png";
-import MenuButtonWide from "../assets/menubuttonwide.png"; // Unit Status icon
-import ClipboardX from "../assets/clipboardx.png"; // Reports icon
-import OctagonLogo from "../assets/XOctagonFill.png";
-import StackLogo from "../assets/Stack.png";
 import PersonLogo from "../assets/Person.png";
-import ToolsLogo from "../assets/tools_logo.png";
-import AccountSettingLogo from "../assets/GearFill.png"; // Re-using GearFill for Account Setting
+
+// 📊 Recharts for System Status visualization
 import {
   ResponsiveContainer,
   LineChart,
@@ -24,10 +21,10 @@ import {
   Tooltip,
 } from "recharts";
 
-
 const DashboardTechnician = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [data, setData] = useState({
     totalUnits: 0,
     counts: { functional: 0, maintenance: 0, outOfOrder: 0 },
@@ -37,48 +34,87 @@ const DashboardTechnician = () => {
     trend: [],
   });
 
+  const [profile, setProfile] = useState(null); // 🆕 store technician profile data
+
+  // 🧮 Normalizes backend data key names (avoids case mismatch)
+  function normalizeCounts(counts) {
+    if (!counts) return { functional: 0, maintenance: 0, outOfOrder: 0 };
+    return {
+      functional: counts.Functional || counts.functional || 0,
+      maintenance: counts.Maintenance || counts.maintenance || 0,
+      outOfOrder: counts["Out Of Order"] || counts.outOfOrder || 0,
+    };
+  }
+
   useEffect(() => {
     setActiveLink(window.location.pathname);
     fetchDashboard();
+    fetchProfile();
   }, []);
 
-  async function fetchDashboard() {
-    setLoading(true);
+  // 🧑‍🔧 Fetch Technician Profile
+  async function fetchProfile() {
     try {
-  const res = await api.get('/dashboard');
-  setData(res.data || data);
+      const res = await api.get("/technician/profile");
+      setProfile(res.data);
     } catch (err) {
-      console.error("fetchDashboard error:", err?.response ?? err);
-      alert("Failed to load dashboard data. See console.");
+      console.error("❌ fetchProfile error:", err);
+    }
+  }
+
+  // 🧾 Fetch Dashboard Data
+  async function fetchDashboard() {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+
+      const res = await api.get("/technician/dashboard", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const backendData = res.data || {};
+      const normalizedCounts = normalizeCounts(backendData.counts);
+
+      setData({
+        totalUnits: backendData.totalUnits || 0,
+        counts: normalizedCounts,
+        percentFunctional: backendData.percentFunctional || 0,
+        perLab: backendData.perLab || [],
+        recentUnits: backendData.recentUnits || [],
+        trend: backendData.trend || [],
+      });
+    } catch (err) {
+      console.error("❌ fetchDashboard error:", err?.response ?? err);
+      setError("Failed to load dashboard data.");
     } finally {
       setLoading(false);
     }
   }
 
-  const { totalUnits, counts, percentFunctional, perLab, recentUnits, trend } = data;
-
-  // fallback trend data
-  const mockTrend = [
-    { date: "Mon", value: 60 },
-    { date: "Tue", value: 70 },
-    { date: "Wed", value: 75 },
-    { date: "Thu", value: 80 },
-    { date: "Fri", value: 78 },
-    { date: "Sat", value: 82 },
-    { date: "Sun", value: 85 },
-  ];
-  const chartData = trend?.length ? trend : mockTrend;
+  // 🧠 Chart (trend of functional percentage)
+  const chartData =
+    data.trend?.length > 0
+      ? data.trend
+      : [
+          { date: "Mon", value: 60 },
+          { date: "Tue", value: 72 },
+          { date: "Wed", value: 68 },
+          { date: "Thu", value: 80 },
+          { date: "Fri", value: 75 },
+          { date: "Sat", value: 85 },
+          { date: "Sun", value: 90 },
+        ];
 
   const StatusChart = ({ dataPoints }) => (
     <div style={{ width: "100%", height: 200 }}>
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={dataPoints} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
+        <LineChart data={dataPoints}>
           <CartesianGrid stroke="#1b2630" strokeDasharray="3 3" vertical={false} />
-          <XAxis dataKey="date" axisLine={false} tick={{ fill: "#a5b3c2", fontSize: 12 }} />
-          <YAxis domain={[0, 100]} axisLine={false} tick={{ fill: "#a5b3c2", fontSize: 12 }} />
+          <XAxis dataKey="date" tick={{ fill: "#a5b3c2", fontSize: 12 }} />
+          <YAxis domain={[0, 100]} tick={{ fill: "#a5b3c2", fontSize: 12 }} />
           <Tooltip
             contentStyle={{ background: "#071019", border: "none", color: "#fff" }}
-            formatter={(v) => `${v}%`}
+            formatter={(v) => `${v}% Functional`}
           />
           <Line
             type="monotone"
@@ -97,9 +133,13 @@ const DashboardTechnician = () => {
     setActiveLink(path);
     window.location.href = path;
   };
-  
+
+  // 🧾 Destructure data
+  const { totalUnits, counts, percentFunctional, recentUnits } = data;
+
   return (
     <div className="dashboard">
+      {/* HEADER */}
       <header className="top-bar-dashboard">
         <div className="logo-and-nav">
           <div className="logo">
@@ -107,71 +147,170 @@ const DashboardTechnician = () => {
             <span className="logo-text">OpenPC</span>
             <span className="logo-line">|</span>
           </div>
-          <span className="page-title">Technician Dashboard</span>
+          <nav className="nav-links-dashboard">
+            <a
+              href="/dashboard-technician"
+              className={`nav-link-dashboard ${
+                activeLink === "/dashboard-technician" ? "active" : ""
+              }`}
+              onClick={(e) => {
+                e.preventDefault();
+                handleNavClick("/dashboard-technician");
+              }}
+            >
+              Technician Dashboard
+            </a>
+          </nav>
         </div>
+
+        {/* ✅ Dynamic profile name and role */}
         <div className="nav-actions">
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
-          <span className="profile-name">Technician Name</span> {/* Example Technician Name */}
-          <span className="profile-role">Technician</span> {/* Example Technician Role */}
+          <span className="profile-name">
+            {profile
+              ? `${profile.firstName || profile.username || ""} ${
+                  profile.lastName || ""
+                }`.trim()
+              : "Technician"}
+          </span>
+          <span className="profile-role">{profile?.role?.name || "Technician"}</span>
         </div>
       </header>
 
+      {/* MAIN LAYOUT */}
       <div className="main-layout three-column">
-        {/* LEFT sidebar */}
+        {/* SIDEBAR */}
         <aside className="sidebar">
           <ul className="sidebar-menu">
-            <li><a href="/dashboard-technician" className={`sidebar-link ${activeLink === "/dashboard-technician" ? "active" : ""}`} onClick={(e) => {e.preventDefault();handleNavClick('/dashboard-technician');}}><img src={HouseLogo} className="menu-icon" alt="Home" /><span>Dashboard</span></a></li>
-            <li><a href="/unit-status-technician" className={`sidebar-link ${activeLink === "/unit-status-technician" ? "active" : ""}`} onClick={(e) => {e.preventDefault();handleNavClick('/unit-status-technician');}}><img src={MenuButtonWide} className="menu-icon" alt="Unit Status" /><span>Unit Status</span></a></li>
-            <li><a href="/reports-tech" className={`sidebar-link ${activeLink === '/reports-tech' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/reports-tech');}}><img src={ClipboardX} className="menu-icon" alt="Reports Icon" /><span>Reports</span></a></li>
-            <li><a href="/technician-profile" className={`sidebar-link ${activeLink === "/technician-profile" ? "active" : ""}`} onClick={(e) => {e.preventDefault();handleNavClick('/technician-profile');}}><img src={GearLogo} className="menu-icon" alt="Account Setting" /><span>Account Setting</span></a></li>
+            <li>
+              <a
+                href="/dashboard-technician"
+                className={`sidebar-link ${
+                  activeLink === "/dashboard-technician" ? "active" : ""
+                }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick("/dashboard-technician");
+                }}
+              >
+                <img src={HouseLogo} className="menu-icon" alt="Home" />
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="/unit-status-technician"
+                className={`sidebar-link ${
+                  activeLink === "/unit-status-technician" ? "active" : ""
+                }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick("/unit-status-technician");
+                }}
+              >
+                <img src={PcDisplayLogo} className="menu-icon" alt="Unit Status" />
+                <span>Unit Status</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="/reports-tech"
+                className={`sidebar-link ${
+                  activeLink === "/reports-tech" ? "active" : ""
+                }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick("/reports-tech");
+                }}
+              >
+                <img src={ClipboardLogo} className="menu-icon" alt="Reports Icon" />
+                <span>Reports</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="/technician-profile"
+                className={`sidebar-link ${
+                  activeLink === "/technician-profile" ? "active" : ""
+                }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick("/technician-profile");
+                }}
+              >
+                <img src={GearLogo} className="menu-icon" alt="Account Setting" />
+                <span>Account Setting</span>
+              </a>
+            </li>
           </ul>
         </aside>
 
-        {/* MAIN content */}
+        {/* MAIN CONTENT */}
         <main className="main-content">
           <div className="dashboard-main-content">
+            {error && (
+              <div className="error-box">⚠️ {error}</div>
+            )}
+
+            {/* DASHBOARD CARDS */}
             <div className="dashboard-cards">
-              <div className="card total-units clickable-card" onClick={() => handleNavClick('/total-units')}>
-                <img src={PcDisplayLogo} alt="PC Display Icon" className="card-icon" />
-                <div className="card-content">
+              {/* Total Units */}
+              <div className="card total-units clickable-card">
+                <div className="card-header">
+                  <img src={PcDisplayLogo} alt="PC Display Icon" className="card-icon" />
                   <h3>Total Units</h3>
                   <p className="stat-number">{loading ? "..." : totalUnits}</p>
                 </div>
               </div>
 
-              <div className="card functional clickable-card" onClick={() => handleNavClick('/functional')}>
-                <img src={ClipboardLogo} alt="Clipboard Icon" className="card-icon" />
-                <div className="card-content">
-                  <h3>Functional Units</h3>
-                  <p className="stat-number">{loading ? "..." : counts.functional}</p>
+              {/* Functional */}
+              <div className="card functional clickable-card">
+                <div className="card-header">
+                  <img src={ClipboardLogo} alt="Clipboard Icon" className="card-icon" />
+                  <h3>Functional</h3>
+                </div>
+                <div className="card-body">
+                  <p className="stat-number">
+                    {loading ? "..." : `${counts.functional} / ${totalUnits}`}
+                  </p>
+                  <div className="progress-bar">
+                    <div
+                      className="progress-fill"
+                      style={{ width: `${percentFunctional}%` }}
+                    ></div>
+                  </div>
                 </div>
               </div>
 
-              <div className="card maintenance clickable-card" onClick={() => handleNavClick('/maintenance')}>
-                <img src={ToolsLogo} alt="Tools Icon" className="card-icon" />
-                <div className="card-content">
-                  <h3>Under Maintenance</h3>
-                  <p className="stat-number">{loading ? "..." : counts.maintenance}</p>
+              {/* Maintenance */}
+              <div className="card maintenance clickable-card">
+                <div className="card-header">
+                  <img src={GearLogo} alt="Gear Icon" className="card-icon" />
+                  <h3>Maintenance</h3>
+                </div>
+                <div className="card-body">
+                  <p className="stat-number">
+                    {loading ? "..." : counts.maintenance}
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Bottom Row */}
+            {/* BOTTOM ROW */}
             <div className="dashboard-bottom-row">
+              {/* Recent Units */}
               <div className="recent-activity-card card" style={{ flex: "0 0 60%" }}>
                 <h3>Recent Units</h3>
                 <ul className="recent-list">
                   {recentUnits.length === 0 ? (
-                    <li style={{ padding: 8 }}>
-                      {loading ? "Loading..." : "No recent activity"}
-                    </li>
+                    <li>{loading ? "Loading..." : "No recent activity"}</li>
                   ) : (
                     recentUnits.map((u) => (
-                      <li key={u._id} className="recent-item">
+                      <li key={u._id}>
                         <strong>{u.name}</strong> —{" "}
                         <span style={{ textTransform: "capitalize" }}>{u.status}</span>
                         {u.lab?.name && <span> • {u.lab.name}</span>}
-                        <div style={{ fontSize: 12, color: "#666" }}>
+                        <div className="timestamp">
                           {new Date(u.updatedAt).toLocaleString()}
                         </div>
                       </li>
@@ -180,25 +319,16 @@ const DashboardTechnician = () => {
                 </ul>
               </div>
 
-              {/* 🧠 System Status WITH Chart */}
+              {/* System Status */}
               <div className="system-status-card card" style={{ flex: "0 0 35%" }}>
                 <h3>System Status</h3>
                 <p>Database: <strong>Connected</strong></p>
                 <p>API: <strong>{loading ? "Loading..." : "OK"}</strong></p>
-
-                <div style={{ marginTop: 12, background: "transparent" }}>
-                  <StatusChart dataPoints={chartData} />
+                <StatusChart dataPoints={chartData} />
+                <div className="status-summary">
+                  <strong>{percentFunctional}%</strong> functional units
                 </div>
-
-                <div style={{ marginTop: 12, textAlign: "center", color: "#ccc" }}>
-                  <strong>{percentFunctional}%</strong> functional
-                </div>
-
-                <div style={{ marginTop: 8, textAlign: "center" }}>
-                  <button onClick={fetchDashboard} className="btn small">
-                    Refresh
-                  </button>
-                </div>
+                <button onClick={fetchDashboard} className="btn small">Refresh</button>
               </div>
             </div>
           </div>

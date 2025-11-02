@@ -132,6 +132,13 @@ const TechnicianProfile = () => {
                     <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
                   </div>
                 </div>
+                <div className="form-group">
+                  <label>Tech ID</label>
+                  <div className="input-with-icon">
+                    <input type="text" value="01593" readOnly />
+                    <img src={Lock} alt="Lock Icon" className="input-icon" />
+                  </div>
+                </div>
               </div>
 
               <h3>Contact Information</h3>
