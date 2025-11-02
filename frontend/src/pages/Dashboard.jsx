@@ -27,6 +27,17 @@ import {
 } from "recharts";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const userRole = localStorage.getItem('userRole');
+
+    if (!token || userRole?.toLowerCase() !== 'auditor') {
+      navigate('/login'); // Redirect unauthorized access
+    }
+  }, [navigate]);
+  
   const [activeLink, setActiveLink] = useState(window.location.pathname || "/dashboard");
   const [loading, setLoading] = useState(false);
 
@@ -38,13 +49,6 @@ const Dashboard = () => {
   const [recentUnits, setRecentUnits] = useState([]);
   const [trend, setTrend] = useState([]);
 
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    setActiveLink(window.location.pathname || '/dashboard');
-    fetchDashboard();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   async function fetchDashboard() {
     setLoading(true);

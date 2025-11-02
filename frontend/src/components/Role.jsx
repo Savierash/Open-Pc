@@ -121,8 +121,8 @@ const Role = () => {
             role="button"
             tabIndex={0}
             className="role-image"
-            onClick={() => handleRoleClick('inventory')}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleRoleClick('inventory'); }}
+            onClick={() => handleRoleClick('auditor')}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleRoleClick('auditor'); }}
             style={{
               backgroundImage: `url(${AuditorButton})`,
               backgroundSize: 'cover',

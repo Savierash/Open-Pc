@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext'; // ✅ import context
 import api from '../api';
 import axios from 'axios';
 import '../styles/OTP.css';
@@ -13,6 +14,7 @@ import ToolsLogo from '../assets/tools_logo.png';
 const apiBase = import.meta.env.VITE_APP_API_URL || 'http://localhost:5000';
 
 const OTP = () => {
+  const { setUser, setToken } = useAuth();
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [activeLink, setActiveLink] = useState('');
   const [error, setError] = useState('');
@@ -50,26 +52,35 @@ const OTP = () => {
 
       // ✅ Save token + user object
       const { token, user } = res.data;
-      localStorage.setItem('token', token);
+      setToken(token);
+      setUser(user);
+      localStorage.setItem('accessToken', token);
+      localStorage.removeItem('accessToken'); 
       localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('userName', user.username)
+      
 
       alert('✅ Your account has been successfully verified!');
 
       // ✅ Redirect based on role
-      const role = user?.role?.toLowerCase(); // Safe check + normalization
-      switch (role) {
+      let roleKey = typeof user?.role === 'string' 
+        ? user.role.toLowerCase() 
+        : user.role.key?.toLowerCase();
+
+      localStorage.setItem('userRole', roleKey);
+
+      switch (roleKey) {
         case 'technician':
-        case 'tech': // Use the same key as backend
           navigate('/Dashboard-technician');
           break;
         case 'auditor':
-          navigate('/Dashboard');
+          navigate('/dashboard');
           break;
         case 'admin':
           navigate('/Dashboard-Admin');
           break;
         default:
-          console.warn(`⚠️ Unknown role: ${role}, redirecting home...`);
+          console.warn(`⚠️ Unknown role: ${roleKey}, redirecting home...`);
           navigate('/');
       }
 

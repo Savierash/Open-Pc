@@ -65,7 +65,7 @@ const Signup = () => {
         gender,
         password,
         confirmPassword,
-        roleKey,
+        roleKey, // ✅ include role in payload
       };
 
       // ✅ Always log this so we can debug
