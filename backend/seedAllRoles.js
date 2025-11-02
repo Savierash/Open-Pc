@@ -3,6 +3,7 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
+// Import models
 const User = require('./models/Users');
 const Role = require('./models/role');
 const Lab = require('./models/lab');
@@ -12,18 +13,22 @@ const Unit = require('./models/unit');
   try {
     console.log('🌱 Connecting to MongoDB...');
     await mongoose.connect(process.env.MONGO_URI);
+    console.log('✅ Connected to MongoDB');
 
     // 🧩 STEP 1: Ensure roles exist
     const roles = ['Admin', 'Technician', 'Auditor'];
-    for (const roleName of roles) {
-      const existing = await Role.findOne({ name: roleName });
-      if (!existing) {
-        await Role.create({ name: roleName });
-        console.log(`✅ Created role: ${roleName}`);
-      } else {
-        console.log(`ℹ️ Role already exists: ${roleName}`);
-      }
-    }
+for (const roleName of roles) {
+  const existing = await Role.findOne({ name: roleName });
+  if (!existing) {
+    await Role.create({ 
+      key: roleName.toLowerCase(), // 'admin', 'technician', 'auditor'
+      name: roleName 
+    });
+    console.log(`✅ Created role: ${roleName}`);
+  } else {
+    console.log(`ℹ️ Role already exists: ${roleName}`);
+  }
+}
 
     // 🧩 STEP 2: Create sample users
     const usersData = [
@@ -74,7 +79,7 @@ const Unit = require('./models/unit');
       const units = [
         { name: 'Microscope', lab: labs[0]._id, status: 'functional' },
         { name: 'Centrifuge', lab: labs[1]._id, status: 'maintenance' },
-        { name: 'Computer #1', lab: labs[2]._id, status: 'out-of-order' }, // ✅ fixed spelling
+        { name: 'Computer #1', lab: labs[2]._id, status: 'out-of-order' },
         { name: 'Computer #2', lab: labs[2]._id, status: 'functional' },
         { name: 'Spectrometer', lab: labs[1]._id, status: 'functional' },
         { name: 'Laser Device', lab: labs[0]._id, status: 'maintenance' },

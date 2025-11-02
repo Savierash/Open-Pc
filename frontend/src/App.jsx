@@ -61,6 +61,7 @@ import './styles/Pending.css';
 
 function App() {
   return (
+    <AuthProvider>
     <Router>
       <Routes>
           <Route path="/document" element={<DocumentPage />} />
@@ -95,6 +96,7 @@ function App() {
           <Route path="/pending" element={<Pending />} />
         </Routes>
       </Router>
+      </AuthProvider>
   );
 }
 

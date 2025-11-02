@@ -1,5 +1,7 @@
 // src/pages/Signup.jsx
 import { useSearchParams } from 'react-router-dom';
+import { useAuth } from "../context/AuthContext";
+import api from '../api';
 import React, { useState, useEffect } from 'react';
 import '../styles/Signup.css';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
@@ -13,11 +15,15 @@ import BroadcastLogo from '../assets/broadcast_logo.png';
 import ToolsLogo from '../assets/tools_logo.png';
 import axios from 'axios';
 
-// use shared auth context via useAuth (AuthContext handles token and api)
-
 const Signup = () => {
   const [searchParams] = useSearchParams();
-  const roleKey = searchParams.get('role'); // ✅ capture role from query
+  const rawRole = searchParams.get('role'); // e.g. 'tech'
+  const roleMap = {
+    tech: 'technician',
+    auditor: 'auditor',
+    admin: 'admin',
+  };
+  const roleKey = roleMap[rawRole] ?? null; // ✅ capture role from query
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -29,7 +35,7 @@ const Signup = () => {
   const [activeLink, setActiveLink] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
- 
+
   const navigate = useNavigate();
   const location = useLocation();
   const { register: registerWithContext, setAuthToken } = useAuth() || {}; // optional helpers from context
@@ -41,35 +47,38 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
+
     setLoading(true);
     try {
       const username = `${firstName.trim()} ${lastName.trim()}`.trim();
+      const payload = {
+        username,
+        firstName,
+        lastName,
+        contactNumber: phoneNumber,
+        email,
+        gender,
+        password,
+        confirmPassword,
+        roleKey,
+      };
 
-      // Read role from query param (e.g. /signup?role=auditor)
-      const query = new URLSearchParams(location.search);
-      const selectedRole = query.get('role') || 'user';
+      // ✅ Always log this so we can debug
+      console.log('📦 Sending payload:', payload);
 
-      // If your AuthContext provides a register helper, prefer using it
       if (typeof registerWithContext === 'function') {
-        // Some register helpers return the token/user — adapt as needed
-        const result = await registerWithContext({
-          username,
-          firstName,
-          lastName,
-          phoneNumber,
-          email,
-          password,
-          confirmPassword,
-          role: selectedRole,
-        });
+        console.log("🧠 Using registerWithContext from AuthContext");
 
-        // If context's register returned a token/user, redirect accordingly
+        const result = await registerWithContext(payload);
+
         const token = result?.token || result?.data?.token;
         const user = result?.user || result?.data?.user || null;
+
         if (token && typeof setAuthToken === 'function') {
           setAuthToken(token);
         } else if (token) {
@@ -77,35 +86,23 @@ const Signup = () => {
         }
         if (user) localStorage.setItem('user', JSON.stringify(user));
 
-        // decide redirect path like below
-        const userRole = (user && user.role) ? String(user.role).toLowerCase() : String(selectedRole).toLowerCase();
+        const userRole = (user && user.role) ? String(user.role).toLowerCase() : 'user';
         let redirectPath = '/dashboard';
         if (userRole === 'admin') redirectPath = '/dashboard-adminpanel';
         else if (userRole === 'auditor') redirectPath = '/dashboard-admin';
-        else if (userRole === 'tech' || userRole === 'technician') redirectPath = '/dashboard-technician';
+        else if (userRole === 'technician') redirectPath = '/dashboard-technician';
         navigate(redirectPath, { replace: true });
         return;
       }
 
-      // Fallback: call API directly using centralized `api` client.
-      // NOTE: api base already includes "/api", so call '/auth/register'
-      const res = await api.post('/auth/register', {
-        username,
-        firstName,
-        lastName,
-        contactNumber,  // ✅ Add here
-        email,
-        gender,
-        password,
-        confirmPassword,
-        roleKey,
-      });
+      // Fallback: call API directly
+      const res = await api.post('/auth/register', payload);
 
       alert('✅ OTP has been sent to your email.');
-
       navigate('/otp', { state: { email } });
+
     } catch (err) {
-      console.error('Signup error', err);
+      console.error("Signup error:", JSON.stringify(err.response?.data, null, 2) || err.message);
       setError(err.response?.data?.message || 'Signup failed');
     } finally {
       setLoading(false);
@@ -153,7 +150,6 @@ const Signup = () => {
         </div>
       </header>
 
-      {/* Background decorative logos */}
       <img src={WifiLogo} alt="" className="bg-logo bg-logo-top-left" />
       <img src={ChatLogo} alt="" className="bg-logo bg-logo-top-right" />
       <img src={BroadcastLogo} alt="" className="bg-logo bg-logo-bottom-left" />
@@ -164,6 +160,7 @@ const Signup = () => {
 
         <div className="signup-container">
           <form onSubmit={handleSubmit} className="signup-form">
+            {/* Name Fields */}
             <div style={{ display: 'flex', gap: '16px' }}>
               <div className="input-wrapper" style={{ flex: 1 }}>
                 <input
@@ -192,6 +189,7 @@ const Signup = () => {
               </div>
             </div>
 
+            {/* Phone Number */}
             <div className="input-wrapper">
               <input
                 type="tel"
@@ -205,6 +203,7 @@ const Signup = () => {
               <img src={PhoneIcon} alt="Phone Number icon" className="input-icon" />
             </div>
 
+            {/* Email */}
             <div className="input-wrapper">
               <input
                 type="email"
@@ -218,6 +217,7 @@ const Signup = () => {
               <img src={PersonLogo} alt="Email icon" className="input-icon" />
             </div>
 
+            {/* Gender */}
             <div className="input-wrapper">
               <select
                 id="gender"
@@ -233,9 +233,8 @@ const Signup = () => {
               </select>
               <img src={PersonLogo} alt="Gender icon" className="input-icon" />
             </div>
-            
-            
-            { /* Changed password input wrapper: place toggle inside input */ }
+
+            {/* Password */}
             <div className="input-wrapper" style={{ position: 'relative' }}>
               <input
                 type={showPasswords ? 'text' : 'password'}
@@ -267,6 +266,7 @@ const Signup = () => {
               <img src={LockLogo} alt="Password icon" className="input-icon" />
             </div>
 
+            {/* Confirm Password */}
             <div className="input-wrapper" style={{ position: 'relative' }}>
               <input
                 type={showPasswords ? 'text' : 'password'}

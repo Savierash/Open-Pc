@@ -2,8 +2,8 @@
 const mongoose = require('mongoose');
 
 const RoleSchema = new mongoose.Schema({
-  key: { type: String, required: true, unique: true }, // e.g. 'auditor', 'tech'
-  name: { type: String, required: true },              // human name e.g. 'Auditor'
+  key: { type: String, required: true, unique: true }, // e.g. 'admin', 'technician'
+  name: { type: String, required: true },              // e.g. 'Administrator'
   description: { type: String, default: '' },
   createdAt: { type: Date, default: Date.now },
 });

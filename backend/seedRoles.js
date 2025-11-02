@@ -6,7 +6,9 @@ module.exports = async function seedRoles() {
     { key: 'admin', name: 'Admin', description: 'System administrator with full access' },
     { key: 'auditor', name: 'Auditor', description: 'Can audit and review reports' },
     { key: 'technician', name: 'Technician', description: 'Handles maintenance and logs reports' },
+    { key: 'inventory', name: 'Inventory', description: 'Manages inventory and stock' }, // ✅ added
   ];
+  
 
   for (const role of roles) {
     const exists = await Role.findOne({ key: role.key });
