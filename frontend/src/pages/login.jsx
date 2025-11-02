@@ -49,42 +49,12 @@ const Login = () => {
   const handleNavClick = (path) => navigate(path);
 
   // --- Helper: Extract roles from the returned user object ---
-  const extractRoles = (user) => {
-    if (!user) return [];
-
-    const roles = [];
-
-    if (typeof user.role === 'string') roles.push(user.role.toLowerCase());
-    if (user.role && typeof user.role === 'object') {
-      if (user.role.key) roles.push(String(user.role.key).toLowerCase());
-      if (user.role.name) roles.push(String(user.role.name).toLowerCase());
-    }
-
-    if (Array.isArray(user.roles)) {
-      user.roles.forEach((r) => {
-        if (!r) return;
-        if (typeof r === 'string') roles.push(r.toLowerCase());
-        else if (r.key) roles.push(String(r.key).toLowerCase());
-        else if (r.name) roles.push(String(r.name).toLowerCase());
-      });
-    }
-
-    if (user.roleKey) roles.push(String(user.roleKey).toLowerCase());
-    if (user.roleName) roles.push(String(user.roleName).toLowerCase());
-
-    return Array.from(new Set(roles));
-  };
-
-  // --- Map roles to pages (priority-aware) ---
-  const getDashboardPath = (roles) => {
-    if (!roles || roles.length === 0) return '/dashboard';
-
-    const lower = roles.map(r => String(r).toLowerCase());
-
-    if (lower.includes('admin') || lower.includes('administrator')) return '/dashboard-admin';
-    if (lower.includes('auditor')) return '/inventory';
-    if (lower.includes('tech') || lower.includes('technician')) return '/dashboard-tech';
-
+  const getDashboardPath = (role) => {
+    if (!role) return '/dashboard';
+    const r = role.toLowerCase();
+    if (r === 'admin') return '/Dashboard-admin';
+    if (r === 'auditor') return '/Dashboard';
+    if (r === 'tech' || r === 'technician') return '/Dashboard-technician';
     return '/dashboard';
   };
 
@@ -95,41 +65,30 @@ const Login = () => {
     setLoading(true);
 
     try {
-      // ✅ Use reusable `api` instance for cleaner code
       const res = await api.post('/api/auth/login', {
         usernameOrEmail,
         password,
       });
 
-      // if login() already saved token/user to localStorage in AuthContext, we can rely on that
-      // Extract roles and redirect accordingly
-      const roles = extractRoles(user);
-      const dashboardPath = getDashboardPath(roles);
+      console.log('✅ Login success:', res.data);
 
-      // ✅ Store token and user safely in localStorage
-      if (token) localStorage.setItem('token', token);
-      if (user) localStorage.setItem('user', JSON.stringify(user));
+      // ✅ Added this: Extract user and token from response
+      const { user, token } = res.data;
 
-      // ✅ Route user based on their role value from backend response
-      switch (user.role) {
-        case 'admin':
-          navigate('/Dashboard-admin');
-          break;
-        case 'auditor':
-          navigate('/dashboard');
-          break;
-        case 'technician':
-          navigate('/Dashboard-technician');
-          break;
-        default:
-          navigate('/dashboard');
+      if (!user || !token) {
+        throw new Error('Invalid login response from server');
       }
+
+      // ✅ Save token and user in localStorage
+      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('token', token);
+
+      // ✅ Redirect based on role
+      const dashboardPath = getDashboardPath(user.role);
+      navigate(dashboardPath);
     } catch (err) {
       console.error('Login error:', err);
-      setError(
-        err.response?.data?.message ||
-          'Login failed — please check your credentials.'
-      );
+      setError(err.response?.data?.message || 'Login failed — please check your credentials.');
     } finally {
       setLoading(false);
     }

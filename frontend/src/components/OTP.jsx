@@ -4,6 +4,11 @@ import axios from 'axios';
 import '../styles/OTP.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ComputerLogo1 from '../assets/LOGO1.png';
+import WifiLogo from '../assets/wifi_logo.png';
+import ChatLogo from '../assets/chat_logo.png';
+import BroadcastLogo from '../assets/broadcast_logo.png';
+import ToolsLogo from '../assets/tools_logo.png';
+
 
 const apiBase = import.meta.env.VITE_APP_API_URL || 'http://localhost:5000';
 
@@ -32,47 +37,49 @@ const OTP = () => {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError('');
-  setLoading(true);
+    e.preventDefault();
+    setError('');
+    setLoading(true);
 
-  const code = otp.join('');
+    const code = otp.join('');
 
-  try {
-    const res = await axios.post(`${apiBase}/api/auth/verify-otp`, { email, otp: code });
+    try {
+      const res = await axios.post(`${apiBase}/api/auth/verify-otp`, { email, otp: code });
 
+      console.log('✅ OTP verification success:', res.data);
 
-    console.log('✅ OTP verification success:', res.data);
+      // ✅ Save token + user object
+      const { token, user } = res.data;
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
 
-    // ✅ Save token + user object
-    const { token, user } = res.data;
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
+      alert('✅ Your account has been successfully verified!');
 
-    alert('✅ Your account has been successfully verified!');
+      // ✅ Redirect based on role
+      const role = user?.role?.toLowerCase(); // Safe check + normalization
+      switch (role) {
+        case 'technician':
+        case 'tech': // Use the same key as backend
+          navigate('/Dashboard-technician');
+          break;
+        case 'auditor':
+          navigate('/Dashboard');
+          break;
+        case 'admin':
+          navigate('/Dashboard-Admin');
+          break;
+        default:
+          console.warn(`⚠️ Unknown role: ${role}, redirecting home...`);
+          navigate('/');
+      }
 
-    // Redirect based on user role
-    switch (user.role) {
-      case 'technician':
-        navigate('/Dashboard-technician');
-        break;
-      case 'auditor':
-        navigate('/Dashboard');
-        break;
-      case 'admin':
-        navigate('/Dashboard-Admin');
-        break;
-      default:
-        navigate('/');
+    } catch (err) {
+      console.error('❌ OTP verification failed:', err);
+      setError(err.response?.data?.message || 'OTP verification failed');
+    } finally {
+      setLoading(false);
     }
-
-  } catch (err) {
-    console.error('❌ OTP verification failed:', err);
-    setError(err.response?.data?.message || 'OTP verification failed');
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const handleNavClick = (path) => {
     navigate(path);

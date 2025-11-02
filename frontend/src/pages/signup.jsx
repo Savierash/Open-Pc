@@ -71,29 +71,6 @@ const Signup = () => {
       // ✅ Always log this so we can debug
       console.log('📦 Sending payload:', payload);
 
-      if (typeof registerWithContext === 'function') {
-        console.log("🧠 Using registerWithContext from AuthContext");
-
-        const result = await registerWithContext(payload);
-
-        const token = result?.token || result?.data?.token;
-        const user = result?.user || result?.data?.user || null;
-
-        if (token && typeof setAuthToken === 'function') {
-          setAuthToken(token);
-        } else if (token) {
-          localStorage.setItem('token', token);
-        }
-        if (user) localStorage.setItem('user', JSON.stringify(user));
-
-        const userRole = (user && user.role) ? String(user.role).toLowerCase() : 'user';
-        let redirectPath = '/dashboard';
-        if (userRole === 'admin') redirectPath = '/dashboard-adminpanel';
-        else if (userRole === 'auditor') redirectPath = '/dashboard-admin';
-        else if (userRole === 'technician') redirectPath = '/dashboard-technician';
-        navigate(redirectPath, { replace: true });
-        return;
-      }
 
       // Fallback: call API directly
       const res = await api.post('/auth/register', payload);
