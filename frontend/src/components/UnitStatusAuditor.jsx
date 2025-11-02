@@ -18,10 +18,6 @@ import GraphUp from "../assets/GraphUp.png";
 import ShieldLockFill from "../assets/ShieldLockFill.png";
 import PcDisplayIcon from "../assets/pcdisplay.png"; // PC card icon
 
-// API base (Vite)
-const RAW_API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
-const API_BASE = RAW_API_BASE.replace(/\/+$/, '');
-
 const UnitStatusAuditor = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
   const [filter, setFilter] = useState('Functional');
@@ -207,7 +203,7 @@ const UnitStatusAuditor = () => {
             <div className="auditor-unit-cards-grid">
               {filteredUnits.map(unit => (
                 <div className="auditor-pc-card" key={unit.id}>
-                  <img src={PcDisplayLogo} alt="PC Icon" className="auditor-pc-card-icon" />
+                  <img src={PcDisplayIcon} alt="PC Icon" className="auditor-pc-card-icon" />
                   <div className="auditor-pc-card-content">
                     <span>{unit.id}</span>
                     <div className="status-indicator">

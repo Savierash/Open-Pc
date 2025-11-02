@@ -16,10 +16,6 @@ import ClipboardX from "../assets/clipboardx.png"; // Reports icon
 import PersonLogo from "../assets/Person.png";
 import PcDisplayIcon from "../assets/pcdisplay.png"; // PC card icon
 
-// API base (Vite)
-const RAW_API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
-const API_BASE = RAW_API_BASE.replace(/\/+$/, '');
-
 const UnitStatusTechnician = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
   const [editingField, setEditingField] = useState(null);
@@ -176,11 +172,6 @@ const UnitStatusTechnician = () => {
             <span className="logo-text">OpenPC</span>
             <span className="logo-line">|</span>
           </div>
-          <nav className="nav-links-dashboard">
-            <a href="/dashboard" className={`nav-link-dashboard`}>
-              Unit Status
-            </a>
-          </nav>
           <span className="page-title">Unit Status</span>
         </div>
         <div className="nav-actions">
@@ -244,20 +235,22 @@ const UnitStatusTechnician = () => {
               </div>
 
               <div className="unit-cards-grid">
-                {filteredUnits.map((unit) => (
-                  <div
-                    key={unit._id}
-                    className={`pc-card ${selectedUnit._id === unit._id ? 'active' : ''}`}
-                    onClick={() => handleSelectUnit(unit)}
-                  >
-                    <img src={PcDisplayLogo} alt="PC Icon" className="pc-card-icon" />
-                    <span>{unit.name}</span>
-                    <div className="status-indicator">
-                      <span>{unit.status}</span>
-                      <span className={`status-dot ${unit.status.toLowerCase().replace(' ', '-')}`}></span>
-                    </div>
+                <div className="pc-card">
+                  <img src={PcDisplayIcon} alt="PC Icon" className="pc-card-icon" />
+                  <span>ITS300-PC-002</span>
+                  <div className="status-indicator">
+                    <span>Out Of Order</span>
+                    <span className="status-dot out-of-order"></span>
                   </div>
-                ))}
+                </div>
+                <div className="pc-card">
+                  <img src={PcDisplayIcon} alt="PC Icon" className="pc-card-icon" />
+                  <span>ITS300-PC-010</span>
+                  <div className="status-indicator">
+                    <span>Out Of Order</span>
+                    <span className="status-dot out-of-order"></span>
+                  </div>
+                </div>
               </div>
             </div>
 

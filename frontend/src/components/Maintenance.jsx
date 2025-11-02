@@ -15,14 +15,7 @@ import StackLogo from '../assets/icon_6.png'; // Inventory icon
 import MenuButtonWide from '../assets/menubuttonwide.png'; // Unit Status icon
 import ClipboardX from '../assets/clipboardx.png'; // Reports icon
 import PersonLogo from '../assets/Person.png';
-import ToolsLogo from '../assets/tools_logo.png';
-
-import axios from 'axios';
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
-
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
-const COLORS = ['#FFF59D', '#FFEB3B', '#FFD54F', '#FFC107', '#FFB300', '#FFA000'];
-
+import ToolsLogo from '../assets/tools_logo.png'; // Import Tools Logo
 import AccountSettingLogo from '../assets/GearFill.png'; // Account Setting icon
 
 const Maintenance = () => {

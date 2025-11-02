@@ -14,12 +14,8 @@ import GearLogo from '../assets/GearFill.png';
 import OctagonLogo from '../assets/XOctagonFill.png';
 import StackLogo from '../assets/icon_6.png'; // Inventory icon
 import ToolsLogo from '../assets/tools_logo.png';
-import SearchIcon from '../assets/Person.png';
-import EditIcon from '../assets/GearFill.png';
-
-// API base (Vite)
-const RAW_API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
-const API_BASE = RAW_API_BASE.replace(/\/+$/, '');
+import SearchIcon from '../assets/Person.png'; // Assuming Person.png is used as a search icon as in ReportsTech.jsx
+import EditIcon from '../assets/GearFill.png'; // Using GearFill.png as an edit icon
 import MenuButtonWide from '../assets/menubuttonwide.png'; // Unit Status icon
 import ClipboardX from '../assets/clipboardx.png'; // Reports icon
 
@@ -232,16 +228,7 @@ const ReportsAuditor = () => {
             <span className="logo-text">OpenPC</span>
             <span className="logo-line">|</span>
           </div>
-          <nav className="nav-links-dashboard">
-            <a
-              href="/dashboard"
-              className={`nav-link-dashboard ${activeLink === '/dashboard' || activeLink === '/reports-auditor' ? 'active' : ''}`}
-              onClick={(e) => { e.preventDefault(); handleNavClick('/dashboard'); }}
-            >
-              Dashboard
-            </a>
-            <span className="logo-text">Reports</span>
-          </nav>
+          <span className="page-title">Reports</span>
         </div>
         <div className="nav-actions">
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
@@ -266,8 +253,28 @@ const ReportsAuditor = () => {
               </a>
             </li>
             <li>
-              <a href="/reports-auditor" className={`sidebar-link ${activeLink === '/reports-auditor' ? 'active' : ''}`} onClick={(e)=>{e.preventDefault(); handleNavClick('/reports-auditor');}}>
-                <img src={ClipboardLogo} alt="Reports Auditor Icon" className="menu-icon" />
+              <a 
+                href="/unit-status-auditor" 
+                className={`sidebar-link ${activeLink === '/unit-status-auditor' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/unit-status-auditor');
+                }}
+              >
+                <img src={MenuButtonWide} alt="Unit Status Icon" className="menu-icon" />
+                <span>Unit Status</span>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/reports-auditor" 
+                className={`sidebar-link ${activeLink === '/reports-auditor' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/reports-auditor');
+                }}
+              >
+                <img src={ClipboardX} alt="Reports Auditor Icon" className="menu-icon" />
                 <span>Reports</span>
               </a>
             </li>

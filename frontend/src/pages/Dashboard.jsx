@@ -8,13 +8,13 @@ import HouseLogo from "../assets/HouseFill.png";
 import PcDisplayLogo from "../assets/PcDisplayHorizontal.png";
 import ClipboardLogo from "../assets/ClipboardCheck.png";
 import GearLogo from "../assets/GearFill.png";
-import StackLogo from "../assets/icon_6.png";
+import OctagonLogo from "../assets/XOctagonFill.png";
+import StackLogo from "../assets/icon_6.png"; // Inventory icon
 import PersonLogo from "../assets/Person.png";
 import ToolsLogo from "../assets/tools_logo.png";
-import AccountSettingLogo from "../assets/GearFill.png";
-import MenuButtonWide from "../assets/menubuttonwide.png";
-import ClipboardX from "../assets/clipboardx.png";
-
+import AccountSettingLogo from "../assets/GearFill.png"; // Re-using GearFill for Account Setting
+import MenuButtonWide from "../assets/menubuttonwide.png"; // Unit Status icon
+import ClipboardX from "../assets/clipboardx.png"; // Reports icon
 import {
   ResponsiveContainer,
   LineChart,
@@ -226,7 +226,8 @@ const Dashboard = () => {
           <ul className="sidebar-menu">
             <li><a href="/dashboard" className={`sidebar-link ${activeLink === "/dashboard" ? "active" : ""}`}><img src={HouseLogo} className="menu-icon" alt="Home" /><span>Dashboard</span></a></li>
             <li><a href="/inventory" className={`sidebar-link ${activeLink === "/inventory" ? "active" : ""}`}><img src={StackLogo} className="menu-icon" alt="Inventory" /><span>Inventory</span></a></li>
-            <li><a href="/reports-auditor" className={`sidebar-link ${activeLink === '/reports-auditor' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/reports-auditor');}}><img src={ClipboardLogo} alt="Reports Icon" className="menu-icon" /><span>Reports</span></a></li>
+            <li><a href="/unit-status-auditor" className={`sidebar-link ${activeLink === "/unit-status-auditor" ? "active" : ""}`}><img src={MenuButtonWide} className="menu-icon" alt="Unit Status" /><span>Unit Status</span></a></li>
+            <li><a href="/reports-auditor" className={`sidebar-link ${activeLink === '/reports-auditor' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/reports-auditor');}}><img src={ClipboardX} alt="Reports Icon" className="menu-icon" /><span>Reports</span></a></li>
             <li><a href="/technicians" className={`sidebar-link ${activeLink === '/technicians' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/technicians');}}><img src={ToolsLogo} alt="Technicians Icon" className="menu-icon" /><span>Technicians</span></a></li>
             <li><a href="/auditor-profile" className={`sidebar-link ${activeLink === '/auditor-profile' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/auditor-profile');}}><img src={AccountSettingLogo} alt="Account Setting Icon" className="menu-icon" /><span>Account Setting</span></a></li>
           </ul>
@@ -235,9 +236,9 @@ const Dashboard = () => {
         <main className="main-content">
           <div className="dashboard-main-content">
             <div className="dashboard-cards">
-              <div className="card total-units clickable-card" onClick={() => handleNavClick("/total-units")}>
-                <div className="card-header">
-                  <img src={PcDisplayLogo} alt="PC Display Icon" className="card-icon" />
+              <div className="card total-units clickable-card" onClick={() => handleNavClick('/total-units')}>
+                <img src={PcDisplayLogo} alt="PC Display Icon" className="card-icon" />
+                <div className="card-content">
                   <h3>Total Units</h3>
                   <p className="stat-number">{loading ? "..." : totalUnits}</p>
                 </div>

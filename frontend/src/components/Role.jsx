@@ -4,8 +4,8 @@ import api from '../services/api';
 import '../styles/Role.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ComputerLogo1 from '../assets/LOGO1.png';
-import AuditorButton from '../assets/AUDITOR BUTTON.png';
-import TechButton from '../assets/TECH BUTTON.png';
+import AuditorButton from '../assets/AUDITOR BUTTON.png'; // Import Auditor image
+import TechButton from '../assets/TECH BUTTON.png';     // Import Tech image
 import WifiLogo from '../assets/wifi_logo.png';
 import ChatLogo from '../assets/chat_logo.png';
 import BroadcastLogo from '../assets/broadcast_logo.png';

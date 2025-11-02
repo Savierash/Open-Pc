@@ -132,13 +132,6 @@ const TechnicianProfile = () => {
                     <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
                   </div>
                 </div>
-                <div className="form-group">
-                  <label>Tech ID</label>
-                  <div className="input-with-icon">
-                    <input type="text" value="01593" readOnly />
-                    <img src={Lock} alt="Lock Icon" className="input-icon" />
-                  </div>
-                </div>
               </div>
 
               <h3>Contact Information</h3>
@@ -146,22 +139,22 @@ const TechnicianProfile = () => {
                 <div className="form-group">
                   <label>Email</label>
                   <div className="input-with-icon">
-                    <input type="email" value={profile?.email || ''} readOnly />
-                    <img src={Lock} alt="Lock Icon" className="input-icon" />
+                    <input type="email" value="kresnerleonardo@gmail.com" readOnly />
+                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
                   </div>
                 </div>
                 <div className="form-group">
                   <label>Contact No.</label>
                   <div className="input-with-icon">
-                    <input type="text" value={profile?.phoneNumber || ''} readOnly />
-                    <img src={Lock} alt="Lock Icon" className="input-icon" />
+                    <input type="text" value="0918453982" readOnly />
+                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
                   </div>
                 </div>
                 <div className="form-group">
                   <label>Address</label>
                   <div className="input-with-icon">
-                    <input type="text" value={profile?.address || ''} readOnly />
-                    <img src={Lock} alt="Lock Icon" className="input-icon" />
+                    <input type="text" value="Dagupan USA Chicago" readOnly />
+                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
                   </div>
                 </div>
               </div>

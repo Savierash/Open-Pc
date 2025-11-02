@@ -126,18 +126,6 @@ const OutOfOrder = () => {
             <span className="logo-text">OpenPC</span>
             <span className="logo-line">|</span>
           </div>
-          <nav className="nav-links-dashboard">
-            <a
-              href="/dashboard"
-              className={`nav-link-dashboard active`}
-              onClick={(e) => {
-                e.preventDefault();
-                handleNavClick('/dashboard');
-              }}
-            >
-              Dashboard
-            </a>
-          </nav>
           <span className="page-title">Out of Order</span>
         </div>
         <div className="nav-actions">

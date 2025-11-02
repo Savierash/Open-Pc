@@ -140,15 +140,15 @@ const AuditorProfile = () => {
                 <div className="form-group">
                   <label>Full name</label>
                   <div className="input-with-icon">
-                    <input type="text" value={profile?.username?.split(' ')[0] || ''} onChange={(e) => setProfile((p) => ({ ...p, username: `${e.target.value} ${p?.username?.split(' ')[1] || ''}` }))} />
-                    <img src={Lock} alt="Lock Icon" className="input-icon" />
+                    <input type="text" value="John" readOnly />
+                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
                   </div>
                 </div>
                 <div className="form-group">
                   <label>Last Name</label>
                   <div className="input-with-icon">
-                    <input type="text" value={profile?.username?.split(' ')[1] || ''} onChange={(e) => setProfile((p) => ({ ...p, username: `${p?.username?.split(' ')[0] || ''} ${e.target.value}` }))} />
-                    <img src={Lock} alt="Lock Icon" className="input-icon" />
+                    <input type="text" value="Paul" readOnly />
+                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
                   </div>
                 </div>
               </div>
@@ -158,22 +158,22 @@ const AuditorProfile = () => {
                 <div className="form-group">
                   <label>Email</label>
                   <div className="input-with-icon">
-                    <input type="email" value={profile?.email || ''} readOnly />
-                    <img src={Lock} alt="Lock Icon" className="input-icon" />
+                    <input type="email" value="johnpaul@gmail.com" readOnly />
+                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
                   </div>
                 </div>
                 <div className="form-group">
                   <label>Contact No.</label>
                   <div className="input-with-icon">
-                    <input type="text" value={profile?.phoneNumber || ''} onChange={(e) => setProfile((p) => ({ ...p, phoneNumber: e.target.value }))} />
-                    <img src={Lock} alt="Lock Icon" className="input-icon" />
+                    <input type="text" value="0918453982" readOnly />
+                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
                   </div>
                 </div>
                 <div className="form-group">
                   <label>Address</label>
                   <div className="input-with-icon">
-                    <input type="text" value={profile?.address || ''} onChange={(e) => setProfile((p) => ({ ...p, address: e.target.value }))} />
-                    <img src={Lock} alt="Lock Icon" className="input-icon" />
+                    <input type="text" value="Dagupan USA Chicago" readOnly />
+                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
                   </div>
                 </div>
               </div>
