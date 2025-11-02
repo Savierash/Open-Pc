@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import '../styles/Login.css';
+
 import ComputerLogo1 from '../assets/LOGO1.png';
 import LockLogo from '../assets/Lock.png';
 import PersonLogo from '../assets/Person.png';
@@ -11,7 +12,22 @@ import ChatLogo from '../assets/chat_logo.png';
 import BroadcastLogo from '../assets/broadcast_logo.png';
 import ToolsLogo from '../assets/tools_logo.png';
 
-// use shared AuthContext (AuthContext provides login/register and the centralized api client)
+// ✅ Access Vite env var (note: needs `VITE_` prefix to work properly)
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+// ✅ Create axios instance that includes base URL, timeout, and sends cookies if needed
+const api = axios.create({
+  baseURL: API_BASE,
+  timeout: 10000,
+  withCredentials: true, // important for cookie-based sessions
+});
+
+// ✅ Automatically attach Authorization header if token exists in localStorage
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
 
 const Login = () => {
   const [usernameOrEmail, setUsernameOrEmail] = useState('');
@@ -78,6 +94,7 @@ const Login = () => {
     setLoading(true);
 
     try {
+      // ✅ Use reusable `api` instance for cleaner code
       const res = await api.post('/api/auth/login', {
         usernameOrEmail,
         password,
@@ -88,30 +105,32 @@ const Login = () => {
       const roles = extractRoles(user);
       const dashboardPath = getDashboardPath(roles);
 
+      // ✅ Store token and user safely in localStorage
       if (token) localStorage.setItem('token', token);
       if (user) localStorage.setItem('user', JSON.stringify(user));
 
+      // ✅ Route user based on their role value from backend response
       switch (user.role) {
-      case 'admin':
-        navigate('/Dashboard-admin');
-        break;
-      case 'auditor':
-        navigate('/dashboard');
-        break;
-      case 'technician':
-        navigate('/Dashboard-technician');
-        break;
-      default:
-        navigate('/dashboard');
-    }
-  } catch (err) {
-    console.error('Login error:', err);
-    setError(
-      err.response?.data?.message ||
-      'Login failed — please check your credentials.'
-    );
-  } finally {
-    setLoading(false);
+        case 'admin':
+          navigate('/Dashboard-admin');
+          break;
+        case 'auditor':
+          navigate('/dashboard');
+          break;
+        case 'technician':
+          navigate('/Dashboard-technician');
+          break;
+        default:
+          navigate('/dashboard');
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      setError(
+        err.response?.data?.message ||
+          'Login failed — please check your credentials.'
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -126,13 +145,39 @@ const Login = () => {
           </div>
 
           <nav className="nav-links-login">
-            <a className={`nav-link-login ${activeLink === '/' ? 'active' : ''}`} onClick={() => handleNavClick('/')}>Home</a>
-            <a className={`nav-link-login ${activeLink === '/about' ? 'active' : ''}`} onClick={() => handleNavClick('/about')}>About</a>
-            <a className={`nav-link-login ${activeLink === '/services' ? 'active' : ''}`} onClick={() => handleNavClick('/services')}>Services</a>
+            <a
+              className={`nav-link-login ${
+                activeLink === '/' ? 'active' : ''
+              }`}
+              onClick={() => handleNavClick('/')}
+            >
+              Home
+            </a>
+            <a
+              className={`nav-link-login ${
+                activeLink === '/about' ? 'active' : ''
+              }`}
+              onClick={() => handleNavClick('/about')}
+            >
+              About
+            </a>
+            <a
+              className={`nav-link-login ${
+                activeLink === '/services' ? 'active' : ''
+              }`}
+              onClick={() => handleNavClick('/services')}
+            >
+              Services
+            </a>
           </nav>
         </div>
         <div className="nav-actions">
-          <button className="btn-signup" onClick={() => handleNavClick('/signup')}>Sign Up</button>
+          <button
+            className="btn-signup"
+            onClick={() => handleNavClick('/signup')}
+          >
+            Sign Up
+          </button>
         </div>
       </header>
 
@@ -160,6 +205,7 @@ const Login = () => {
               <img src={PersonLogo} alt="User icon" className="input-icon" />
             </div>
 
+            {/* ✅ Password input with toggle visibility */}
             <div className="input-wrapper" style={{ position: 'relative' }}>
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -169,7 +215,7 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 className="input"
                 required
-                style={{ paddingRight: 40 }}
+                style={{ paddingRight: 40 }} // space for toggle
               />
               <button
                 type="button"
@@ -190,14 +236,66 @@ const Login = () => {
                 }}
               >
                 {showPassword ? (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M3 3L21 21" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M10.58 10.58C10.2 10.95 10 11.44 10 12C10 13.66 11.34 15 13 15c.56 0 1.05-.2 1.42-.58" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M3 3L21 21"
+                      stroke="#333"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M10.58 10.58C10.2 10.95 10 11.44 10 12C10 13.66 11.34 15 13 15c.56 0 1.05-.2 1.42-.58"
+                      stroke="#333"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M14.12 14.12C15.06 13.18 15.6 12.13 15.6 12c0-2.21-1.79-4-4-4-.13 0-1.18.54-2.12 1.48"
+                      stroke="#333"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M2.5 12C3.9 7.5 7.7 4 12 4c1.39 0 2.71.26 3.95.74"
+                      stroke="#333"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 ) : (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <circle cx="12" cy="12" r="3" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"
+                      stroke="#333"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="3"
+                      stroke="#333"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 )}
               </button>
@@ -212,8 +310,12 @@ const Login = () => {
           </form>
 
           <div className="links-container">
-            <Link to="/signup" className="link">Don't have an account?</Link>
-            <Link to="/forgot-password" className="link">Forgot Password?</Link>
+            <Link to="/signup" className="link">
+              Don't have an account?
+            </Link>
+            <Link to="/forgot-password" className="link">
+              Forgot Password?
+            </Link>
           </div>
         </div>
       </main>

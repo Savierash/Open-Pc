@@ -22,13 +22,14 @@ const Signup = () => {
   const [lastName, setLastName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
+  const [gender, setGender] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPasswords, setShowPasswords] = useState(false);
   const [activeLink, setActiveLink] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
+ 
   const navigate = useNavigate();
   const location = useLocation();
   const { register: registerWithContext, setAuthToken } = useAuth() || {}; // optional helpers from context
@@ -92,8 +93,9 @@ const Signup = () => {
         username,
         firstName,
         lastName,
-        phoneNumber,
+        contactNumber,  // ✅ Add here
         email,
+        gender,
         password,
         confirmPassword,
         roleKey,
@@ -216,6 +218,24 @@ const Signup = () => {
               <img src={PersonLogo} alt="Email icon" className="input-icon" />
             </div>
 
+            <div className="input-wrapper">
+              <select
+                id="gender"
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+                className="input"
+                required
+              >
+                <option value="" disabled>Select gender</option>
+                <option value="male">male</option>
+                <option value="female">female</option>
+                <option value="other">other</option>
+              </select>
+              <img src={PersonLogo} alt="Gender icon" className="input-icon" />
+            </div>
+            
+            
+            { /* Changed password input wrapper: place toggle inside input */ }
             <div className="input-wrapper" style={{ position: 'relative' }}>
               <input
                 type={showPasswords ? 'text' : 'password'}

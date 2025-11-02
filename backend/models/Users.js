@@ -1,21 +1,21 @@
-// backend/models/Users.js
 const mongoose = require('mongoose');
 
-// Align schema with controller expectations (username + password)
 const UserSchema = new mongoose.Schema({
-  email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-  username: { type: String, required: true, trim: true },
+  email: { type: String, required: true, unique: true },
+  username: { type: String, required: true },
   password: { type: String, required: true },
-  phoneNumber: { type: String, default: null },
-  // OTP fields for forgot-password flow
-  otp: { type: String, default: null },
-  otpExpires: { type: Date, default: null },
-  role: { type: mongoose.Schema.Types.ObjectId, ref: 'Role' },
-  isVerified: { type: Boolean, default: false }, // for email verification
-  createdAt: { type: Date, default: Date.now },
-  lastLoginAt: { type: Date }
-  
-  
-});
+  role: { type: mongoose.Schema.Types.ObjectId, ref: 'Role', required: true },
 
-module.exports = mongoose.model('User', UserSchema);
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
+  gender: { type: String, enum: ['male', 'female', 'other'], default: 'other' },
+
+  contactNumber: { type: String, default: '' },
+  address: { type: String, default: '' },
+
+  techId: { type: String, unique: true, sparse: true },
+  avatar: { type: String, default: '' },
+  isVerified: { type: Boolean, default: false },
+}, { timestamps: true });
+
+module.exports = mongoose.model('User', UserSchema); // ✅ Make sure this line exists

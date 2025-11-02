@@ -106,7 +106,7 @@ const ReportsTech = () => {
     const fetchReports = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`http://localhost:5000/api/technician/reports/unit/${selectedUnit}`, config);
+        const res = await axios.get(`http://localhost:5000/api/technician/reports/unit/${selectedUnit._id}`, config);
         setReports(res.data);
         setSelectedReport(res.data[0] || null); // Auto-select first report
       } catch (err) {
@@ -138,7 +138,7 @@ const ReportsTech = () => {
         <div className="nav-actions">
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
           <span className="profile-name">
-            {profile ? `${profile.firstname || profile.username || ""} ${profile.lastname || ""}`.trim() : "Technician"}
+            {profile ? `${profile.firstName || profile.username || ""} ${profile.lastName || ""}`.trim() : "Technician"}
           </span>
           <span className="profile-role">{profile?.role?.name || "Technician"}</span>
         </div>
@@ -198,11 +198,11 @@ const ReportsTech = () => {
                   {filteredUnits.length > 0 ? (
                     filteredUnits.map((unit) => (
                       <div key={unit._id} className={`report-card ${unit._id === selectedUnit ? 'selected' : ''}`}
-                        onClick={() => setSelectedUnit(unit._id)}
+                        onClick={() => setSelectedUnit(unit)}
                         style={{ cursor: "pointer" }}
                       >
                         <span>{unit.name}</span>
-                        <span className={`status-tag ${unit.status === 'out-of-order' ? 'out-of-order' : 'functional'}`}>
+                        <span className={`status-tag ${unit.status?.toLowerCase().replace(/\s+/g, '-')}`}>
                           {unit.status}
                         </span>
                       </div>

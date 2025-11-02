@@ -1,8 +1,10 @@
+// src/pages/TechnicianProfile.jsx
+
 import React, { useState, useEffect } from "react";
 import { useAuth } from '../context/AuthContext';
 import "../styles/TechnicianProfile.css";
-import PersonCircle from "../assets/PersonCircle.png";
-import PencilSquare from "../assets/pencilsquare.png"; // Edit icon
+import PersonCircle from "../assets/PersonCircle.png"; // Fallback profile image
+import Lock from "../assets/Lock.png";
 import GearFill from "../assets/GearFill.png";
 import ComputerLogo1 from "../assets/LOGO1.png";
 import HouseLogo from "../assets/HouseFill.png";
@@ -10,42 +12,80 @@ import StackLogo from "../assets/Stack.png";
 import ClipboardLogo from "../assets/ClipboardCheck.png";
 import ToolsLogo from "../assets/tools_logo.png";
 import PcDisplayLogo from "../assets/PcDisplayHorizontal.png";
-import MenuButtonWide from "../assets/menubuttonwide.png"; // Unit Status icon
-import ClipboardX from "../assets/clipboardx.png"; // Reports icon
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import axios from "axios";
+import { useNavigate } from 'react-router-dom';
 
 const TechnicianProfile = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
-  const { user, fetchProfile, updateProfile, logout } = useAuth();
-  const [profile, setProfile] = useState(null);
+  const [user, setUser] = useState(null);
+  const [editing, setEditing] = useState({ contactNumber: '', address: '' });
+
+  const navigate = useNavigate();
+  const token = localStorage.getItem('token');
+  const apiBaseUrl = "http://localhost:5000/api";
 
   useEffect(() => {
     setActiveLink(window.location.pathname);
+    fetchUserData();
   }, []);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const res = await fetchProfile();
-        if (res && res.user) setProfile(res.user);
-      } catch (err) {
-        console.error('Failed to load profile', err);
-      }
-    };
-    load();
-  }, []);
+  const fetchUserData = async () => {
+    try {
+      const res = await axios.get(`${apiBaseUrl}/users/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUser(res.data);
+      setEditing({
+        contactNumber: res.data.contactNumber || '',
+        address: res.data.address || '',
+      });
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
 
-  const navigate = useNavigate(); // Initialize useNavigate
+  const handleUpdate = async (field, value) => {
+    setEditing(prev => ({ ...prev, [field]: value }));
+    try {
+      await axios.put(`${apiBaseUrl}/users/update`, { [field]: value }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    } catch (error) {
+      console.error("Update failed:", error);
+    }
+  };
 
-  const handleNavClick = (path) => {
-    setActiveLink(path);
-    navigate(path);
+  const handleProfileImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('profileImage', file);
+
+    try {
+      const res = await axios.post(
+        `${apiBaseUrl}/users/upload-profile-image`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      setUser(prev => ({ ...prev, avatar: res.data.imageUrl }));
+    } catch (error) {
+      console.error("Image upload failed:", error);
+    }
   };
 
   const handleLogout = () => {
-    logout();
+    localStorage.removeItem("token");
     navigate('/');
   };
+
+  if (!user) return <p>Loading profile...</p>;
+  const avatarUrl = user.avatar ? `${apiBaseUrl.replace("/api", "")}${user.avatar}` : PersonCircle;
 
   return (
     <div className="dashboard">
@@ -59,9 +99,9 @@ const TechnicianProfile = () => {
           </div>
         </div>
         <div className="nav-actions">
-          <img src={PersonCircle} alt="Profile Icon" className="profile-icon-dashboard" />
-          <span className="profile-name">Kresner Leonardo</span>
-          <span className="profile-role">Technician</span>
+          <img src={avatarUrl} alt="Profile Icon" className="profile-icon-dashboard" />
+          <span className="profile-name">{user.username || "Technician"}</span>
+          <span className="profile-role">{user?.role?.name || "Role"}</span>
         </div>
       </header>
 
@@ -69,15 +109,15 @@ const TechnicianProfile = () => {
         <aside className="sidebar">
           <ul className="sidebar-menu">
             <li>
-              <a href="/dashboard-technician" className={`sidebar-link ${activeLink === "/dashboard-technician" ? "active" : ""}`} onClick={(e) => {e.preventDefault();handleNavClick('/dashboard-technician');}}>
+              <a href="/dashboard-technician" className={`sidebar-link ${activeLink === "/dashboard-technician" ? "active" : ""}`} onClick={(e) => {e.preventDefault();navigate('/dashboard-technician');}}>
                 <img src={HouseLogo} className="menu-icon" alt="Home" />
                 <span>Dashboard</span>
               </a>
             </li>
-            <li><a href="/unit-status-technician" className={`sidebar-link ${activeLink === "/unit-status-technician" ? "active" : ""}`} onClick={(e) => {e.preventDefault();handleNavClick('/unit-status-technician');}}><img src={MenuButtonWide} className="menu-icon" alt="Unit Status" /><span>Unit Status</span></a></li>
-            <li><a href="/reports-tech" className={`sidebar-link ${activeLink === '/reports-tech' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/reports-tech');}}><img src={ClipboardX} className="menu-icon" alt="Reports Icon" /><span>Reports</span></a></li>
+            <li><a href="/unit-status-technician" className={`sidebar-link ${activeLink === "/unit-status-technician" ? "active" : ""}`} onClick={(e) => {e.preventDefault();navigate('/unit-status-technician');}}><img src={PcDisplayLogo} className="menu-icon" alt="Unit Status" /><span>Unit Status</span></a></li>
+            <li><a href="/reports-tech" className={`sidebar-link ${activeLink === '/reports-tech' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();navigate('/reports-tech');}}><img src={ClipboardLogo} className="menu-icon" alt="Reports Icon" /><span>Reports</span></a></li>
             <li>
-              <a href="/technician-profile" className={`sidebar-link ${activeLink === "/technician-profile" ? "active" : ""}`} onClick={(e) => {e.preventDefault();handleNavClick('/technician-profile');}}>
+              <a href="/technician-profile" className={`sidebar-link ${activeLink === "/technician-profile" ? "active" : ""}`} onClick={(e) => {e.preventDefault();navigate('/technician-profile');}}>
                 <img src={GearFill} className="menu-icon" alt="Account Setting" />
                 <span>Account Setting</span>
               </a>
@@ -92,69 +132,86 @@ const TechnicianProfile = () => {
 
             <div className="profile-card">
               <div className="profile-avatar">
-                <img src={PersonCircle} alt="User Avatar" />
+                <img src={avatarUrl} alt="User Avatar" />
                 <div className="user-info">
-                  <p className="user-name">{profile?.username || user?.username || '—'}</p>
-                  <p className="user-detail">{profile?.email || user?.email || '—'}</p>
+                  <p className="user-name">{user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.username}</p>
+                  <p className="user-detail">{user.gender || "Gender not set"}</p>
                 </div>
               </div>
               <div className="contact-info">
-                <p>{profile?.address || '—'}</p>
-                <p>{profile?.phoneNumber || user?.phoneNumber || '—'}</p>
+                <p>{editing.address || "—"}</p>
+                <p>{editing.contactNumber || "—"}</p>
               </div>
               <div className="profile-actions">
-                <button className="delete-button">Delete</button>
-                <button className="upload-button">Upload new picture</button>
+                <button className="delete-button" onClick={() => alert('Account deletion not yet implemented')}>Delete</button>
+                <label htmlFor="upload-input" className="upload-button">Upload new picture</label>
+                <input
+                  id="upload-input"
+                  type="file"
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  onChange={handleProfileImageUpload}
+                />
               </div>
             </div>
 
             <div className="form-section">
               <h3>Full Name</h3>
+
               <div className="form-row">
                 <div className="form-group">
-                  <label>Full name</label>
+                  <label>First Name</label>
                   <div className="input-with-icon">
-                    <input type="text" value="Kresner" readOnly />
-                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
+                    <input type="text" value={user.firstName || ''} readOnly />
+                    <img src={Lock} alt="Lock Icon" className="input-icon" />
                   </div>
                 </div>
                 <div className="form-group">
                   <label>Last Name</label>
                   <div className="input-with-icon">
-                    <input type="text" value="Leonardo" readOnly />
-                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
+                    <input type="text" value={user.lastName || ''} readOnly />
+                    <img src={Lock} alt="Lock Icon" className="input-icon" />
                   </div>
                 </div>
                 <div className="form-group">
                   <label>Tech ID</label>
                   <div className="input-with-icon">
-                    <input type="text" value="01593" readOnly />
-                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
+                    <input type="text" value={user.techId || "—"} readOnly />
+                    <img src={Lock} alt="Lock Icon" className="input-icon" />
                   </div>
                 </div>
               </div>
 
               <h3>Contact Information</h3>
+
               <div className="form-row">
                 <div className="form-group">
                   <label>Email</label>
                   <div className="input-with-icon">
-                    <input type="email" value="kresnerleonardo@gmail.com" readOnly />
-                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
+                    <input type="email" value={user.email || ''} readOnly />
+                    <img src={Lock} alt="Lock Icon" className="input-icon" />
                   </div>
                 </div>
+
                 <div className="form-group">
                   <label>Contact No.</label>
                   <div className="input-with-icon">
-                    <input type="text" value="0918453982" readOnly />
-                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
+                    <input
+                      type="text"
+                      value={editing.contactNumber}
+                      onChange={(e) => handleUpdate("contactNumber", e.target.value)}
+                    />
                   </div>
                 </div>
+
                 <div className="form-group">
                   <label>Address</label>
                   <div className="input-with-icon">
-                    <input type="text" value="Dagupan USA Chicago" readOnly />
-                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
+                    <input
+                      type="text"
+                      value={editing.address}
+                      onChange={(e) => handleUpdate("address", e.target.value)}
+                    />
                   </div>
                 </div>
               </div>
