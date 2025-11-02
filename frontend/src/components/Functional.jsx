@@ -17,11 +17,6 @@ import PersonLogo from '../assets/Person.png';
 import ToolsLogo from '../assets/tools_logo.png';
 import AccountSettingLogo from '../assets/GearFill.png'; // Account Setting icon
 
-// Recharts (donut)
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
-
-const COLORS = ['#64d6f0', '#3fb4d6', '#1f91c0', '#1976a5', '#144f73', '#0f3f55', '#2a9d8f'];
-
 const Functional = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
 
@@ -188,18 +183,6 @@ const Functional = () => {
             <span className="logo-text">OpenPC</span>
             <span className="logo-line">|</span>
           </div>
-          <nav className="nav-links-dashboard">
-            <a
-              href="/dashboard"
-              className={`nav-link-dashboard active`}
-              onClick={(e) => {
-                e.preventDefault();
-                handleNavClick('/dashboard');
-              }}
-            >
-              Dashboard
-            </a>
-          </nav>
           <span className="page-title">Functional Units</span>
         </div>
         <div className="nav-actions">

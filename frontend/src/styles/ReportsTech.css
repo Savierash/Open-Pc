@@ -227,7 +227,6 @@
   transition: all 0.2s ease;
 }
 
-/* Hide the default checkbox */
 .issues-checkbox-grid input[type="checkbox"] {
   position: absolute;
   opacity: 0;
@@ -235,7 +234,6 @@
   height: 0;
 }
 
-/* Custom checkbox */
 .issues-checkbox-grid label::before {
   content: '';
   display: inline-block;
@@ -248,12 +246,10 @@
   transition: all 0.2s ease;
 }
 
-/* Checked state */
 .issues-checkbox-grid input[type="checkbox"]:checked + label {
   color: rgba(255, 255, 255, 1);
 }
 
-/* Custom checkmark */
 .issues-checkbox-grid input[type="checkbox"]:checked + label::before {
   background-color: transparent;
   border-color: rgba(255, 255, 255, 0.4);

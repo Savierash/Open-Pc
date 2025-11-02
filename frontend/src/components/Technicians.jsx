@@ -11,11 +11,11 @@ import PcDisplayLogo from '../assets/PcDisplayHorizontal.png';
 import ClipboardLogo from '../assets/ClipboardCheck.png';
 import GearLogo from '../assets/GearFill.png';
 import OctagonLogo from '../assets/XOctagonFill.png';
-import StackLogo from '../assets/icon_6.png';
+import StackLogo from '../assets/icon_6.png'; // Inventory icon
 import ToolsLogo from '../assets/tools_logo.png';
-import CopyIcon from '../assets/copypaste.png';
-import MenuButtonWide from '../assets/menubuttonwide.png';
-import ClipboardX from '../assets/clipboardx.png';
+import CopyIcon from '../assets/copypaste.png'; // Copy icon for input fields
+import MenuButtonWide from '../assets/menubuttonwide.png'; // Unit Status icon
+import ClipboardX from '../assets/clipboardx.png'; // Reports icon
 
 const Technicians = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname || '/technicians');
@@ -164,17 +164,32 @@ const Technicians = () => {
             </li>
 
             <li>
-              <Link to="/unit-status-auditor" className={`sidebar-link ${activeLink === '/unit-status-auditor' ? 'active' : ''}`} onClick={() => setActiveLink('/unit-status-auditor')}>
+              <a 
+                href="/unit-status-auditor" 
+                className={`sidebar-link ${activeLink === '/unit-status-auditor' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/unit-status-auditor');
+                }}
+              >
                 <img src={MenuButtonWide} alt="Unit Status Icon" className="menu-icon" />
                 <span>Unit Status</span>
-              </Link>
+              </a>
             </li>
 
             <li>
-              <Link to="/reports-auditor" className={`sidebar-link ${activeLink === '/reports-auditor' ? 'active' : ''}`} onClick={() => setActiveLink('/reports-auditor')}>
+              
+              <a 
+                href="/reports-auditor" 
+                className={`sidebar-link ${activeLink === '/reports-auditor' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/reports-auditor');
+                }}
+              >
                 <img src={ClipboardX} alt="Reports Icon" className="menu-icon" />
                 <span>Reports</span>
-              </Link>
+              </a>
             </li>
 
             <li>

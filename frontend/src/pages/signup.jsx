@@ -7,6 +7,10 @@ import ComputerLogo1 from '../assets/LOGO1.png';
 import PersonLogo from '../assets/Person.png';
 import LockLogo from '../assets/Lock.png';
 import PhoneIcon from '../assets/Telephone.png';
+import WifiLogo from '../assets/wifi_logo.png';
+import ChatLogo from '../assets/chat_logo.png';
+import BroadcastLogo from '../assets/broadcast_logo.png';
+import ToolsLogo from '../assets/tools_logo.png';
 import axios from 'axios';
 
 // use shared auth context via useAuth (AuthContext handles token and api)
