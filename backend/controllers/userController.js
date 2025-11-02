@@ -1,38 +1,49 @@
+// backend/controllers/UserController.js
+
 const User = require('../models/Users');
-const Role = require('../models/role');
+const fs = require('fs');
+const path = require('path');
 
 // GET /api/users?role=technician&q=search
-exports.list = async (req, res) => {
-  try {
-    const { role: roleKey, q } = req.query;
-    let filter = {};
-    if (roleKey) {
-      // find role id for key
-      const role = await Role.findOne({ key: roleKey });
-      if (role) filter.role = role._id;
-      else return res.json([]);
-    }
-    if (q) {
-      const re = new RegExp(q, 'i');
-      filter.$or = [{ username: re }, { email: re }, { phoneNumber: re }];
-    }
+exports.list = async (req, res) => { /* ...existing code... */ };
 
-    const users = await User.find(filter).select('-password -otp -otpExpires').lean();
-    res.json(users);
+// GET /api/users/:id
+exports.get = async (req, res) => { /* ...existing code... */ };
+
+// ✅ GET /api/users/me
+exports.getMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('-password');
+    res.json(user);
   } catch (err) {
-    console.error('List users error', err);
+    console.error('Get me error', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
 
-// GET /api/users/:id
-exports.get = async (req, res) => {
+// ✅ PUT /api/users/update
+exports.updateUser = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).select('-password -otp -otpExpires').lean();
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    const updates = req.body;
+    const user = await User.findByIdAndUpdate(req.user._id, updates, { new: true }).select('-password');
     res.json(user);
   } catch (err) {
-    console.error('Get user error', err);
+    console.error('Update user error', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// ✅ POST /api/users/upload-profile-image
+exports.uploadProfileImage = async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
+
+    const imagePath = `/uploads/profilePics/${req.file.filename}`;
+    const user = await User.findByIdAndUpdate(req.user._id, { profileImage: imagePath }, { new: true });
+
+    res.json({ message: 'Image uploaded', user });
+  } catch (err) {
+    console.error('Upload profile image error', err);
     res.status(500).json({ message: 'Server error' });
   }
 };

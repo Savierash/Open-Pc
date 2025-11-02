@@ -110,9 +110,7 @@ exports.getDashboard = async (req, res) => {
 exports.getUnits = async (req, res) => {
   try {
     const labId = req.query.labId;
-    const techId = req.user?.id || req.user?._id;
     const filter = labId ? { lab: labId } : {};
-    if (techId) filter.assignedTo = techId; // 🆕 optional filtering by assigned technician
 
     const units = await Unit.find(filter).populate('lab', 'name').sort({ name: 1 });
     res.json(units);
@@ -147,10 +145,10 @@ exports.getReports = async (req, res) => {
 
 exports.getReportsByUnit = async (req, res) => {
   try {
-    const { unitId } = req.params;
+    const { unitId } = req.query; // ✅ Changed from req.params
     const reports = await Report.find({ unit: unitId })
       .populate('unit technician', 'name username status')
-      .sort({ createdAt: -1 }); // latest first
+      .sort({ createdAt: -1 });
 
     res.json(reports);
   } catch (err) {

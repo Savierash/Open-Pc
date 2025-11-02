@@ -19,15 +19,7 @@ import PcDisplayIcon from "../assets/pcdisplay.png"; // PC card icon
 const UnitStatusTechnician = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
   const [editingField, setEditingField] = useState(null);
-  const [selectedUnit, setSelectedUnit] = useState({
-    name: 'ITS300-PC-002',
-    os: 'Windows 11',
-    ram: '16GB',
-    storage: '128GB SSD',
-    cpu: 'Core i3 10th Gen',
-    lastIssued: 'September 12, 2025',
-    status: 'Maintenance',
-  });
+  const [selectedUnit, setSelectedUnit] = useState(null);
 
   const [user, setUser] = useState(null);
   const [labs, setLabs] = useState([]); // store list of labs
@@ -36,131 +28,94 @@ const UnitStatusTechnician = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [profile, setProfile] = useState(null);
-   const [statusFilter, setStatusFilter] = useState("All");
+  const [searchQ, setSearchQ] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
 
   useEffect(() => {
-  async function fetchProfile() {
-    try {
-      const res = await api.get("/technician/profile");
-      console.log("👤 Technician profile:", res.data);
-      setProfile(res.data);
-    } catch (err) {
-      console.error("❌ fetchProfile error:", err);
-    }
-  }
-  fetchProfile();
-}, []);
-
-
-
-  useEffect(() => {
-    const fetchLabsAndUnits = async () => {
+    async function fetchProfile() {
       try {
-        const token = localStorage.getItem('token');
-        const labRes = await axios.get('http://localhost:5000/api/labs', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setLabs(labRes.data);
-        if (labRes.data.length > 0) {
-          setSelectedLab(labRes.data[0]._id); // auto-select first lab
-        }
+        const res = await api.get("/technician/profile");
+        setProfile(res.data);
       } catch (err) {
-        console.error('Failed to fetch labs:', err);
-      } finally {
-        setLoading(false);
+        console.error("❌ fetchProfile error:", err);
       }
-    };
-    fetchLabsAndUnits();
+    }
+    fetchProfile();
   }, []);
 
-  // 🆕 Fetch units when selectedLab changes
-  useEffect(() => {
-    if (!selectedLab) return;
-    const fetchUnits = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const unitRes = await axios.get(`http://localhost:5000/api/units?labId=${selectedLab}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setUnits(unitRes.data);
-      } catch (err) {
-        console.error('Failed to fetch units:', err);
-      }
-    };
-    fetchUnits();
-  }, [selectedLab]);
-
-  const handleNavClick = (path) => {
-    setActiveLink(path);
-    window.location.href = path;
-  };
-
-  // load labs on mount
+  // 🧠 Fetch labs when component loads
   useEffect(() => {
     fetchLabs();
   }, []);
 
-  // when selectedLab changes, fetch units
+  // 🧠 Fetch units when a lab is selected
   useEffect(() => {
-    if (selectedLab && selectedLab._id) {
+    if (selectedLab?._id) {
       fetchUnits(selectedLab._id);
     }
   }, [selectedLab]);
 
-  // filter units by search
-  useEffect(() => {
-    if (!searchQ) return setFilteredUnits(units);
-    const q = searchQ.toLowerCase();
-    setFilteredUnits(units.filter(u => (u.name || '').toLowerCase().includes(q)));
-  }, [searchQ, units]);
-
-  // ---------- API calls ----------
+  // ✅ Fetch labs
   const fetchLabs = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API_BASE}/labs`);
+      const res = await api.get("/labs");
       setLabs(res.data || []);
       if (res.data && res.data.length > 0) {
-        // pick ITS 300 if present, otherwise first
-        const prefer = res.data.find(l => l.name && l.name.toLowerCase().includes('its 300')) || res.data[0];
+        // Set the full lab object, not just id
+        const prefer = res.data.find(l => l.name?.toLowerCase().includes("its 300")) || res.data[0];
         setSelectedLab(prefer);
       }
     } catch (err) {
-      console.error('fetchLabs error', err);
-      window.alert('Failed to load labs — check backend. See console.');
+      console.error("fetchLabs error", err);
+      window.alert("Failed to load labs — check backend. See console.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSelectUnit = (unit) => {
-    setSelectedUnit(unit);
+  // ✅ Fetch units for a specific lab
+  const fetchUnits = async (labId) => {
+    setLoading(true);
+    try {
+      const res = await api.get(`/units?labId=${labId}`);
+      setUnits(res.data || []);
+    } catch (err) {
+      console.error("fetchUnits error", err);
+      window.alert("Failed to load units — check backend. See console.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // 🆕 Filter units based on chosen status
-  const filteredUnits = units.filter((unit) => {
-    if (statusFilter === "All") return true;
-    return unit.status.toLowerCase() === statusFilter.toLowerCase();
-  });
+  const handleUnitDetailChange = (field, value) => {
+    setSelectedUnit(prev => ({ ...prev, [field]: value }));
+  };
 
-  // 🆕 Handle status or info save
   const handleSave = async () => {
     if (!selectedUnit?._id) return;
     try {
       setSaving(true);
-      const token = localStorage.getItem("token");
-      await axios.put(
-        `http://localhost:5000/api/unit/${selectedUnit._id}`,
-        selectedUnit,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await api.put(`/unit/${selectedUnit._id}`, selectedUnit);
       alert("✅ Unit updated successfully!");
+      fetchUnits(selectedLab._id); // refresh
     } catch (err) {
       console.error("Failed to save unit:", err);
       alert("❌ Error saving changes");
     } finally {
       setSaving(false);
     }
+  };
+
+  const filteredUnits = units.filter((unit) => {
+    const matchesStatus = statusFilter === "All" || unit.status?.toLowerCase() === statusFilter.toLowerCase();
+    const matchesSearch = unit.name?.toLowerCase().includes(searchQ.toLowerCase());
+    return matchesStatus && matchesSearch;
+  });
+
+  const handleNavClick = (path) => {
+    setActiveLink(path);
+    window.location.href = path;
   };
 
   return (
@@ -177,7 +132,6 @@ const UnitStatusTechnician = () => {
         <div className="nav-actions">
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
           <span className="profile-name">
-            {/* To get the users acc to integrate with interface with Async profile in line 37*/}
             {profile ? `${profile.firstName || profile.username || ""} ${profile.lastName || ""}`.trim() : "Technician"}
           </span>
           <span className="profile-role">{profile?.role?.name || "Technician"}</span>
@@ -197,7 +151,6 @@ const UnitStatusTechnician = () => {
         <main className="main-content unit-status-main-content">
           <div className="unit-status-page-content">
 
-            
             {/* Left Container: Lab List */}
             <div className="unit-status-lab-panel">
               <h2 className="panel-title">Lab</h2>
@@ -205,8 +158,8 @@ const UnitStatusTechnician = () => {
                 {labs.map((lab) => (
                   <div 
                     key={lab._id}
-                    className={`lab-card-new ${selectedLab === lab._id ? 'active' : ''}`}
-                    onClick={() => setSelectedLab(lab._id)}
+                    className={`lab-card-new ${selectedLab?._id === lab._id ? 'active' : ''}`}
+                    onClick={() => setSelectedLab(lab)}
                   >
                     {lab.name}
                   </div>
@@ -215,10 +168,11 @@ const UnitStatusTechnician = () => {
               </div>
             </div>
 
-            {/* Middle: units */}
+            {/* Middle: Units */}
             <div className="unit-status-middle-panel">
               <div className="middle-panel-header">
-                <h2 className="panel-title">{labs.find(l => l._id === selectedLab)?.name || 'Select Lab'}
+                <h2 className="panel-title">
+                  {selectedLab ? selectedLab.name : 'Select Lab'}
                 </h2>
                 <div className="status-filters">
                   <button className="status-button functional-button" onClick={() => setStatusFilter("functional")}>Functional</button>
@@ -235,134 +189,138 @@ const UnitStatusTechnician = () => {
               </div>
 
               <div className="unit-cards-grid">
-                <div className="pc-card">
-                  <img src={PcDisplayIcon} alt="PC Icon" className="pc-card-icon" />
-                  <span>ITS300-PC-002</span>
-                  <div className="status-indicator">
-                    <span>Out Of Order</span>
-                    <span className="status-dot out-of-order"></span>
+                {filteredUnits.map((unit) => (
+                  <div 
+                    key={unit._id} 
+                    className="pc-card" 
+                    onClick={() => setSelectedUnit(unit)}
+                  >
+                    <img src={PcDisplayIcon} alt="PC Icon" className="pc-card-icon" />
+                    <span>{unit.name}</span>
+                    <div className="status-indicator">
+                      <span>{unit.status}</span>
+                      <span className={`status-dot ${unit.status.toLowerCase()}`}></span>
+                    </div>
                   </div>
-                </div>
-                <div className="pc-card">
-                  <img src={PcDisplayIcon} alt="PC Icon" className="pc-card-icon" />
-                  <span>ITS300-PC-010</span>
-                  <div className="status-indicator">
-                    <span>Out Of Order</span>
-                    <span className="status-dot out-of-order"></span>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
 
-            {/* Right: info panel */}
+            {/* Right: Info Panel */}
             <div className="unit-status-info-panel">
               <h2 className="panel-title">INFORMATION</h2>
-              <div className="info-item">
-                <input 
-                  type="text" 
-                  value={selectedUnit.name}
-                  onChange={(e) => handleUnitDetailChange('name', e.target.value)}
-                  className={`info-input ${editingField === 'name' ? 'editable' : ''}`}
-                  readOnly={editingField !== 'name'}
-                />
-                <img 
-                  src={ClipboardLogo} 
-                  alt="Edit Icon" 
-                  className="edit-icon" 
-                  onClick={() => setEditingField(editingField === 'name' ? null : 'name')}
-                />
-              </div>
-              <div className="info-item">
-                <input 
-                  type="text" 
-                  value={selectedUnit.os}
-                  onChange={(e) => handleUnitDetailChange('os', e.target.value)}
-                  className={`info-input ${editingField === 'os' ? 'editable' : ''}`}
-                  readOnly={editingField !== 'os'}
-                />
-                <img 
-                  src={ClipboardLogo} 
-                  alt="Edit Icon" 
-                  className="edit-icon" 
-                  onClick={() => setEditingField(editingField === 'os' ? null : 'os')}
-                />
-              </div>
-              <div className="info-item">
-                <input 
-                  type="text" 
-                  value={selectedUnit.ram}
-                  onChange={(e) => handleUnitDetailChange('ram', e.target.value)}
-                  className={`info-input ${editingField === 'ram' ? 'editable' : ''}`}
-                  readOnly={editingField !== 'ram'}
-                />
-                <img 
-                  src={ClipboardLogo} 
-                  alt="Edit Icon" 
-                  className="edit-icon" 
-                  onClick={() => setEditingField(editingField === 'ram' ? null : 'ram')}
-                />
-              </div>
-              <div className="info-item">
-                <input 
-                  type="text" 
-                  value={selectedUnit.storage}
-                  onChange={(e) => handleUnitDetailChange('storage', e.target.value)}
-                  className={`info-input ${editingField === 'storage' ? 'editable' : ''}`}
-                  readOnly={editingField !== 'storage'}
-                />
-                <img 
-                  src={ClipboardLogo} 
-                  alt="Edit Icon" 
-                  className="edit-icon" 
-                  onClick={() => setEditingField(editingField === 'storage' ? null : 'storage')}
-                />
-              </div>
-              <div className="info-item">
-                <input 
-                  type="text" 
-                  value={selectedUnit.cpu}
-                  onChange={(e) => handleUnitDetailChange('cpu', e.target.value)}
-                  className={`info-input ${editingField === 'cpu' ? 'editable' : ''}`}
-                  readOnly={editingField !== 'cpu'}
-                />
-                <img 
-                  src={ClipboardLogo} 
-                  alt="Edit Icon" 
-                  className="edit-icon" 
-                  onClick={() => setEditingField(editingField === 'cpu' ? null : 'cpu')}
-                />
-              </div>
-              <div className="info-item">
-                <input 
-                  type="text" 
-                  value={selectedUnit.lastIssued}
-                  onChange={(e) => handleUnitDetailChange('lastIssued', e.target.value)}
-                  className={`info-input ${editingField === 'lastIssued' ? 'editable' : ''}`}
-                  readOnly={editingField !== 'lastIssued'}
-                />
-                <img 
-                  src={ClipboardLogo} 
-                  alt="Edit Icon" 
-                  className="edit-icon" 
-                  onClick={() => setEditingField(editingField === 'lastIssued' ? null : 'lastIssued')}
-                />
-              </div>
-              
-              <div className="set-status-section">
-                <span>SET STATUS:</span>
-                <select 
-                  className="status-dropdown"
-                  value={selectedUnit.status}
-                  onChange={(e) => handleUnitDetailChange('status', e.target.value)}
-                >
-                  <option>Maintenance</option>
-                  <option>Functional</option>
-                  <option>Out Of Order</option>
-                </select>
-              </div>
-              <button className="save-button"onClick={handleSave} disabled={saving}>
-                {saving ? "Saving..." : "Save"}
-                </button>
+              {selectedUnit ? (
+                <>
+                  <div className="info-item">
+                    <input 
+                      type="text" 
+                      value={selectedUnit.name || ""}
+                      onChange={(e) => handleUnitDetailChange('name', e.target.value)}
+                      className={`info-input ${editingField === 'name' ? 'editable' : ''}`}
+                      readOnly={editingField !== 'name'}
+                    />
+                    <img 
+                      src={ClipboardLogo} 
+                      alt="Edit Icon" 
+                      className="edit-icon" 
+                      onClick={() => setEditingField(editingField === 'name' ? null : 'name')}
+                    />
+                  </div>
+                  <div className="info-item">
+                    <input 
+                      type="text" 
+                      value={selectedUnit.os || ""}
+                      onChange={(e) => handleUnitDetailChange('os', e.target.value)}
+                      className={`info-input ${editingField === 'os' ? 'editable' : ''}`}
+                      readOnly={editingField !== 'os'}
+                    />
+                    <img 
+                      src={ClipboardLogo} 
+                      alt="Edit Icon" 
+                      className="edit-icon" 
+                      onClick={() => setEditingField(editingField === 'os' ? null : 'os')}
+                    />
+                  </div>
+                  <div className="info-item">
+                    <input 
+                      type="text" 
+                      value={selectedUnit.ram || ""}
+                      onChange={(e) => handleUnitDetailChange('ram', e.target.value)}
+                      className={`info-input ${editingField === 'ram' ? 'editable' : ''}`}
+                      readOnly={editingField !== 'ram'}
+                    />
+                    <img 
+                      src={ClipboardLogo} 
+                      alt="Edit Icon" 
+                      className="edit-icon" 
+                      onClick={() => setEditingField(editingField === 'ram' ? null : 'ram')}
+                    />
+                  </div>
+                  <div className="info-item">
+                    <input 
+                      type="text" 
+                      value={selectedUnit.storage || ""}
+                      onChange={(e) => handleUnitDetailChange('storage', e.target.value)}
+                      className={`info-input ${editingField === 'storage' ? 'editable' : ''}`}
+                      readOnly={editingField !== 'storage'}
+                    />
+                    <img 
+                      src={ClipboardLogo} 
+                      alt="Edit Icon" 
+                      className="edit-icon" 
+                      onClick={() => setEditingField(editingField === 'storage' ? null : 'storage')}
+                    />
+                  </div>
+                  <div className="info-item">
+                    <input 
+                      type="text" 
+                      value={selectedUnit.cpu || ""}
+                      onChange={(e) => handleUnitDetailChange('cpu', e.target.value)}
+                      className={`info-input ${editingField === 'cpu' ? 'editable' : ''}`}
+                      readOnly={editingField !== 'cpu'}
+                    />
+                    <img 
+                      src={ClipboardLogo} 
+                      alt="Edit Icon" 
+                      className="edit-icon" 
+                      onClick={() => setEditingField(editingField === 'cpu' ? null : 'cpu')}
+                    />
+                  </div>
+                  <div className="info-item">
+                    <input 
+                      type="text" 
+                      value={selectedUnit.lastIssued || ""}
+                      onChange={(e) => handleUnitDetailChange('lastIssued', e.target.value)}
+                      className={`info-input ${editingField === 'lastIssued' ? 'editable' : ''}`}
+                      readOnly={editingField !== 'lastIssued'}
+                    />
+                    <img 
+                      src={ClipboardLogo} 
+                      alt="Edit Icon" 
+                      className="edit-icon" 
+                      onClick={() => setEditingField(editingField === 'lastIssued' ? null : 'lastIssued')}
+                    />
+                  </div>
+                  
+                  <div className="set-status-section">
+                    <span>SET STATUS:</span>
+                    <select 
+                      className="status-dropdown"
+                      value={selectedUnit.status || "Functional"}
+                      onChange={(e) => handleUnitDetailChange('status', e.target.value)}
+                    >
+                      <option>Maintenance</option>
+                      <option>Functional</option>
+                      <option>Out Of Order</option>
+                    </select>
+                  </div>
+                  <button className="save-button"onClick={handleSave} disabled={saving}>
+                    {saving ? "Saving..." : "Save"}
+                    </button>
+                </>
+              ) : (
+                <p className="placeholder-text">Select a unit to view details</p>
+              )}
             </div>
           </div>
         </main>

@@ -14,6 +14,7 @@ import ClipboardX from "../assets/clipboardx.png"; // Reports icon
 import OctagonLogo from "../assets/XOctagonFill.png";
 import StackLogo from "../assets/Stack.png";
 import PersonLogo from "../assets/Person.png";
+import ToolsLogo from "../assets/tools_logo.png";
 
 // 📊 Recharts for System Status visualization
 import {

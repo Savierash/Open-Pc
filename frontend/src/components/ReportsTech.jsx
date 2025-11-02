@@ -34,13 +34,6 @@ const ReportsTech = () => {
   const token = localStorage.getItem("token"); // ✅ Added for auth
   const config = { headers: { Authorization: `Bearer ${token}` } }; // ✅ Axios config
 
-  // ✅ Capture active link on render
-  useEffect(() => {
-    setActiveLink(window.location.pathname);
-    fetchLabs();
-    // eslint-disable-next-line
-  }, []);
-
   // ✅ Fetch technician profile for dynamic name
   useEffect(() => {
     async function fetchProfile() {
@@ -106,7 +99,7 @@ const ReportsTech = () => {
     const fetchReports = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`http://localhost:5000/api/technician/reports/unit/${selectedUnit._id}`, config);
+        const res = await axios.get(`http://localhost:5000/api/technician/reports/unit/${selectedUnit}`, config);
         setReports(res.data);
         setSelectedReport(res.data[0] || null); // Auto-select first report
       } catch (err) {
@@ -161,7 +154,7 @@ const ReportsTech = () => {
 
             {/* ✅ Lab Panel */}
             <div className="reports-tech-lab-panel">
-              <button className="add-lab-button-reports" onClick={createLab}>ADD LAB</button>
+              <button className="add-lab-button-reports">ADD LAB</button>
               <div className="lab-list-container-reports">
                 {labs.map((lab) => (
                   <div key={lab._id} className={`lab-card-reports ${lab._id === selectedLab ? 'active' : ''}`}
@@ -198,7 +191,7 @@ const ReportsTech = () => {
                   {filteredUnits.length > 0 ? (
                     filteredUnits.map((unit) => (
                       <div key={unit._id} className={`report-card ${unit._id === selectedUnit ? 'selected' : ''}`}
-                        onClick={() => setSelectedUnit(unit)}
+                        onClick={() => setSelectedUnit(unit._id)}
                         style={{ cursor: "pointer" }}
                       >
                         <span>{unit.name}</span>

@@ -1,4 +1,5 @@
 // src/pages/TechnicianProfile.jsx
+import { PencilSquare } from "react-bootstrap-icons";
 
 import React, { useState, useEffect } from "react";
 import { useAuth } from '../context/AuthContext';
