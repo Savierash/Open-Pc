@@ -120,7 +120,6 @@ const Dashboard = () => {
         { date: "Sept 13", value: 55 },
         { date: "Sept 14", value: 75 },
       ];
-      // if your backend provides trend data use it; for now use mock
       setTrend(trendMock.map(t => ({ date: t.date, value: Number(t.value) || 0 })));
     } catch (err) {
       console.error("fetchDashboard error:", err);
@@ -130,16 +129,26 @@ const Dashboard = () => {
     }
   }
 
-  // improved StatusChart for dark background
+  // improved StatusChart for dark background & reliable height
   const StatusChart = ({ dataPoints = [] }) => {
     const data = (Array.isArray(dataPoints) ? dataPoints : []).map(d => ({
       date: d.date || '',
       value: typeof d.value === 'number' ? d.value : Number(d.value) || 0
     }));
 
+    if (!data.length) {
+      // Render a small placeholder so container still occupies space
+      return (
+        <div style={{ width: '100%', height: 220, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9aa7b2' }}>
+          <div>No trend data available</div>
+        </div>
+      );
+    }
+
     const values = data.map(d => d.value);
     const maxVal = values.length ? Math.max(...values) : 100;
     const minVal = values.length ? Math.min(...values) : 0;
+    // small padding so line isn't flush to edges
     const pad = Math.max(5, Math.round((maxVal - minVal) * 0.12));
     const domainTop = Math.max(100, maxVal + pad);
     const domainBottom = Math.max(0, minVal - pad);
@@ -172,7 +181,7 @@ const Dashboard = () => {
               dataKey="date"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 12 }}
+              tick={{ fill: 'rgba(255,255,255,0.75)', fontSize: 12 }}
               interval="preserveStartEnd"
               padding={{ left: 6, right: 6 }}
             />
@@ -180,7 +189,7 @@ const Dashboard = () => {
               domain={[domainBottom, domainTop]}
               axisLine={false}
               tickLine={false}
-              tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
+              tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 12 }}
             />
             <Tooltip content={<CustomTooltipSmall />} cursor={{ stroke: 'rgba(255,255,255,0.06)', strokeWidth: 1 }} />
             <Line
@@ -226,9 +235,9 @@ const Dashboard = () => {
           <ul className="sidebar-menu">
             <li><a href="/dashboard" className={`sidebar-link ${activeLink === "/dashboard" ? "active" : ""}`}><img src={HouseLogo} className="menu-icon" alt="Home" /><span>Dashboard</span></a></li>
             <li><a href="/inventory" className={`sidebar-link ${activeLink === "/inventory" ? "active" : ""}`}><img src={StackLogo} className="menu-icon" alt="Inventory" /><span>Inventory</span></a></li>
-            <li><a href="/reports-auditor" className={`sidebar-link ${activeLink === '/reports-auditor' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/reports-auditor');}}><img src={ClipboardLogo} alt="Reports Icon" className="menu-icon" /><span>Reports</span></a></li>
-            <li><a href="/technicians" className={`sidebar-link ${activeLink === '/technicians' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/technicians');}}><img src={ToolsLogo} alt="Technicians Icon" className="menu-icon" /><span>Technicians</span></a></li>
-            <li><a href="/auditor-profile" className={`sidebar-link ${activeLink === '/auditor-profile' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/auditor-profile');}}><img src={AccountSettingLogo} alt="Account Setting Icon" className="menu-icon" /><span>Account Setting</span></a></li>
+            <li><a href="/reports-auditor" className={`sidebar-link ${activeLink === '/reports-auditor' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/reports-auditor'); }}><img src={ClipboardLogo} alt="Reports Icon" className="menu-icon" /><span>Reports</span></a></li>
+            <li><a href="/technicians" className={`sidebar-link ${activeLink === '/technicians' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/technicians'); }}><img src={ToolsLogo} alt="Technicians Icon" className="menu-icon" /><span>Technicians</span></a></li>
+            <li><a href="/auditor-profile" className={`sidebar-link ${activeLink === '/auditor-profile' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/auditor-profile'); }}><img src={AccountSettingLogo} alt="Account Setting Icon" className="menu-icon" /><span>Account Setting</span></a></li>
           </ul>
         </aside>
 
