@@ -1,22 +1,19 @@
 // src/pages/DashboardAdmin.jsx
 import React, { useState, useEffect } from "react";
-import api from '../services/api';
+import api from "../services/api";
 import "../styles/DashboardAdmin.css";
 import ComputerLogo1 from "../assets/LOGO1.png";
 import HouseLogo from "../assets/HouseFill.png";
-import GraphLogo from "../assets/GraphUp.png";
 import PcDisplayLogo from "../assets/PcDisplayHorizontal.png";
 import ClipboardLogo from "../assets/ClipboardCheck.png";
 import GearLogo from "../assets/GearFill.png";
-import OctagonLogo from "../assets/XOctagonFill.png";
 import StackLogo from "../assets/Stack.png";
 import PersonLogo from "../assets/Person.png";
 import ToolsLogo from "../assets/tools_logo.png";
-import AccountSettingLogo from "../assets/GearFill.png"; // Re-using GearFill for Account Setting
 import HeadsetPurple from "../assets/headsetpurple.png";
 import PersonCheckFill from "../assets/personcheckfill.png";
 import PersonRed from "../assets/Personred.png";
-import EnvelopeCheck from "../assets/envelopecheck.png"; // Tech Requests icon
+import EnvelopeCheck from "../assets/envelopecheck.png";
 import AdminTechnicians from "../components/AdminTechnicians";
 import AdminTechRequests from "../components/AdminTechRequests";
 import {
@@ -32,6 +29,7 @@ import {
 const DashboardAdmin = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
   const [loading, setLoading] = useState(false);
+  const [animatedKey, setAnimatedKey] = useState(0); // ✅ trigger chart animation refresh
   const [data, setData] = useState({
     totalUnits: 0,
     counts: { functional: 0, maintenance: 0, outOfOrder: 0 },
@@ -47,14 +45,15 @@ const DashboardAdmin = () => {
   useEffect(() => {
     setActiveLink(window.location.pathname);
     fetchDashboard();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function fetchDashboard() {
     setLoading(true);
     try {
-      const res = await api.get('/dashboard');
+      const res = await api.get("/dashboard");
       setData(res.data || data);
+      // ✅ Re-trigger chart animation on data refresh
+      setAnimatedKey((prev) => prev + 1);
     } catch (err) {
       console.error("fetchDashboard error:", err?.response ?? err);
       alert("Failed to load dashboard data. See console.");
@@ -63,82 +62,79 @@ const DashboardAdmin = () => {
     }
   }
 
-  const { totalUnits, counts, percentFunctional, perLab, recentUnits, trend, accounts, accepted, rejected } = data;
+  const {
+    totalUnits,
+    counts,
+    percentFunctional,
+    recentUnits,
+    trend,
+    accounts,
+    accepted,
+    rejected,
+  } = data;
 
-  // fallback trend data
-  const mockTrend = [
-    { date: "Mon", value: 60 },
-    { date: "Tue", value: 70 },
-    { date: "Wed", value: 75 },
-    { date: "Thu", value: 80 },
-    { date: "Fri", value: 78 },
-    { date: "Sat", value: 82 },
-    { date: "Sun", value: 85 },
-  ];
+  const chartData =
+    Array.isArray(trend) && trend.length > 0
+      ? trend.map((d) => ({
+          date: String(d.date ?? ""),
+          value: Number(d.value ?? 0),
+        }))
+      : [
+          { date: "Mon", value: 60 },
+          { date: "Tue", value: 70 },
+          { date: "Wed", value: 75 },
+          { date: "Thu", value: 80 },
+          { date: "Fri", value: 78 },
+          { date: "Sat", value: 82 },
+          { date: "Sun", value: 85 },
+        ];
 
-  // normalize incoming trend (ensure numeric values and string dates)
-  const chartData = (trend && Array.isArray(trend) && trend.length ? trend : mockTrend)
-    .map(d => ({
-      date: d.date === undefined ? (d.day || '') : String(d.date),
-      value: Number(d.value ?? d.y ?? 0)
-    }));
-
-  // StatusChart: robust domain handling + guaranteed height
-  const StatusChart = ({ dataPoints = chartData }) => {
+  // ✅ Same animated StatusChart used by Technician & Auditor
+  const StatusChart = ({ dataPoints = [] }) => {
     const dataToUse = Array.isArray(dataPoints) ? dataPoints : [];
 
-    if (dataToUse.length === 0) {
+    if (!dataToUse.length) {
       return (
-        <div style={{ width: '100%', height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9aa7b2' }}>
+        <div
+          style={{
+            width: "100%",
+            height: 200,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#9aa7b2",
+          }}
+        >
           No trend data available
         </div>
       );
     }
 
-    // ensure numbers and compute domain padding
-    const values = dataToUse.map(d => Number(d.value) || 0);
-    const maxVal = values.length ? Math.max(...values) : 100;
-    const minVal = values.length ? Math.min(...values) : 0;
-    const pad = Math.max(5, Math.round((maxVal - minVal) * 0.12));
-    const domainTop = Math.max(10, maxVal + pad);
-    const domainBottom = Math.max(0, minVal - pad);
-
-    const CustomTooltipSmall = ({ active, payload }) => {
-      if (!active || !payload || !payload.length) return null;
-      const p = payload[0];
-      return (
-        <div style={{
-          background: 'rgba(8,12,16,0.95)',
-          color: '#fff',
-          padding: 8,
-          borderRadius: 6,
-          boxShadow: '0 6px 18px rgba(0,0,0,0.4)',
-          fontSize: 12,
-          minWidth: 90,
-        }}>
-          <div style={{ fontWeight: 700 }}>{p.payload.date}</div>
-          <div style={{ opacity: 0.9 }}>{p.value}</div>
-        </div>
-      );
-    };
-
     return (
-      // give the wrapper an explicit height so ResponsiveContainer can calculate
-      <div style={{ width: '100%', height: 200, minHeight: 200 }}>
+      <div style={{ width: "100%", height: 200 }}>
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={dataToUse} margin={{ top: 6, right: 12, left: -8, bottom: 6 }}>
+          <LineChart key={animatedKey} data={dataToUse}>
             <CartesianGrid stroke="#1b2630" strokeDasharray="3 3" vertical={false} />
-            <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: '#a5b3c2', fontSize: 12 }} />
-            <YAxis domain={[domainBottom, domainTop]} axisLine={false} tickLine={false} tick={{ fill: '#a5b3c2', fontSize: 12 }} />
-            <Tooltip content={<CustomTooltipSmall />} cursor={{ stroke: 'rgba(255,255,255,0.06)', strokeWidth: 1 }} />
+            <XAxis dataKey="date" tick={{ fill: "#a5b3c2", fontSize: 12 }} />
+            <YAxis domain={[0, 100]} tick={{ fill: "#a5b3c2", fontSize: 12 }} />
+            <Tooltip
+              contentStyle={{
+                background: "#071019",
+                border: "none",
+                color: "#fff",
+              }}
+              formatter={(v) => `${v}% Functional`}
+            />
             <Line
               type="monotone"
               dataKey="value"
               stroke="#38bdf8"
               strokeWidth={3}
-              dot={{ r: 4, fill: '#38bdf8' }}
+              dot={{ r: 4, fill: "#38bdf8" }}
               activeDot={{ r: 6 }}
-              strokeLinecap="round"
+              isAnimationActive={true}
+              animationDuration={1000}
+              animationEasing="ease-in-out"
             />
           </LineChart>
         </ResponsiveContainer>
@@ -164,39 +160,83 @@ const DashboardAdmin = () => {
         </div>
         <div className="nav-actions">
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
-          <span className="profile-name">{localStorage.getItem('username') || 'User'}</span>
-          <span className="profile-role">{localStorage.getItem('userRole') || 'Role'}</span>
+          <span className="profile-name">
+            {localStorage.getItem("username") || "Admin"}
+          </span>
+          <span className="profile-role">
+            {localStorage.getItem("userRole") || "Administrator"}
+          </span>
         </div>
       </header>
 
       <div className="main-layout three-column">
-        {/* LEFT sidebar */}
+        {/* Sidebar */}
         <aside className="sidebar">
           <ul className="sidebar-menu">
             <li>
-              <a href="/dashboard-admin" className={`sidebar-link ${activeLink === "/dashboard-admin" ? "active" : ""}`} onClick={(e) => { e.preventDefault(); handleNavClick('/dashboard-admin'); }}>
-                <img src={HouseLogo} className="menu-icon" alt="Home" /><span>Dashboard</span>
+              <a
+                href="/dashboard-admin"
+                className={`sidebar-link ${
+                  activeLink === "/dashboard-admin" ? "active" : ""
+                }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick("/dashboard-admin");
+                }}
+              >
+                <img src={HouseLogo} className="menu-icon" alt="Home" />
+                <span>Dashboard</span>
               </a>
             </li>
             <li>
-              <a href="/admin-technicians" className={`sidebar-link ${activeLink === "/admin-technicians" ? "active" : ""}`} onClick={(e) => { e.preventDefault(); handleNavClick('/admin-technicians'); }}>
-                <img src={ToolsLogo} className="menu-icon" alt="Technicians" /><span>Technicians</span>
+              <a
+                href="/admin-technicians"
+                className={`sidebar-link ${
+                  activeLink === "/admin-technicians" ? "active" : ""
+                }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick("/admin-technicians");
+                }}
+              >
+                <img src={ToolsLogo} className="menu-icon" alt="Technicians" />
+                <span>Technicians</span>
               </a>
             </li>
             <li>
-              <a href="/admin-profile" className={`sidebar-link ${activeLink === "/admin-profile" ? "active" : ""}`} onClick={(e) => { e.preventDefault(); handleNavClick('/admin-profile'); }}>
-                <img src={GearLogo} className="menu-icon" alt="Account Setting" /><span>Account Setting</span>
+              <a
+                href="/admin-profile"
+                className={`sidebar-link ${
+                  activeLink === "/admin-profile" ? "active" : ""
+                }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick("/admin-profile");
+                }}
+              >
+                <img src={GearLogo} className="menu-icon" alt="Account Setting" />
+                <span>Account Setting</span>
               </a>
             </li>
             <li>
-              <a href="/admin-tech-requests" className={`sidebar-link ${activeLink === "/admin-tech-requests" ? "active" : ""}`} onClick={(e) => { e.preventDefault(); handleNavClick('/admin-tech-requests'); }}>
-                <img src={EnvelopeCheck} className="menu-icon" alt="Tech Requests" /><span>Tech Requests</span>
+              <a
+                href="/admin-tech-requests"
+                className={`sidebar-link ${
+                  activeLink === "/admin-tech-requests" ? "active" : ""
+                }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick("/admin-tech-requests");
+                }}
+              >
+                <img src={EnvelopeCheck} className="menu-icon" alt="Tech Requests" />
+                <span>Tech Requests</span>
               </a>
             </li>
           </ul>
         </aside>
 
-        {/* MAIN content */}
+        {/* Main Content */}
         <main className="main-content">
           {activeLink === "/admin-technicians" ? (
             <AdminTechnicians />
@@ -205,7 +245,7 @@ const DashboardAdmin = () => {
           ) : (
             <div className="dashboard-main-content">
               <div className="dashboard-cards">
-                <div className="card accounts clickable-card" onClick={() => handleNavClick('/accounts')}>
+                <div className="card accounts clickable-card">
                   <img src={HeadsetPurple} alt="Accounts Icon" className="card-icon" />
                   <div className="card-content">
                     <h3>Accounts</h3>
@@ -213,7 +253,7 @@ const DashboardAdmin = () => {
                   </div>
                 </div>
 
-                <div className="card accepted clickable-card" onClick={() => handleNavClick('/accepted')}>
+                <div className="card accepted clickable-card">
                   <img src={PersonCheckFill} alt="Accepted Icon" className="card-icon" />
                   <div className="card-content">
                     <h3>Accepted</h3>
@@ -221,7 +261,7 @@ const DashboardAdmin = () => {
                   </div>
                 </div>
 
-                <div className="card rejected clickable-card" onClick={() => handleNavClick('/rejected')}>
+                <div className="card rejected clickable-card">
                   <img src={PersonRed} alt="Rejected Icon" className="card-icon" />
                   <div className="card-content">
                     <h3>Rejected</h3>
@@ -254,20 +294,21 @@ const DashboardAdmin = () => {
                   </ul>
                 </div>
 
-                {/* 🧠 System Status WITH Chart */}
+                {/* ✅ System Status Chart */}
                 <div className="system-status-card card" style={{ flex: "0 0 35%" }}>
                   <h3>System Status</h3>
-                  <p>Database: <strong>Connected</strong></p>
-                  <p>API: <strong>{loading ? "Loading..." : "OK"}</strong></p>
-
-                  <div style={{ marginTop: 12, background: "transparent" }}>
+                  <p>
+                    Database: <strong>Connected</strong>
+                  </p>
+                  <p>
+                    API: <strong>{loading ? "Loading..." : "OK"}</strong>
+                  </p>
+                  <div style={{ marginTop: 12 }}>
                     <StatusChart dataPoints={chartData} />
                   </div>
-
                   <div style={{ marginTop: 12, textAlign: "center", color: "#ccc" }}>
                     <strong>{percentFunctional}%</strong> functional
                   </div>
-
                   <div style={{ marginTop: 8, textAlign: "center" }}>
                     <button onClick={fetchDashboard} className="btn small">
                       Refresh

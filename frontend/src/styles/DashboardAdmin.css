@@ -1366,4 +1366,26 @@
   padding: 0 20px;
   overflow: hidden;
 }
+.system-status-card {
+  flex: 0 0 35%;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.system-status-card > div {
+  flex-grow: 1;
+  min-height: 200px;
+}
+
+/* Optional: improve spacing & alignment */
+.system-status-card h3 {
+  margin-bottom: 10px;
+}
+
+.system-status-card .btn.small {
+  margin-top: 10px;
+  align-self: center;
+}
 
