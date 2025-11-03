@@ -146,7 +146,7 @@
 }
 
 .status-tag-auditor {
-  background-color: #dc3545;
+  background-color: rgba(255, 255, 255, 0.1);
   color: white;
   padding: 5px 10px;
   border-radius: 15px;

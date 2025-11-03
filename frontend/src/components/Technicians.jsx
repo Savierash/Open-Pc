@@ -25,104 +25,32 @@ const Technicians = () => {
   const [selectedTech, setSelectedTech] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     setActiveLink(window.location.pathname || '/technicians');
   }, []);
 
   useEffect(() => {
-  if (!authLoading && user) {
-    loadTechnicians();
-  } else if (!authLoading && !user) {
-    navigate('/login');
-  }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [user, authLoading]);
-
-  async function tryFetch(url, opts = {}) {
-    try {
-      const res = await api.get(url, opts);
-      if (res && res.data) return res.data;
-    } catch (err) {
-      // return null so caller will try next option
-      return null;
+    if (!authLoading && user) {
+      loadTechnicians();
+    } else if (!authLoading && !user) {
+      navigate('/login');
     }
-    return null;
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading]);
 
   async function loadTechnicians() {
     setLoading(true);
     setError('');
     try {
-      // Try a variety of likely endpoint shapes. The first that returns data wins.
-      // Order: query param, nested role path, dedicated technicians endpoint, plural users path
-      const candidates = [
-        { url: '/users', opts: { params: { role: 'technician' } } }, // /users?role=technician
-        { url: '/users/role/technician' },                            // /users/role/technician
-        { url: '/technicians' },                                      // /technicians
-        { url: '/users/technicians' },                                // /users/technicians
-        { url: '/users', opts: { params: { role: 'tech' } } },        // /users?role=tech (alternate)
-      ];
-
-      let data = null;
-      for (const c of candidates) {
-        try {
-          const res = await api.get(c.url, c.opts);
-          if (res && Array.isArray(res.data) && res.data.length >= 0) {
-            data = res.data;
-            console.info('[Technicians] fetched from', c.url, c.opts ?? '');
-            break;
-          }
-          // some servers wrap results: { users: [...] } or { data: [...] }
-          if (res && res.data && Array.isArray(res.data.users)) {
-            data = res.data.users;
-            console.info('[Technicians] fetched from', c.url, '-> res.data.users');
-            break;
-          }
-          if (res && res.data && Array.isArray(res.data.data)) {
-            data = res.data.data;
-            console.info('[Technicians] fetched from', c.url, '-> res.data.data');
-            break;
-          }
-        } catch (e) {
-          // continue to next candidate
-          console.debug('[Technicians] endpoint failed:', c.url, e?.message || e);
-        }
-      }
-
-      if (!data) {
-        // Last-ditch: try calling /users and filter locally for role
-        try {
-          const resAll = await api.get('/users');
-          const all = resAll?.data || [];
-          if (Array.isArray(all)) {
-            data = all.filter(u => {
-              const r = (u.role || u.roleKey || u.roleName || '').toString().toLowerCase();
-              if (r.includes('technician') || r.includes('tech')) return true;
-              // check roles array shapes
-              if (Array.isArray(u.roles)) {
-                return u.roles.some(rr => (rr?.toString?.() || '').toLowerCase().includes('tech') || (rr?.key || '').toLowerCase().includes('tech'));
-              }
-              return false;
-            });
-            if (data.length) console.info('[Technicians] filtered from /users');
-          }
-        } catch (err) {
-          console.debug('[Technicians] fallback /users failed', err?.message || err);
-        }
-      }
-
-      if (!data) {
-        setTechnicians([]);
-        setError('No technicians endpoint found on API (404). Check backend routes.');
-      } else {
-        setTechnicians(data);
-        setSelectedTech(data.length > 0 ? data[0] : null);
-      }
+      const res = await api.get('/users', { params: { role: 'technician' } });
+      const data = Array.isArray(res.data) ? res.data : res.data.users || [];
+      setTechnicians(data);
+      setSelectedTech(data.length > 0 ? data[0] : null);
     } catch (err) {
       console.error('Failed to load technicians', err);
-      setError('Failed to load technicians — check console.');
+      setError('Failed to load technicians. Check backend route /api/users?role=technician');
     } finally {
       setLoading(false);
     }
@@ -133,8 +61,21 @@ const Technicians = () => {
     navigate(path);
   };
 
+  const handleCopy = (value) => {
+    if (!value) return;
+    navigator.clipboard.writeText(value);
+    alert('Copied to clipboard!');
+  };
+
+  const filteredTechs = technicians.filter((t) => {
+    const name = `${t.username || ''} ${t.firstName || ''} ${t.lastName || ''}`.toLowerCase();
+    const email = (t.email || '').toLowerCase();
+    return name.includes(search.toLowerCase()) || email.includes(search.toLowerCase());
+  });
+
   return (
     <div className="dashboard">
+      {/* ===== HEADER ===== */}
       <header className="top-bar-dashboard">
         <div className="logo-and-nav">
           <div className="logo">
@@ -146,31 +87,40 @@ const Technicians = () => {
         </div>
         <div className="nav-actions">
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
-           <span className="profile-name">{localStorage.getItem('username') || 'User'}</span>
+          <span className="profile-name">{localStorage.getItem('username') || 'User'}</span>
           <span className="profile-role">{localStorage.getItem('userRole') || 'Role'}</span>
         </div>
       </header>
 
       <div className="main-layout">
+        {/* ===== SIDEBAR ===== */}
         <aside className="sidebar">
           <ul className="sidebar-menu">
             <li>
-              <Link to="/dashboard" className={`sidebar-link ${activeLink === '/dashboard' ? 'active' : ''}`} onClick={() => setActiveLink('/dashboard')}>
+              <Link
+                to="/dashboard"
+                className={`sidebar-link ${activeLink === '/dashboard' ? 'active' : ''}`}
+                onClick={() => setActiveLink('/dashboard')}
+              >
                 <img src={HouseLogo} alt="Home Icon" className="menu-icon" />
                 <span>Dashboard</span>
               </Link>
             </li>
 
             <li>
-              <Link to="/inventory" className={`sidebar-link ${activeLink === '/inventory' ? 'active' : ''}`} onClick={() => setActiveLink('/inventory')}>
+              <Link
+                to="/inventory"
+                className={`sidebar-link ${activeLink === '/inventory' ? 'active' : ''}`}
+                onClick={() => setActiveLink('/inventory')}
+              >
                 <img src={StackLogo} alt="Inventory Icon" className="menu-icon" />
                 <span>Inventory</span>
               </Link>
             </li>
 
             <li>
-              <a 
-                href="/unit-status-auditor" 
+              <a
+                href="/unit-status-auditor"
                 className={`sidebar-link ${activeLink === '/unit-status-auditor' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
@@ -183,9 +133,8 @@ const Technicians = () => {
             </li>
 
             <li>
-              
-              <a 
-                href="/reports-auditor" 
+              <a
+                href="/reports-auditor"
                 className={`sidebar-link ${activeLink === '/reports-auditor' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
@@ -198,14 +147,22 @@ const Technicians = () => {
             </li>
 
             <li>
-              <Link to="/technicians" className={`sidebar-link ${activeLink === '/technicians' ? 'active' : ''}`} onClick={() => setActiveLink('/technicians')}>
+              <Link
+                to="/technicians"
+                className={`sidebar-link ${activeLink === '/technicians' ? 'active' : ''}`}
+                onClick={() => setActiveLink('/technicians')}
+              >
                 <img src={ToolsLogo} alt="Technicians Icon" className="menu-icon" />
                 <span>Technicians</span>
               </Link>
             </li>
 
             <li>
-              <Link to="/auditor-profile" className={`sidebar-link ${activeLink === '/auditor-profile' ? 'active' : ''}`} onClick={() => setActiveLink('/auditor-profile')}>
+              <Link
+                to="/auditor-profile"
+                className={`sidebar-link ${activeLink === '/auditor-profile' ? 'active' : ''}`}
+                onClick={() => setActiveLink('/auditor-profile')}
+              >
                 <img src={GearLogo} alt="Account Setting Icon" className="menu-icon" />
                 <span>Account Setting</span>
               </Link>
@@ -213,35 +170,50 @@ const Technicians = () => {
           </ul>
         </aside>
 
+        {/* ===== MAIN CONTENT ===== */}
         <main className="technicians-page-main-content">
           <div className="search-bar-container-top">
             <div className="search-text">Search A Technician</div>
             <div className="search-input-wrapper">
-              <input type="text" placeholder="Search A Technician" className="search-input" />
+              <input
+                type="text"
+                placeholder="Search A Technician"
+                className="search-input"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
               <img src={PersonLogo} alt="Search Icon" className="search-icon" />
             </div>
             <h2 className="page-title">Technicians</h2>
           </div>
 
           <div className="technicians-page-content">
+            {/* === LEFT PANEL: LIST === */}
             <div className="technicians-search-panel">
               <div className="technicians-list">
                 {loading ? (
                   <div style={{ padding: 12, color: '#ccc' }}>Loading technicians...</div>
                 ) : error ? (
                   <div style={{ padding: 12, color: 'salmon' }}>{error}</div>
-                ) : technicians.length === 0 ? (
+                ) : filteredTechs.length === 0 ? (
                   <div style={{ padding: 12, color: '#ccc' }}>No technicians found</div>
                 ) : (
-                  technicians.map((t) => (
+                  filteredTechs.map((t) => (
                     <div
                       key={t._id}
-                      className={`technician-list-item ${selectedTech && selectedTech._id === t._id ? 'selected' : ''}`}
+                      className={`technician-list-item ${
+                        selectedTech && selectedTech._id === t._id ? 'selected' : ''
+                      }`}
                       onClick={() => setSelectedTech(t)}
                     >
                       <img src={PersonLogo} alt="Technician Icon" className="technician-icon" />
                       <div className="technician-name-and-id">
-                        <span>{t.username || `${t.firstName || ''} ${t.lastName || ''}`.trim() || t.email || 'Unnamed'}</span>
+                        <span>
+                          {t.username ||
+                            `${t.firstName || ''} ${t.lastName || ''}`.trim() ||
+                            t.email ||
+                            'Unnamed'}
+                        </span>
                         <span className="technician-id">{String(t._id || '').slice(-5)}</span>
                       </div>
                     </div>
@@ -250,50 +222,111 @@ const Technicians = () => {
               </div>
             </div>
 
+            {/* === RIGHT PANEL: DETAILS === */}
             <div className="technicians-info-panel">
               <h2>Technician's Information</h2>
               <div className="technician-detail-card">
                 <div className="technician-profile-header">
                   <img src={PersonLogo} alt="Profile Icon" className="profile-detail-icon" />
-                  <h3>{selectedTech ? (selectedTech.username || `${selectedTech.firstName || ''} ${selectedTech.lastName || ''}`.trim()) : 'Select a technician'}</h3>
+                  <h3>
+                    {selectedTech
+                      ? selectedTech.username ||
+                        `${selectedTech.firstName || ''} ${selectedTech.lastName || ''}`.trim()
+                      : 'Select a technician'}
+                  </h3>
                 </div>
               </div>
 
               <label className="detail-label">Full name</label>
               <div className="detail-row-name">
-                <input type="text" value={(selectedTech?.firstName) || (selectedTech?.username?.split(' ')[0]) || ''} readOnly className="detail-input" />
-                <input type="text" value={(selectedTech?.lastName) || (selectedTech?.username?.split(' ')[1]) || ''} readOnly className="detail-input" />
+                <input
+                  type="text"
+                  value={
+                    selectedTech?.firstName ||
+                    selectedTech?.username?.split(' ')[0] ||
+                    '—'
+                  }
+                  readOnly
+                  className="detail-input"
+                />
+                <input
+                  type="text"
+                  value={
+                    selectedTech?.lastName ||
+                    selectedTech?.username?.split(' ')[1] ||
+                    '—'
+                  }
+                  readOnly
+                  className="detail-input"
+                />
               </div>
 
               <label className="detail-label contact-email-label">Contact Information</label>
               <label className="detail-label">Email</label>
               <div className="detail-row">
                 <div className="input-with-icon-wrapper">
-                  <input type="text" value={selectedTech?.email || ''} readOnly className="detail-input" />
-                  <img src={CopyIcon} alt="Copy Icon" className="copy-icon" />
+                  <input
+                    type="text"
+                    value={selectedTech?.email || '—'}
+                    readOnly
+                    className="detail-input"
+                  />
+                  <img
+                    src={CopyIcon}
+                    alt="Copy Icon"
+                    className="copy-icon"
+                    onClick={() => handleCopy(selectedTech?.email || '')}
+                  />
                 </div>
               </div>
 
               <label className="detail-label">Contact No.</label>
               <div className="detail-row">
                 <div className="input-with-icon-wrapper">
-                  <input type="text" value={selectedTech?.phoneNumber || selectedTech?.phone || ''} readOnly className="detail-input" />
-                  <img src={CopyIcon} alt="Copy Icon" className="copy-icon" />
+                  <input
+                    type="text"
+                    value={selectedTech?.contactNumber || selectedTech?.phoneNumber || selectedTech?.phone || '—'}
+                    readOnly
+                    className="detail-input"
+                  />
+                  <img
+                    src={CopyIcon}
+                    alt="Copy Icon"
+                    className="copy-icon"
+                    onClick={() =>
+                      handleCopy(selectedTech?.contactNumber ||selectedTech?.phoneNumber || selectedTech?.phone || '')
+                    }
+                  />
                 </div>
               </div>
 
               <label className="detail-label">Address</label>
               <div className="detail-row">
                 <div className="input-with-icon-wrapper">
-                  <input type="text" value={selectedTech?.address || ''} readOnly className="detail-input" />
+                  <input
+                    type="text"
+                    value={selectedTech?.address || '—'}
+                    readOnly
+                    className="detail-input"
+                  />
                 </div>
               </div>
 
               <label className="detail-label">Tech ID:</label>
               <div className="detail-row">
                 <div className="input-with-icon-wrapper">
-                  <input type="text" value={selectedTech?._id?.slice(-5) || ''} readOnly className="detail-input" />
-                  <img src={CopyIcon} alt="Copy Icon" className="copy-icon" />
+                  <input
+                    type="text"
+                    value={selectedTech?._id?.slice(-5) || '—'}
+                    readOnly
+                    className="detail-input"
+                  />
+                  <img
+                    src={CopyIcon}
+                    alt="Copy Icon"
+                    className="copy-icon"
+                    onClick={() => handleCopy(selectedTech?._id?.slice(-5) || '')}
+                  />
                 </div>
               </div>
             </div>

@@ -1,8 +1,8 @@
-// backend/controllers/UserController.js
+// backend/controllers/userController.js
 
 const User = require('../models/Users');
-const fs = require('fs');
 const path = require('path');
+const fs = require('fs');
 
 // ✅ GET /api/users?role=technician&q=search
 exports.list = async (req, res) => {
@@ -10,14 +10,37 @@ exports.list = async (req, res) => {
     const { role, q } = req.query;
     const filter = {};
 
-    if (role) filter.role = role;
-    if (q) filter.name = { $regex: q, $options: 'i' };
+    const Role = require('../models/role');
 
-    const users = await User.find(filter).select('-password');
-    res.json(users);
+    if (role) {
+      const roleDoc = await Role.findOne({ key: new RegExp(role, 'i') });
+      if (roleDoc) {
+        filter.role = roleDoc._id;
+      } else {
+        return res.status(404).json({ message: `Role '${role}' not found` });
+      }
+    }
+
+    if (q) {
+      filter.$or = [
+        { username: { $regex: q, $options: 'i' } },
+        { firstName: { $regex: q, $options: 'i' } },
+        { lastName: { $regex: q, $options: 'i' } },
+        { email: { $regex: q, $options: 'i' } },
+      ];
+    }
+
+    const users = await User.find(filter)
+      .populate('role', 'key name')
+      .select('-password');
+
+    res.status(200).json(users);
   } catch (err) {
     console.error('User list error:', err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({
+      message: 'Failed to fetch users',
+      error: err.message,
+    });
   }
 };
 
@@ -62,7 +85,7 @@ exports.uploadProfileImage = async (req, res) => {
     if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
 
     const imagePath = `/uploads/profilePics/${req.file.filename}`;
-    const user = await User.findByIdAndUpdate(req.user._id, { profileImage: imagePath }, { new: true });
+    const user = await User.findByIdAndUpdate(req.user._id, { avatar: imagePath }, { new: true });
 
     res.json({ message: 'Image uploaded', user });
   } catch (err) {

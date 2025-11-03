@@ -20,6 +20,20 @@ import EditIcon from '../assets/GearFill.png'; // Using GearFill.png as an edit 
 import MenuButtonWide from '../assets/menubuttonwide.png'; // Unit Status icon
 import ClipboardX from '../assets/clipboardx.png'; // Reports icon
 
+
+const getStatusColor = (status) => {
+  switch (status?.toLowerCase()) {
+    case 'functional':
+      return '#22c55e'; // green
+    case 'maintenance':
+      return '#f97316'; // orange
+    case 'out of order':
+      return '#ef4444'; // red
+    default:
+      return '#6b7280'; // gray
+  }
+};
+
 const API_BASE = 'http://localhost:5000/api';
 
 const ReportsAuditor = () => {
@@ -368,7 +382,7 @@ const ReportsAuditor = () => {
                       onClick={() => setSelectedUnit(unit)}
                     >
                       <span>{unit.name}</span>
-                      <span className={`status-tag-auditor ${unit.status ? unit.status.toLowerCase().replace(/ /g, '-') : 'functional'}`}>{unit.status || 'Functional'}</span>
+                      <span className="status-tag-auditor" style={{color: getStatusColor(unit.status),fontWeight: 600,}}>{unit.status || 'Functional'} &#x25cf;</span>
                     </div>
                   ))
                 )}
@@ -381,7 +395,7 @@ const ReportsAuditor = () => {
 
               <div className="report-detail-card-header-auditor">
                 <span>{selectedUnit ? selectedUnit.name : 'ITS300-PC-XXX'}</span>
-                <span className={`status-tag-auditor ${selectedUnit ? (selectedUnit.status || 'functional').toLowerCase().replace(/ /g, '-') : 'placeholder'}`}>{selectedUnit ? (selectedUnit.status || 'Functional') : 'Status'}</span>
+                <span className="status-tag-auditor" style={{color: getStatusColor(selectedUnit?.status),fontWeight: 600,}}>{selectedUnit ? (selectedUnit.status || 'Functional') : 'Status'} &#x25cf;</span>
               </div>
 
               <div className="info-item-auditor input-with-icon">

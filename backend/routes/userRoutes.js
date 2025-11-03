@@ -1,8 +1,10 @@
 // backend/routes/userRoutes.js
+const multer = require('multer');
 const express = require('express');
 const { protect } = require('../middleware/authMiddleware');
-const UserController = require('../controllers/UserController');
-const multer = require('multer');
+const UserController = require('../controllers/userController');
+console.log('Loaded controller file from:', require.resolve('../controllers/userController'));
+console.log('Controller exports:', Object.keys(UserController));
 const path = require('path');
 
 const router = express.Router();
