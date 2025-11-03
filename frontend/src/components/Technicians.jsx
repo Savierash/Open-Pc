@@ -1,7 +1,7 @@
 // src/pages/Technicians.jsx
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import api from '../api';
 import { useAuth } from '../context/AuthContext';
 import '../styles/Dashboard.css';
 import ComputerLogo1 from '../assets/LOGO1.png';
@@ -20,20 +20,25 @@ import ClipboardX from '../assets/clipboardx.png'; // Reports icon
 const Technicians = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname || '/technicians');
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [technicians, setTechnicians] = useState([]);
   const [selectedTech, setSelectedTech] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  
 
   useEffect(() => {
     setActiveLink(window.location.pathname || '/technicians');
   }, []);
 
   useEffect(() => {
+  if (!authLoading && user) {
     loadTechnicians();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  } else if (!authLoading && !user) {
+    navigate('/login');
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [user, authLoading]);
 
   async function tryFetch(url, opts = {}) {
     try {

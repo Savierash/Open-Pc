@@ -1,4 +1,4 @@
-// frontend/src/api.js
+// src/api.js
 import axios from "axios";
 
 const api = axios.create({
@@ -7,7 +7,7 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("accessToken"); // ✅ Use the right key
+  const token = localStorage.getItem("accessToken"); // ✅ match this to ReportsTech.jsx
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
