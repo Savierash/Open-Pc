@@ -251,8 +251,8 @@ const AdminTechRequests = () => {
 
         <div className="nav-actions">
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
-          <span className="profile-name">Admin</span>
-          <span className="profile-role">Administrator</span>
+          <span className="profile-name">{localStorage.getItem('username') || 'User'}</span>
+          <span className="profile-role">{localStorage.getItem('userRole') || 'Role'}</span>
         </div>
       </header>
 
