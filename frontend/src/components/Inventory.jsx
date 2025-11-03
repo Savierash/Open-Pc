@@ -364,40 +364,33 @@ const Inventory = () => {
           <div className="inventory-page-content">
             {/* Left Container: Lab List */}
             <div className="inventory-lab-panel">
-              <button
-                className="inventory-add-lab-button"
-                onClick={openAddLabModal}
-                disabled={adding || creatingLab}
-              >
-                {(adding || creatingLab) ? 'ADDING...' : 'ADD LAB'}
-              </button>
-              <div className="inventory-lab-list-container">
+            <h3 className="inventory-lab-title">Lab</h3>
+            <div className="inventory-lab-list-container">
                 {loading ? (
-                  <div>Loading labs...</div>
-                ) : (
-                  <>
-                    {labs.map((lab) => (
-                      <div
-                        key={lab._id}
-                        className={`inventory-lab-card ${selectedLab?._id === lab._id ? 'active' : ''}`}
-                        onClick={() => handleLabClick(lab)}
-                        onDoubleClick={() => removeLab(labs.indexOf(lab))}
-                        title="Double-click to delete"
-                      >
-                        {lab.name}
-                      </div>
-                    ))}
-                    <div
-                      className={`inventory-lab-card inventory-add-lab-card ${selectedLab ? 'active' : ''}`}
-                      onClick={openAddLabModal}
-                      title="Add new lab"
-                    >
-                      +
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
+      <div>Loading labs...</div>
+    ) : (
+      <>
+        {labs.map((lab) => (
+          <div
+            key={lab._id}
+            className={`inventory-lab-card ${selectedLab?._id === lab._id ? 'active' : ''}`}
+            onClick={() => handleLabClick(lab)}
+            title="Click to view lab units"
+          >
+            {lab.name}
+          </div>
+        ))}
+        <div
+          className="inventory-add-lab-card"
+          title="Add new lab"
+          onClick={openAddLabModal}
+        >
+          +
+        </div>
+      </>
+    )}
+  </div>
+</div>
 
             {/* Middle Container: Unit Status with Filters and PC Cards */}
             <div className="inventory-middle-panel">
