@@ -69,7 +69,7 @@ const AppRoutes = () => {
   return (
     <Wrapper>
       <Routes>
-        <Route path="/document" element={<DocumentPage />} />
+        <Route path="/documents" element={<DocumentPage />} />
         <Route path="/" element={<Homepage />} />
         <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
         <Route path="/services" element={<Services />} />

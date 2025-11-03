@@ -1,267 +1,77 @@
-// src/pages/AdminTechRequests.jsx
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import '../styles/AdminTechRequests.css';
-import ComputerLogo1 from '../assets/LOGO1.png';
-import PersonLogo from '../assets/Person.png';
-import HouseLogo from '../assets/HouseFill.png';
-import ToolsLogo from '../assets/tools_logo.png';
-import GearLogo from '../assets/GearFill.png';
-import EnvelopeCheck from '../assets/envelopecheck.png';
-import CopyIcon from '../assets/copypaste.png';
-import DocumentIcon from '../assets/icon_5.png';
-
-// configure API client (Vite env or default)
-const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/+$/, '');
-const api = axios.create({
-  baseURL: API_BASE,
-  timeout: 10000,
-});
-// attach token if available (check both keys commonly used)
-api.interceptors.request.use((cfg) => {
-  const token = localStorage.getItem('accessToken') || localStorage.getItem('token') || null;
-  if (token) cfg.headers = { ...(cfg.headers || {}), Authorization: `Bearer ${token}` };
-  return cfg;
-}, (err) => Promise.reject(err));
-
-/**
- * fetchTechRequestsFromApi(apiClient)
- * - Tries multiple likely endpoints and response shapes.
- * - Returns normalized array of requests:
- *   [{ _id, title, description, status, createdAt, requester, attachments, raw }, ...]
- * - If backend not available, returns a safe mock list so UI can render.
- */
-export async function fetchTechRequestsFromApi(apiClient = api) {
-  // expanded candidates: include debug route and full /requests route
-  const candidates = [
-    '/_debug/requests',      // quick debug route (server helper)
-    '/tech-requests',
-    '/requests/tech',
-    '/requests?type=tech',
-    '/requests', // fallback (we'll filter)
-  ];
-
-  let found = null;
-  let lastErr = null;
-
-  for (const url of candidates) {
-    try {
-      const res = await apiClient.get(url);
-      const payload = res?.data;
-      // Accept array at root
-      if (Array.isArray(payload)) {
-        found = payload;
-        console.info('[fetchTechRequestsFromApi] loaded from', url);
-        break;
-      }
-      // Accept common wrapped shapes
-      if (payload && Array.isArray(payload.requests)) {
-        found = payload.requests;
-        console.info('[fetchTechRequestsFromApi] loaded from', url, '-> payload.requests');
-        break;
-      }
-      if (payload && Array.isArray(payload.data)) {
-        found = payload.data;
-        console.info('[fetchTechRequestsFromApi] loaded from', url, '-> payload.data');
-        break;
-      }
-      // If payload is single object with .requests-like keys
-      if (payload && payload.requests && Array.isArray(payload.requests)) {
-        found = payload.requests;
-        break;
-      }
-    } catch (err) {
-      lastErr = err;
-      // continue to next candidate
-      console.debug('[fetchTechRequestsFromApi] candidate failed:', url, err?.message || err);
-    }
-  }
-
-  // fallback: GET /requests and filter server-side if `/requests` returned mixed
-  if (!found) {
-    try {
-      const res = await apiClient.get('/requests');
-      const all = res?.data;
-      if (Array.isArray(all)) {
-        found = all.filter(r => {
-          const t = (r.type || r.requestType || '').toString().toLowerCase();
-          return t.includes('tech') || t.includes('technician') || t.includes('equipment') || t.includes('repair');
-        });
-        console.info('[fetchTechRequestsFromApi] filtered /requests locally');
-      }
-    } catch (err) {
-      console.debug('[fetchTechRequestsFromApi] fallback /requests failed', err?.message || err);
-    }
-  }
-
-  // If still not found, provide a mock list so UI doesn't break (remove when backend ready)
-  if (!found || !Array.isArray(found) || found.length === 0) {
-    console.warn('[fetchTechRequestsFromApi] no backend data found, returning mock list (remove when backend available). Last error:', lastErr?.message || '');
-    return [
-      {
-        _id: 'mock-1',
-        title: 'Printer not working',
-        description: 'Printer in Lab A is jammed and shows error E13.',
-        status: 'pending',
-        createdAt: new Date().toISOString(),
-        requester: { name: 'Alice', email: 'alice@example.com' },
-        attachments: [],
-        raw: {},
-      },
-      {
-        _id: 'mock-2',
-        title: 'Monitor flickering',
-        description: 'Monitor on PC-12 flickers intermittently.',
-        status: 'pending',
-        createdAt: new Date().toISOString(),
-        requester: { name: 'Bob', email: 'bob@example.com' },
-        attachments: [],
-        raw: {},
-      },
-    ];
-  }
-
-  // Normalize shape
-  const normalized = (found || []).map(r => ({
-    _id: r._id || r.id || r.requestId || '',
-    title: r.title || r.subject || `Request ${r._id || r.id || ''}`,
-    description: r.description || r.details || '',
-    status: (r.status || r.state || 'pending').toString(),
-    createdAt: r.createdAt || r.created_at || r.date || '',
-    requester: r.requester || r.user || r.owner || { name: r.name || r.requesterName || r.email || 'Unknown', email: r.email || '' },
-    attachments: r.attachments || r.files || [],
-    raw: r,
-  }));
-
-  return normalized;
-}
-
-/**
- * updateTechRequestStatusFromApi(apiClient, reqId, newStatus)
- * - Tries a few common update patterns (PATCH/PUT to /requests/:id, POST to /requests/:id/accept etc.)
- * - Returns true on success, throws on failure.
- */
-export async function updateTechRequestStatusFromApi(apiClient = api, reqId, newStatus) {
-  if (!reqId) throw new Error('reqId required');
-  const patterns = [
-    { method: 'patch', url: `/requests/${reqId}`, data: { status: newStatus } },
-    { method: 'put', url: `/requests/${reqId}`, data: { status: newStatus } },
-    { method: 'post', url: `/requests/${reqId}/${newStatus}`, data: {} }, // e.g. /requests/123/accept
-    { method: 'post', url: `/requests/${reqId}/status`, data: { status: newStatus } },
-  ];
-
-  let lastErr = null;
-  for (const p of patterns) {
-    try {
-      const res = await apiClient.request({
-        method: p.method,
-        url: p.url,
-        data: p.data || {},
-      });
-      if (res && (res.status >= 200 && res.status < 300)) {
-        console.info('[updateTechRequestStatusFromApi] success', p.url);
-        return true;
-      }
-      if (res && res.data) {
-        // Some APIs return 200 with data object
-        console.info('[updateTechRequestStatusFromApi] success (data ok)', p.url);
-        return true;
-      }
-    } catch (err) {
-      lastErr = err;
-      console.debug('[updateTechRequestStatusFromApi] pattern failed', p.url, err?.message || err);
-    }
-  }
-  throw lastErr || new Error('Failed to update status');
-}
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../api";
+import "../styles/AdminTechRequests.css";
+import ComputerLogo1 from "../assets/LOGO1.png";
+import HouseLogo from "../assets/HouseFill.png";
+import ToolsLogo from "../assets/tools_logo.png";
+import GearLogo from "../assets/GearFill.png";
+import PersonLogo from "../assets/Person.png";
+import DocumentIcon from "../assets/icon_5.png";
 
 const AdminTechRequests = () => {
   const navigate = useNavigate();
-  const [activeLink, setActiveLink] = useState(window.location.pathname || '/admin-tech-requests');
-
-  // data
-  const [requests, setRequests] = useState([]);      // list of requests
-  const [selected, setSelected] = useState(null);    // currently viewed request
-  const [search, setSearch] = useState('');
+  const [activeLink, setActiveLink] = useState(window.location.pathname);
+  const [requests, setRequests] = useState([]);
+  const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
-    setActiveLink(window.location.pathname);
-    loadRequests();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchTechRequests();
   }, []);
 
-  // wrapper that uses fetchTechRequestsFromApi so you can replace api later
-  async function loadRequests() {
+  const fetchTechRequests = async () => {
     setLoading(true);
-    setError('');
+    setError("");
     try {
-      const list = await fetchTechRequestsFromApi(api);
-      setRequests(list || []);
-      setSelected(list && list.length ? list[0] : null);
+      const res = await api.get("/tech-requests");
+      setRequests(res.data || []);
     } catch (err) {
-      console.error('Failed to load tech requests', err);
-      setError('Failed to load requests — check console for details.');
-      setRequests([]);
+      console.error("Failed to load requests:", err);
+      setError("Failed to load technician requests.");
     } finally {
       setLoading(false);
     }
-  }
+  };
 
-  // optimistic update helper for accept/decline using updateTechRequestStatusFromApi
-  const updateRequestStatus = async (reqId, newStatus) => {
-    if (!reqId) return;
-    // optimistic UI
-    setRequests(prev => prev.map(r => r._id === reqId ? { ...r, status: newStatus } : r));
-    if (selected && selected._id === reqId) setSelected(prev => ({ ...prev, status: newStatus }));
-
+  const handleAccept = async (id) => {
+    if (!window.confirm("Accept this technician?")) return;
     try {
-      await updateTechRequestStatusFromApi(api, reqId, newStatus);
-      // success — leave optimistic UI in place
-      return true;
+      await api.patch(`/tech-requests/${id}/accept`);
+      alert("✅ Technician approved successfully!");
+      fetchTechRequests();
     } catch (err) {
-      console.error('Update status failed', err);
-      // rollback by reloading full list
-      await loadRequests();
-      setError('Failed to update request. See console for details.');
-      return false;
+      console.error("Accept failed:", err);
+      alert("Failed to approve technician.");
     }
   };
 
-  const handleAccept = async (r) => {
-    if (!r) return;
-    if (!window.confirm('Accept this request?')) return;
-    await updateRequestStatus(r._id, 'accepted');
-  };
-
-  const handleDecline = async (r) => {
-    if (!r) return;
-    if (!window.confirm('Decline this request?')) return;
-    await updateRequestStatus(r._id, 'declined');
-  };
-
-  const copyToClipboard = async (text) => {
+  const handleReject = async (id) => {
+    if (!window.confirm("Reject this technician?")) return;
     try {
-      await navigator.clipboard.writeText(text || '');
-      console.info('copied', text);
+      await api.patch(`/tech-requests/${id}/reject`);
+      alert("❌ Technician rejected.");
+      fetchTechRequests();
     } catch (err) {
-      console.warn('copy failed', err);
+      console.error("Reject failed:", err);
+      alert("Failed to reject technician.");
     }
   };
 
-  const filtered = requests.filter(req => {
-    const q = search.trim().toLowerCase();
-    if (!q) return true;
-    return (req.title || '').toLowerCase().includes(q) ||
-           (req.description || '').toLowerCase().includes(q) ||
-           (req.requester?.name || '').toLowerCase().includes(q) ||
-           String(req._id || '').toLowerCase().includes(q);
+  const filteredRequests = requests.filter((r) => {
+    const q = search.toLowerCase();
+    return (
+      r.firstName?.toLowerCase().includes(q) ||
+      r.lastName?.toLowerCase().includes(q) ||
+      r.email?.toLowerCase().includes(q)
+    );
   });
 
   return (
     <div className="dashboard">
+      {/* Top Bar */}
       <header className="top-bar-dashboard">
         <div className="logo-and-nav">
           <div className="logo">
@@ -274,143 +84,182 @@ const AdminTechRequests = () => {
 
         <div className="nav-actions">
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
-          <span className="profile-name">{localStorage.getItem('username') || 'User'}</span>
-          <span className="profile-role">{localStorage.getItem('userRole') || 'Role'}</span>
+          <span className="profile-name">
+            {localStorage.getItem("username") || "Admin"}
+          </span>
+          <span className="profile-role">Admin</span>
         </div>
       </header>
 
+      {/* Main Layout */}
       <div className="main-layout">
+        {/* Sidebar */}
         <aside className="sidebar">
           <ul className="sidebar-menu">
             <li>
-              <a href="/dashboard-admin" className={`sidebar-link ${activeLink === '/dashboard-admin' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); setActiveLink('/dashboard-admin'); navigate('/dashboard-admin'); }}>
-                <img src={HouseLogo} className="menu-icon" alt="Home" /><span>Dashboard</span>
+              <a
+                href="/dashboard-admin"
+                className={`sidebar-link ${
+                  activeLink === "/dashboard-admin" ? "active" : ""
+                }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setActiveLink("/dashboard-admin");
+                  navigate("/dashboard-admin");
+                }}
+              >
+                <img src={HouseLogo} className="menu-icon" alt="Home" />
+                <span>Dashboard</span>
               </a>
             </li>
             <li>
-              <a href="/admin-technicians" className={`sidebar-link ${activeLink === '/admin-technicians' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); setActiveLink('/admin-technicians'); navigate('/admin-technicians'); }}>
-                <img src={ToolsLogo} className="menu-icon" alt="Technicians" /><span>Technicians</span>
+              <a
+                href="/admin-technicians"
+                className={`sidebar-link ${
+                  activeLink === "/admin-technicians" ? "active" : ""
+                }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setActiveLink("/admin-technicians");
+                  navigate("/admin-technicians");
+                }}
+              >
+                <img src={ToolsLogo} className="menu-icon" alt="Technicians" />
+                <span>Technicians</span>
               </a>
             </li>
             <li>
-              <a href="/admin-profile" className={`sidebar-link ${activeLink === '/admin-profile' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); setActiveLink('/admin-profile'); navigate('/admin-profile'); }}>
-                <img src={GearLogo} className="menu-icon" alt="Account Setting" /><span>Account Setting</span>
-              </a>
-            </li>
-            <li>
-              <a href="/admin-tech-requests" className={`sidebar-link ${activeLink === '/admin-tech-requests' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); setActiveLink('/admin-tech-requests'); }}>
-                <img src={EnvelopeCheck} className="menu-icon" alt="Tech Requests" /><span>Tech Requests</span>
+              <a
+                href="/admin-profile"
+                className={`sidebar-link ${
+                  activeLink === "/admin-profile" ? "active" : ""
+                }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setActiveLink("/admin-profile");
+                  navigate("/admin-profile");
+                }}
+              >
+                <img src={GearLogo} className="menu-icon" alt="Settings" />
+                <span>Account Setting</span>
               </a>
             </li>
           </ul>
         </aside>
 
+        {/* Content */}
         <main className="technicians-page-main-content">
           <div className="search-bar-container-top">
             <div className="search-text">Search Requests</div>
             <div className="search-input-wrapper">
-              <input value={search} onChange={(e) => setSearch(e.target.value)} type="text" placeholder="Search requests or requester" className="search-input" />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                type="text"
+                placeholder="Search technician by name or email"
+                className="search-input"
+              />
             </div>
-            <h2 className="page-title">Tech Requests</h2>
           </div>
 
           <div className="technicians-page-content">
+            {/* List Panel */}
             <div className="technicians-search-panel">
-              <div className="technicians-list">
-                {loading ? (
-                  <div style={{ padding: 12, color: '#ccc' }}>Loading requests...</div>
-                ) : error ? (
-                  <div style={{ padding: 12, color: 'salmon' }}>{error}</div>
-                ) : filtered.length === 0 ? (
-                  <div style={{ padding: 12, color: '#999' }}>No requests found</div>
-                ) : (
-                  filtered.map(req => (
-                    <div
+              {loading ? (
+                <p>Loading requests...</p>
+              ) : error ? (
+                <p style={{ color: "red" }}>{error}</p>
+              ) : filteredRequests.length === 0 ? (
+                <p>No pending technician requests found.</p>
+              ) : (
+                <ul className="technicians-list">
+                  {filteredRequests.map((req) => (
+                    <li
                       key={req._id}
-                      className={`technician-list-item ${selected && selected._id === req._id ? 'selected' : ''}`}
+                      className={`technician-list-item ${
+                        selected && selected._id === req._id ? "selected" : ""
+                      }`}
                       onClick={() => setSelected(req)}
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                        <img src={PersonLogo} alt="Requester" className="technician-icon" />
-                        <div>
-                          <div style={{ fontWeight: 700 }}>{req.title}</div>
-                          <div style={{ fontSize: 12, color: '#888' }}>{req.requester?.name || 'Unknown'}</div>
-                        </div>
+                      <div>
+                        <strong>
+                          {req.firstName} {req.lastName}
+                        </strong>
+                        <p style={{ color: "#999", fontSize: 13 }}>
+                          {req.email}
+                        </p>
                       </div>
-                      <div style={{ fontSize: 12, color: '#666' }}>{req.status}</div>
-                    </div>
-                  ))
-                )}
-              </div>
+                      <span
+                        className={`status-label ${req.status}`}
+                        style={{
+                          textTransform: "capitalize",
+                          color:
+                            req.status === "pending"
+                              ? "orange"
+                              : req.status === "accepted"
+                              ? "green"
+                              : "red",
+                        }}
+                      >
+                        {req.status}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
+            {/* Detail Panel */}
             <div className="technicians-info-panel">
-              <h2>Request Details</h2>
-
               {!selected ? (
-                <div style={{ padding: 12, color: '#777' }}>{loading ? 'Loading...' : 'Select a request'}</div>
+                <p>Select a technician to view details</p>
               ) : (
                 <>
-                  <div className="technician-detail-card">
-                    <div className="technician-profile-header">
-                      <img src={PersonLogo} alt="Profile Icon" className="profile-detail-icon" />
-                      <div>
-                        <h3 style={{ margin: 0 }}>{selected.title}</h3>
-                        <div style={{ fontSize: 13, color: '#666' }}>{selected.requester?.name || selected.requester?.email || 'Requester'}</div>
-                      </div>
-                    </div>
+                  <h2>
+                    {selected.firstName} {selected.lastName}
+                  </h2>
+                  <p>Email: {selected.email}</p>
+                  <p>Contact: {selected.contactNo || "N/A"}</p>
+                  <p>Status: {selected.status}</p>
+
+                  <div className="documents-section">
+                    <h3>Uploaded Documents</h3>
+                    {selected.documents?.length ? (
+                      selected.documents.map((file, idx) => (
+                        <div key={idx} className="document-item">
+                          <img
+                            src={DocumentIcon}
+                            alt="doc"
+                            style={{ width: 32, marginRight: 8 }}
+                          />
+                          <a
+                            href={`http://localhost:5000${file}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {file.split("/").pop()}
+                          </a>
+                        </div>
+                      ))
+                    ) : (
+                      <p>No documents uploaded</p>
+                    )}
                   </div>
 
-                  <label className="detail-label">Description</label>
-                  <div className="detail-row">
-                    <div className="detail-input" style={{ whiteSpace: 'pre-wrap' }}>{selected.description || '—'}</div>
-                  </div>
-
-                  <label className="detail-label">Status</label>
-                  <div className="detail-row">
-                    <div className="detail-input">{selected.status}</div>
-                  </div>
-
-                  <label className="detail-label">Requester Email</label>
-                  <div className="detail-row email-row">
-                    <div className="input-with-icon-wrapper">
-                      <input type="text" value={selected.requester?.email || ''} readOnly className="detail-input" />
-                      <img src={CopyIcon} alt="Copy Icon" className="copy-icon" onClick={() => copyToClipboard(selected.requester?.email || '')} style={{ cursor: 'pointer' }} />
-                    </div>
-                  </div>
-
-                  <div className="contact-documents-layout">
-                    <div style={{ flex: 1 }}>
-                      <label className="detail-label">Submitted</label>
-                      <div className="detail-row">
-                        <div className="detail-input">{selected.createdAt ? new Date(selected.createdAt).toLocaleString() : '—'}</div>
-                      </div>
-                    </div>
-
-                    <div className="documents-section">
-                      <label className="detail-label">Attachments</label>
-                      {(!selected.attachments || selected.attachments.length === 0) ? (
-                        <div className="document-box"><img src={DocumentIcon} alt="No documents" /></div>
-                      ) : (
-                        selected.attachments.map((att, idx) => {
-                          const url = typeof att === 'string' ? att : (att.url || att.path || att.file);
-                          return (
-                            <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                              <img src={DocumentIcon} alt="doc" style={{ width: 36, height: 36 }} />
-                              <a href={url} target="_blank" rel="noreferrer" style={{ color: '#0b66ff' }}>{String(url).split('/').pop()}</a>
-                            </div>
-                          );
-                        })
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="action-buttons" style={{ marginTop: 12 }}>
-                    <button className="accept-button" onClick={() => handleAccept(selected)} disabled={selected.status === 'accepted'}>
+                  <div className="action-buttons">
+                    <button
+                      className="accept-button"
+                      onClick={() => handleAccept(selected._id)}
+                      disabled={selected.status === "accepted"}
+                    >
                       Accept
                     </button>
-                    <button className="decline-button" onClick={() => handleDecline(selected)} disabled={selected.status === 'declined'}>
-                      Decline
+                    <button
+                      className="decline-button"
+                      onClick={() => handleReject(selected._id)}
+                      disabled={selected.status === "rejected"}
+                    >
+                      Reject
                     </button>
                   </div>
                 </>

@@ -1,9 +1,9 @@
-// backend/controllers/authController.js
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Role = require('../models/role');
 const User = require('../models/Users');
 const Otp = require('../models/Otp');
+const TechRequest = require('../models/TechRequest');
 const sendEmail = require('../utils/sendEmail');
 
 // ✅ Generate random 6-digit OTP
@@ -20,12 +20,24 @@ const generateTechId = () => {
 };
 
 /**
- * Register - Creates user and sends OTP to email
+ * ✅ REGISTER
+ * Creates user, sends OTP (non-tech), and creates TechRequest if technician
  */
 exports.register = async (req, res) => {
   try {
-    const { email, username, password, confirmPassword, roleKey, firstName, lastName, gender, contactNumber } = req.body;
+    const {
+      email,
+      username,
+      password,
+      confirmPassword,
+      roleKey,
+      firstName,
+      lastName,
+      gender,
+      contactNumber,
+    } = req.body;
 
+    // ✅ Validate input
     if (!email || !username || !password || !firstName || !lastName || !gender || !roleKey)
       return res.status(400).json({ message: 'Missing required fields' });
 
@@ -36,12 +48,15 @@ exports.register = async (req, res) => {
     if (exists)
       return res.status(409).json({ message: 'Email already registered' });
 
+    // ✅ Hash password
     const salt = await bcrypt.genSalt(10);
     const hashed = await bcrypt.hash(password, salt);
 
+    // ✅ Find role
     const role = await Role.findOne({ key: roleKey });
     if (!role) return res.status(400).json({ message: 'Invalid role' });
 
+    // ✅ Create new user
     const user = new User({
       email,
       username,
@@ -54,22 +69,54 @@ exports.register = async (req, res) => {
       contactNumber,
     });
 
+    // ✅ If technician, assign techId & set inactive BEFORE saving
     if (role.key.toLowerCase() === 'technician') {
       user.techId = generateTechId();
+      user.isActive = false; // 🔒 inactive until admin approves
     }
 
     await user.save();
 
+    // ✅ Create TechRequest for technicians
+    if (role.key.toLowerCase() === 'technician') {
+      try {
+        const existingReq = await TechRequest.findOne({ email });
+        if (!existingReq) {
+          await TechRequest.create({
+            userId: user._id,
+            firstName,
+            lastName,
+            email,
+            contactNo: contactNumber,
+            address: '',
+            documents: [],
+            status: 'pending',
+            techId: user.techId,
+          });
+          console.log(`✅ Created TechRequest for ${email}`);
+        }
+      } catch (err) {
+        console.error('⚠️ Failed to create TechRequest:', err.message);
+      }
+
+      // 🟢 Skip OTP for technicians
+      return res.status(200).json({
+        message: 'Technician registered successfully. Please upload documents for admin review.',
+        email,
+      });
+    }
+
+    // ✅ Non-technician users (Admin/Auditor): generate OTP
     const otpCode = generateOtp();
     await Otp.create({ email, otp: otpCode });
 
-    // ✅ Email template
     const htmlContent = `
       <h2>Welcome to Open-PC!</h2>
       <p>Please verify your email using the OTP below:</p>
       <h1>${otpCode}</h1>
       <p>Expires in 10 minutes.</p>
     `;
+
     await sendEmail(email, 'Open-PC Account Verification', htmlContent);
 
     return res.status(200).json({
@@ -84,7 +131,7 @@ exports.register = async (req, res) => {
 };
 
 /**
- * ✅ Verify OTP and activate account
+ * ✅ VERIFY OTP - Activates account
  */
 exports.verifyOtp = async (req, res) => {
   try {
@@ -104,7 +151,7 @@ exports.verifyOtp = async (req, res) => {
 
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    // ✅ Lowercase role when creating token
+    // ✅ Create JWT token
     const token = jwt.sign(
       { id: user._id, role: (user.role?.key || user.role?.name || '').toLowerCase() },
       process.env.JWT_SECRET,
@@ -118,7 +165,7 @@ exports.verifyOtp = async (req, res) => {
         id: user._id,
         email: user.email,
         username: user.username,
-        role: user.role.key.toLowerCase(), // ✅ frontend consistency
+        role: user.role.key.toLowerCase(),
       },
     });
 
@@ -129,7 +176,7 @@ exports.verifyOtp = async (req, res) => {
 };
 
 /**
- * Login - Only verified users can log in
+ * ✅ LOGIN - Only verified (and active) users can log in
  */
 exports.login = async (req, res) => {
   try {
@@ -147,14 +194,24 @@ exports.login = async (req, res) => {
     }
 
     if (!user) return res.status(401).json({ message: 'Invalid credentials' });
+
+    // ✅ Double-lock: prevent technicians from logging in until approved
+    if (
+      user.role.key.toLowerCase() === 'technician' &&
+      (!user.isVerified || !user.isActive)
+    ) {
+      return res.status(403).json({
+        message: 'Your account is pending admin approval. Please wait for confirmation.',
+      });
+    }
+
     if (!user.isVerified)
-      return res.status(403).json({ message: 'Please verify your email first' });
+      return res.status(403).json({ message: 'Please verify your email first.' });
 
     const matched = await bcrypt.compare(password, user.password);
     if (!matched)
       return res.status(401).json({ message: 'Invalid credentials' });
 
-    // ✅ Fix here: use role.key (not role.name)
     const token = jwt.sign(
       { id: user._id, role: (user.role?.key || user.role?.name || '').toLowerCase() },
       process.env.JWT_SECRET,
@@ -167,7 +224,7 @@ exports.login = async (req, res) => {
         id: user._id,
         email: user.email,
         username: user.username,
-        role: user.role.key.toLowerCase(), // ✅ return lowercase for frontend
+        role: user.role.key.toLowerCase(),
       },
     });
 
@@ -178,7 +235,7 @@ exports.login = async (req, res) => {
 };
 
 /**
- * ✅ Get available roles
+ * ✅ GET ROLES
  */
 exports.getRoles = async (req, res) => {
   try {
@@ -189,7 +246,9 @@ exports.getRoles = async (req, res) => {
   }
 };
 
-// ✅ Get profile for authenticated user
+/**
+ * ✅ GET PROFILE
+ */
 exports.getProfile = async (req, res) => {
   try {
     const userId = req.user && req.user.id;
@@ -205,7 +264,9 @@ exports.getProfile = async (req, res) => {
   }
 };
 
-// ✅ Update profile (phone number, username)
+/**
+ * ✅ UPDATE PROFILE
+ */
 exports.updateProfile = async (req, res) => {
   try {
     const userId = req.user && req.user.id;
@@ -219,9 +280,35 @@ exports.updateProfile = async (req, res) => {
     if (username !== undefined) user.username = username;
     await user.save();
 
-    res.json({ success: true, user: { id: user._id, email: user.email, username: user.username, phoneNumber: user.phoneNumber } });
+    res.json({
+      success: true,
+      user: {
+        id: user._id,
+        email: user.email,
+        username: user.username,
+        phoneNumber: user.phoneNumber,
+      },
+    });
   } catch (err) {
     console.error('Update profile error:', err);
     res.status(500).json({ message: 'Server error' });
+  }
+};
+
+/**
+ * ✅ CHECK STATUS (Pending Page)
+ */
+exports.checkStatus = async (req, res) => {
+  try {
+    const { email } = req.query;
+    if (!email) return res.status(400).json({ message: 'Email is required' });
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    res.json({ verified: !!user.isVerified });
+  } catch (err) {
+    console.error('Check status error:', err);
+    res.status(500).json({ message: 'Server error checking status' });
   }
 };

@@ -1,179 +1,160 @@
 // backend/routes/adminRoutes.js
 const express = require('express');
 const router = express.Router();
-
-const User = require('../models/Users'); // change to '../models/Users' if your file is named Users.js
-const RequestModel = require('../models/Request');
-
 const { protect } = require('../middleware/authMiddleware');
 const { requireRole } = require('../middleware/roleMiddleware');
 
-/**
- * adminGuard wraps handlers with protect + requireRole('admin') if those middlewares exist.
- * If your project expects explicit use of middleware on each route, you can replace adminGuard usage
- * with router.get('/path', protect, requireRole('admin'), handler).
- */
+const User = require('../models/Users');
+const Unit = require('../models/unit');
+const Lab = require('../models/lab');
+const Report = require('../models/report');
+const TechRequest = require('../models/TechRequest');
+const sendEmail = require('../utils/sendEmail'); // ✅ optional (for notifications)
+
+// ✅ Helper for admin-only protection
 function adminGuard(handler) {
   return async (req, res, next) => {
     try {
-      if (typeof protect === 'function' && typeof requireRole === 'function') {
-        return protect(req, res, (err) => {
-          if (err) return next(err);
-          return requireRole('admin')(req, res, (err2) => {
-            if (err2) return next(err2);
-            return handler(req, res, next);
-          });
+      return protect(req, res, (err) => {
+        if (err) return next(err);
+        return requireRole('admin')(req, res, (err2) => {
+          if (err2) return next(err2);
+          return handler(req, res, next);
         });
-      } else {
-        return handler(req, res, next);
-      }
+      });
     } catch (err) {
       return next(err);
     }
   };
 }
 
-/**
- * GET /api/_debug/requests
- * Unprotected convenience endpoint that returns up to 10 requests (or mock if none).
- * Useful while building frontend.
- */
-router.get('/_debug/requests', async (req, res) => {
+/* ============================================================
+   ✅ ADMIN DASHBOARD
+=============================================================== */
+router.get('/dashboard', adminGuard(async (req, res) => {
   try {
-    const docs = await RequestModel.find().limit(10).lean();
-    if (!docs || docs.length === 0) {
-      return res.json([
-        {
-          _id: 'mock-1',
-          title: 'Printer jam (mock)',
-          description: 'Printer in Lab A is jammed.',
-          type: 'tech',
-          status: 'pending',
-          requester: { name: 'Alice', email: 'alice@example.com' },
-          attachments: []
-        }
-      ]);
-    }
-    return res.json(docs);
+    const totalUnits = await Unit.countDocuments();
+    const totalLabs = await Lab.countDocuments();
+    const totalReports = await Report.countDocuments();
+    const pendingTechs = await TechRequest.countDocuments({ status: 'pending' });
+
+    res.json({
+      totalUnits,
+      totalLabs,
+      totalReports,
+      pendingTechRequests: pendingTechs,
+    });
   } catch (err) {
-    console.error('GET /_debug/requests failed', err);
-    return res.status(500).json({ message: 'debug fetch failed', error: err.message });
+    console.error('Dashboard fetch failed:', err);
+    res.status(500).json({ message: 'Failed to fetch dashboard data' });
   }
-});
+}));
 
-/**
- * GET /api/admin/technicians
- * Admin-only: returns list of users whose role indicates "technician".
- */
-router.get('/admin/technicians', protect, requireRole('admin'), async (req, res) => {
+/* ============================================================
+   ✅ TECHNICIANS LIST (Approved Only)
+=============================================================== */
+router.get('/admin/technicians', adminGuard(async (req, res) => {
   try {
-    // Try to match different possible role fields
     const techs = await User.find({
-      $or: [
-        { role: { $regex: /tech/i } },
-        { roleKey: { $regex: /tech/i } },
-        { 'roles.name': { $regex: /tech/i } },
-        { 'roles.key': { $regex: /tech/i } }
-      ]
-    }).select('username firstName lastName email contactNumber phoneNumber address avatar');
+      isActive: true, // ✅ only active
+      isVerified: true, // ✅ only verified
+    })
+      .populate('role', 'key name')
+      .select('username firstName lastName email contactNumber techId role');
 
-    const normalized = techs.map(u => ({
+    // filter explicitly for technician role
+    const filtered = techs.filter(
+      (u) => u.role?.key?.toLowerCase() === 'technician'
+    );
+
+    const normalized = filtered.map((u) => ({
       _id: u._id,
-      username: u.username || `${u.firstName || ''} ${u.lastName || ''}`.trim(),
+      name: u.username || `${u.firstName} ${u.lastName}`.trim(),
       email: u.email,
-      phone: u.contactNumber || u.phoneNumber || '',
-      address: u.address || '',
-      avatar: u.avatar || ''
+      contact: u.contactNumber || '',
+      techId: u.techId || '',
     }));
 
-    return res.json(normalized);
+    res.json(normalized);
   } catch (err) {
-    console.error('GET /admin/technicians failed', err);
-    return res.status(500).json({ message: 'Failed to fetch technicians', error: err.message });
+    console.error('Failed to fetch technicians:', err);
+    res.status(500).json({ message: 'Failed to fetch technicians' });
   }
-});
+}));
 
-/**
- * GET /api/tech-requests
- * Admin-protected: returns requests categorized as tech/repair/equipment.
- */
+/* ============================================================
+   ✅ TECH REQUESTS LIST (Pending/Accepted/Rejected)
+=============================================================== */
 router.get('/tech-requests', adminGuard(async (req, res) => {
   try {
-    const docs = await RequestModel.find({
-      $or: [
-        { type: { $regex: /tech|repair|equipment|technician/i } },
-        { requestType: { $regex: /tech|repair|equipment|technician/i } },
-        { category: { $regex: /tech|repair|equipment|technician/i } },
-      ]
-    })
-    .populate('requester', 'username email')
-    .sort({ createdAt: -1 })
-    .lean();
-
-    return res.json(docs);
+    const requests = await TechRequest.find().sort({ createdAt: -1 }).lean();
+    res.json(requests);
   } catch (err) {
-    console.error('GET /tech-requests failed', err);
-    return res.status(500).json({ message: 'Failed to fetch tech requests', error: err.message });
+    console.error('Failed to fetch tech requests:', err);
+    res.status(500).json({ message: 'Failed to fetch tech requests' });
   }
 }));
 
-/**
- * GET /api/requests
- * Admin-protected: returns all requests (useful for filtering client-side).
- */
-router.get('/requests', adminGuard(async (req, res) => {
+/* ============================================================
+   ✅ ACCEPT TECH REQUEST
+=============================================================== */
+router.patch('/tech-requests/:id/accept', adminGuard(async (req, res) => {
   try {
-    const docs = await RequestModel.find().populate('requester', 'username email').sort({ createdAt: -1 }).lean();
-    return res.json(docs);
+    const { id } = req.params;
+    const request = await TechRequest.findById(id);
+    if (!request) return res.status(404).json({ message: 'Request not found' });
+
+    request.status = 'accepted';
+    await request.save();
+
+    const user = await User.findOne({ email: request.email });
+    if (user) {
+      user.isVerified = true;
+      user.isActive = true; // ✅ make them visible + login enabled
+      await user.save();
+
+      // ✅ Optional: Send notification
+      try {
+        await sendEmail(
+          user.email,
+          'Technician Account Approved',
+          `<h3>Your account has been approved!</h3><p>You may now log in to OpenPC.</p>`
+        );
+      } catch (err) {
+        console.warn('Email notification failed:', err.message);
+      }
+    }
+
+    res.json({ message: 'Technician accepted successfully', request });
   } catch (err) {
-    console.error('GET /requests failed', err);
-    return res.status(500).json({ message: 'Failed to fetch requests', error: err.message });
+    console.error('Error accepting technician:', err);
+    res.status(500).json({ message: 'Error accepting technician' });
   }
 }));
 
-/**
- * PATCH /api/requests/:id
- * Admin-protected: allow updating fields (we accept `status` for now).
- */
-router.patch('/requests/:id', adminGuard(async (req, res) => {
+/* ============================================================
+   ✅ REJECT TECH REQUEST
+=============================================================== */
+router.patch('/tech-requests/:id/reject', adminGuard(async (req, res) => {
   try {
-    const updates = {};
-    if (req.body.status !== undefined) updates.status = req.body.status;
-    if (Object.keys(updates).length === 0) return res.status(400).json({ message: 'No allowed update fields provided' });
+    const { id } = req.params;
+    const request = await TechRequest.findById(id);
+    if (!request) return res.status(404).json({ message: 'Request not found' });
 
-    const updated = await RequestModel.findByIdAndUpdate(req.params.id, { $set: updates }, { new: true }).lean();
-    if (!updated) return res.status(404).json({ message: 'Request not found' });
-    return res.json({ message: 'Request updated', request: updated });
-  } catch (err) {
-    console.error('PATCH /requests/:id failed', err);
-    return res.status(500).json({ message: 'Failed to update request', error: err.message });
-  }
-}));
+    request.status = 'rejected';
+    await request.save();
 
-/**
- * POST /api/requests/:id/accept
- * POST /api/requests/:id/decline
- * Admin-protected convenience endpoints.
- */
-router.post('/requests/:id/accept', adminGuard(async (req, res) => {
-  try {
-    const updated = await RequestModel.findByIdAndUpdate(req.params.id, { $set: { status: 'accepted' } }, { new: true }).lean();
-    if (!updated) return res.status(404).json({ message: 'Request not found' });
-    return res.json({ message: 'Accepted', request: updated });
-  } catch (err) {
-    console.error('POST /requests/:id/accept failed', err);
-    return res.status(500).json({ message: 'Failed to accept request', error: err.message });
-  }
-}));
+    const user = await User.findOne({ email: request.email });
+    if (user) {
+      user.isActive = false;
+      user.isVerified = false;
+      await user.save();
+    }
 
-router.post('/requests/:id/decline', adminGuard(async (req, res) => {
-  try {
-    const updated = await RequestModel.findByIdAndUpdate(req.params.id, { $set: { status: 'declined' } }, { new: true }).lean();
-    if (!updated) return res.status(404).json({ message: 'Request not found' });
-    return res.json({ message: 'Declined', request: updated });
+    res.json({ message: 'Technician rejected successfully', request });
   } catch (err) {
-    console.error('POST /requests/:id/decline failed', err);
-    return res.status(500).json({ message: 'Failed to decline request', error: err.message });
+    console.error('Error rejecting technician:', err);
+    res.status(500).json({ message: 'Error rejecting technician' });
   }
 }));
 

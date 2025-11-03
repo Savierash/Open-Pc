@@ -1,10 +1,9 @@
-// src/pages/Signup.jsx
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from "../context/AuthContext";
 import api from '../api';
 import React, { useState, useEffect } from 'react';
 import '../styles/Signup.css';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import ComputerLogo1 from '../assets/LOGO1.png';
 import PersonLogo from '../assets/Person.png';
 import LockLogo from '../assets/Lock.png';
@@ -13,7 +12,6 @@ import WifiLogo from '../assets/wifi_logo.png';
 import ChatLogo from '../assets/chat_logo.png';
 import BroadcastLogo from '../assets/broadcast_logo.png';
 import ToolsLogo from '../assets/tools_logo.png';
-import axios from 'axios';
 
 const Signup = () => {
   const [searchParams] = useSearchParams();
@@ -38,7 +36,7 @@ const Signup = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const { register: registerWithContext, setAuthToken } = useAuth() || {}; // optional helpers from context
+  const { register: registerWithContext } = useAuth() || {};
 
   useEffect(() => {
     setActiveLink(location.pathname);
@@ -68,18 +66,25 @@ const Signup = () => {
         roleKey, // ✅ include role in payload
       };
 
-      // ✅ Always log this so we can debug
       console.log('📦 Sending payload:', payload);
 
-
-      // Fallback: call API directly
       const res = await api.post('/auth/register', payload);
+      console.log('✅ Signup response:', res.data);
 
-      alert('✅ OTP has been sent to your email.');
-      navigate('/otp', { state: { email } });
+      // ✅ Store email for next pages (Documents / Pending)
+      localStorage.setItem('email', email);
+
+      // ✅ Role-based navigation
+      if (roleKey === 'technician') {
+        alert('✅ Registered as technician. Please upload your documents for admin review.');
+        navigate('/documents', { state: { email } });
+      } else {
+        alert('✅ OTP has been sent to your email.');
+        navigate('/otp', { state: { email } });
+      }
 
     } catch (err) {
-      console.error("Signup error:", JSON.stringify(err.response?.data, null, 2) || err.message);
+      console.error("Signup error:", err.response?.data || err.message);
       setError(err.response?.data?.message || 'Signup failed');
     } finally {
       setLoading(false);
@@ -127,6 +132,7 @@ const Signup = () => {
         </div>
       </header>
 
+      {/* Background Logos */}
       <img src={WifiLogo} alt="" className="bg-logo bg-logo-top-left" />
       <img src={ChatLogo} alt="" className="bg-logo bg-logo-top-right" />
       <img src={BroadcastLogo} alt="" className="bg-logo bg-logo-bottom-left" />

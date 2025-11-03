@@ -1,17 +1,21 @@
 const express = require('express');
 const router = express.Router();
-const AuthController = require('../controllers/AuthController');
+const authController = require('../controllers/AuthController'); // ✅ lowercase matches your file
 const { protect } = require('../middleware/authMiddleware');
 
-// existing endpoints (keep them)
-router.post('/register', AuthController.register);
-router.post('/login', AuthController.login);
-router.post('/verify-otp', AuthController.verifyOtp);
+// Existing endpoints
+router.post('/register', authController.register);
+router.post('/login', authController.login);
+router.post('/verify-otp', authController.verifyOtp);
 
-// new: list roles for landing page
-router.get('/roles', AuthController.getRoles);
-// profile routes
-router.get('/profile', protect, AuthController.getProfile);
-router.post('/profile', protect, AuthController.updateProfile);
+// List roles
+router.get('/roles', authController.getRoles);
+
+// Profile routes
+router.get('/profile', protect, authController.getProfile);
+router.post('/profile', protect, authController.updateProfile);
+
+// ✅ New: Check user verification status
+router.get('/status', authController.checkStatus);
 
 module.exports = router;
