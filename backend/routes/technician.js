@@ -5,21 +5,20 @@ const { protect } = require('../middleware/authMiddleware');
 const { requireRole } = require('../middleware/roleMiddleware');
 const TechnicianController = require('../controllers/TechnicianController');
 
-// Dashboard summary
+// ✅ Dashboard summary
 router.get('/dashboard', protect, requireRole('technician'), TechnicianController.getDashboard);
 
-// Units list & update
+// ✅ Units list & update
 router.get('/units', protect, requireRole('technician'), TechnicianController.getUnits);
 router.put('/units/:id', protect, requireRole('technician'), TechnicianController.updateUnit);
 
-// Reports
+// ✅ Reports
 router.get('/reports', protect, requireRole('technician'), TechnicianController.getReports);
 router.post('/reports', protect, requireRole('technician'), TechnicianController.createReport);
-
-// ✅ NEW: Get reports by unit for technician
 router.get('/reports/unit/:unitId', protect, requireRole('technician'), TechnicianController.getReportsByUnit);
+router.put('/reports/:id/status', protect, requireRole('technician'), TechnicianController.updateReportStatus); // 🆕 Added
 
-// Profile
+// ✅ Profile
 router.get('/profile', protect, requireRole('technician'), TechnicianController.getProfile);
 router.put('/profile', protect, requireRole('technician'), TechnicianController.updateProfile);
 router.delete('/delete', protect, requireRole('technician'), TechnicianController.deleteProfile);

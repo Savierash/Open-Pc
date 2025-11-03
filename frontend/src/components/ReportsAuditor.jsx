@@ -191,7 +191,7 @@ const ReportsAuditor = () => {
       const payload = {
       unitId: selectedUnit._id,
       technicianId,
-      issues: Object.keys(reportIssues).filter(k => reportIssues[k]), // ✅ only send checked issues
+      issues: reportIssues, // ✅ FIXED — send complete issue object
       otherIssues
 };
 

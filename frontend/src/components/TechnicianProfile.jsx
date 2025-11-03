@@ -8,7 +8,7 @@ import ComputerLogo1 from "../assets/LOGO1.png";
 import HouseLogo from "../assets/HouseFill.png";
 import ClipboardLogo from "../assets/ClipboardCheck.png";
 import PcDisplayLogo from "../assets/PcDisplayHorizontal.png";
-import axios from "axios";
+import api from "../api";
 import { useNavigate } from "react-router-dom";
 
 const TechnicianProfile = () => {
@@ -17,23 +17,29 @@ const TechnicianProfile = () => {
   const [editing, setEditing] = useState({ contactNumber: "", address: "" });
 
   const navigate = useNavigate();
-  const token = localStorage.getItem("accessToken");
-  const apiBaseUrl = "http://localhost:5000/api";
 
   useEffect(() => {
     setActiveLink(window.location.pathname);
     fetchUserData();
   }, []);
 
-  // ✅ Fetch technician data
+  // ✅ Fetch technician data (with gender + techId)
   const fetchUserData = async () => {
     try {
-      const res = await axios.get(`${apiBaseUrl}/technician/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const res = await api.get("/technician/profile");
+      const userData = res.data.user || res.data;
+
+      // Capitalize gender + ensure techId fallback
+      const formattedGender = userData.gender
+        ? userData.gender.charAt(0).toUpperCase() + userData.gender.slice(1)
+        : "Not specified";
+
+      setUser({
+        ...userData,
+        gender: formattedGender,
+        techId: userData.techId || "N/A",
       });
 
-      const userData = res.data.user || res.data;
-      setUser(userData);
       setEditing({
         contactNumber: userData.contactNumber || "",
         address: userData.address || "",
@@ -41,6 +47,7 @@ const TechnicianProfile = () => {
     } catch (error) {
       console.error("❌ Error fetching user data:", error);
       if (error.response?.status === 401) {
+        alert("Session expired. Please log in again.");
         localStorage.clear();
         navigate("/login");
       }
@@ -51,11 +58,7 @@ const TechnicianProfile = () => {
   const handleUpdate = async (field, value) => {
     setEditing((prev) => ({ ...prev, [field]: value }));
     try {
-      await axios.put(
-        `${apiBaseUrl}/technician/profile`,
-        { [field]: value },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await api.put("/technician/profile", { [field]: value });
     } catch (error) {
       console.error("❌ Update failed:", error);
     }
@@ -70,16 +73,9 @@ const TechnicianProfile = () => {
     formData.append("avatar", file);
 
     try {
-      const res = await axios.post(
-        `${apiBaseUrl}/technician/profile/upload`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const res = await api.post("/technician/profile/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
       const imageUrl = res.data.imageUrl || res.data.url || res.data.path;
       setUser((prev) => ({ ...prev, avatar: imageUrl }));
@@ -89,7 +85,7 @@ const TechnicianProfile = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("accessToken");
+    localStorage.removeItem("token");
     localStorage.removeItem("userRole");
     localStorage.removeItem("username");
     navigate("/");
@@ -97,12 +93,11 @@ const TechnicianProfile = () => {
 
   if (!user) return <p>Loading profile...</p>;
 
-  const avatarUrl =
-    user.avatar?.startsWith("http") || user.avatar?.startsWith("https")
+  const avatarUrl = user.avatar
+    ? user.avatar.startsWith("http")
       ? user.avatar
-      : user.avatar
-      ? `http://localhost:5000${user.avatar}`
-      : PersonCircle;
+      : `http://localhost:5000${user.avatar}`
+    : PersonCircle;
 
   const PencilIcon = ({ width = 18, height = 18 }) => (
     <svg width={width} height={height} viewBox="0 0 24 24" fill="none">
@@ -125,6 +120,7 @@ const TechnicianProfile = () => {
 
   return (
     <div className="dashboard">
+      {/* === HEADER === */}
       <header className="top-bar-dashboard">
         <div className="logo-and-nav">
           <div className="logo">
@@ -141,15 +137,14 @@ const TechnicianProfile = () => {
         </div>
       </header>
 
+      {/* === SIDEBAR + MAIN === */}
       <div className="main-layout three-column">
         <aside className="sidebar">
           <ul className="sidebar-menu">
             <li>
               <a
                 href="/dashboard-technician"
-                className={`sidebar-link ${
-                  activeLink === "/dashboard-technician" ? "active" : ""
-                }`}
+                className={`sidebar-link ${activeLink === "/dashboard-technician" ? "active" : ""}`}
                 onClick={(e) => {
                   e.preventDefault();
                   navigate("/dashboard-technician");
@@ -162,9 +157,7 @@ const TechnicianProfile = () => {
             <li>
               <a
                 href="/unit-status-technician"
-                className={`sidebar-link ${
-                  activeLink === "/unit-status-technician" ? "active" : ""
-                }`}
+                className={`sidebar-link ${activeLink === "/unit-status-technician" ? "active" : ""}`}
                 onClick={(e) => {
                   e.preventDefault();
                   navigate("/unit-status-technician");
@@ -177,9 +170,7 @@ const TechnicianProfile = () => {
             <li>
               <a
                 href="/reports-tech"
-                className={`sidebar-link ${
-                  activeLink === "/reports-tech" ? "active" : ""
-                }`}
+                className={`sidebar-link ${activeLink === "/reports-tech" ? "active" : ""}`}
                 onClick={(e) => {
                   e.preventDefault();
                   navigate("/reports-tech");
@@ -192,9 +183,7 @@ const TechnicianProfile = () => {
             <li>
               <a
                 href="/technician-profile"
-                className={`sidebar-link ${
-                  activeLink === "/technician-profile" ? "active" : ""
-                }`}
+                className={`sidebar-link ${activeLink === "/technician-profile" ? "active" : ""}`}
                 onClick={(e) => {
                   e.preventDefault();
                   navigate("/technician-profile");
@@ -221,6 +210,7 @@ const TechnicianProfile = () => {
                       ? `${user.firstName} ${user.lastName}`
                       : user.username}
                   </p>
+                  {/* ✅ Dynamic gender only */}
                   <p className="user-detail">{user.gender || "Gender not set"}</p>
                 </div>
               </div>
@@ -260,6 +250,7 @@ const TechnicianProfile = () => {
                     <img src={Lock} alt="Lock Icon" className="input-icon" />
                   </div>
                 </div>
+                {/* ✅ Tech ID box (already in form, dynamic) */}
                 <div className="form-group">
                   <label>Tech ID</label>
                   <div className="input-with-icon">
