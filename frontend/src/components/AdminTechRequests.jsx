@@ -13,14 +13,14 @@ import CopyIcon from '../assets/copypaste.png';
 import DocumentIcon from '../assets/icon_5.png';
 
 // configure API client (Vite env or default)
-const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/+$/, '');
+const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/+$/, '');
 const api = axios.create({
   baseURL: API_BASE,
   timeout: 10000,
 });
-// attach token if available
+// attach token if available (check both keys commonly used)
 api.interceptors.request.use((cfg) => {
-  const token = localStorage.getItem('accessToken');
+  const token = localStorage.getItem('accessToken') || localStorage.getItem('token') || null;
   if (token) cfg.headers = { ...(cfg.headers || {}), Authorization: `Bearer ${token}` };
   return cfg;
 }, (err) => Promise.reject(err));
@@ -33,7 +33,9 @@ api.interceptors.request.use((cfg) => {
  * - If backend not available, returns a safe mock list so UI can render.
  */
 export async function fetchTechRequestsFromApi(apiClient = api) {
+  // expanded candidates: include debug route and full /requests route
   const candidates = [
+    '/_debug/requests',      // quick debug route (server helper)
     '/tech-requests',
     '/requests/tech',
     '/requests?type=tech',
@@ -41,30 +43,42 @@ export async function fetchTechRequestsFromApi(apiClient = api) {
   ];
 
   let found = null;
+  let lastErr = null;
 
   for (const url of candidates) {
     try {
       const res = await apiClient.get(url);
       const payload = res?.data;
+      // Accept array at root
       if (Array.isArray(payload)) {
         found = payload;
+        console.info('[fetchTechRequestsFromApi] loaded from', url);
         break;
       }
+      // Accept common wrapped shapes
       if (payload && Array.isArray(payload.requests)) {
         found = payload.requests;
+        console.info('[fetchTechRequestsFromApi] loaded from', url, '-> payload.requests');
         break;
       }
       if (payload && Array.isArray(payload.data)) {
         found = payload.data;
+        console.info('[fetchTechRequestsFromApi] loaded from', url, '-> payload.data');
+        break;
+      }
+      // If payload is single object with .requests-like keys
+      if (payload && payload.requests && Array.isArray(payload.requests)) {
+        found = payload.requests;
         break;
       }
     } catch (err) {
-      // try next candidate
-      // console.debug('candidate failed', url, err?.message || err);
+      lastErr = err;
+      // continue to next candidate
+      console.debug('[fetchTechRequestsFromApi] candidate failed:', url, err?.message || err);
     }
   }
 
-  // fallback: if /requests returned an array of mixed requests, filter by type
+  // fallback: GET /requests and filter server-side if `/requests` returned mixed
   if (!found) {
     try {
       const res = await apiClient.get('/requests');
@@ -74,14 +88,16 @@ export async function fetchTechRequestsFromApi(apiClient = api) {
           const t = (r.type || r.requestType || '').toString().toLowerCase();
           return t.includes('tech') || t.includes('technician') || t.includes('equipment') || t.includes('repair');
         });
+        console.info('[fetchTechRequestsFromApi] filtered /requests locally');
       }
     } catch (err) {
-      // ignore
+      console.debug('[fetchTechRequestsFromApi] fallback /requests failed', err?.message || err);
     }
   }
 
-  // If still not found, return mock data so UI doesn't break (remove mock when backend exists)
+  // If still not found, provide a mock list so UI doesn't break (remove when backend ready)
   if (!found || !Array.isArray(found) || found.length === 0) {
+    console.warn('[fetchTechRequestsFromApi] no backend data found, returning mock list (remove when backend available). Last error:', lastErr?.message || '');
     return [
       {
         _id: 'mock-1',
@@ -143,12 +159,18 @@ export async function updateTechRequestStatusFromApi(apiClient = api, reqId, new
         url: p.url,
         data: p.data || {},
       });
-      if (res && (res.status >= 200 && res.status < 300)) return true;
-      // some backends return 200 with object in data - treat as success
-      if (res && res.data) return true;
+      if (res && (res.status >= 200 && res.status < 300)) {
+        console.info('[updateTechRequestStatusFromApi] success', p.url);
+        return true;
+      }
+      if (res && res.data) {
+        // Some APIs return 200 with data object
+        console.info('[updateTechRequestStatusFromApi] success (data ok)', p.url);
+        return true;
+      }
     } catch (err) {
       lastErr = err;
-      // try next pattern
+      console.debug('[updateTechRequestStatusFromApi] pattern failed', p.url, err?.message || err);
     }
   }
   throw lastErr || new Error('Failed to update status');
@@ -197,13 +219,14 @@ const AdminTechRequests = () => {
 
     try {
       await updateTechRequestStatusFromApi(api, reqId, newStatus);
-      // success — optionally refresh a single request or full list
-      // await loadRequests();
+      // success — leave optimistic UI in place
+      return true;
     } catch (err) {
       console.error('Update status failed', err);
-      // rollback by reloading
+      // rollback by reloading full list
       await loadRequests();
-      setError('Failed to update request. See console.');
+      setError('Failed to update request. See console for details.');
+      return false;
     }
   };
 
