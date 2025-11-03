@@ -155,22 +155,65 @@ const ReportsTech = () => {
       <div className="main-layout three-column">
         <aside className="sidebar">
           <ul className="sidebar-menu">
-            <li><a href="/dashboard-technician" className={`sidebar-link ${activeLink === "/dashboard-technician" ? "active" : ""}`}><img src={HouseLogo} className="menu-icon" alt="Home" /><span>Dashboard</span></a></li>
-            <li><a href="/unit-status-technician" className={`sidebar-link ${activeLink === "/unit-status-technician" ? "active" : ""}`}><img src={MenuButtonWide} className="menu-icon" alt="Unit Status" /><span>Unit Status</span></a></li>
-            <li><a href="/reports-tech" className={`sidebar-link ${activeLink === '/reports-tech' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/reports-tech');}}><img src={ClipboardX} alt="Reports Icon" className="menu-icon" /><span>Reports</span></a></li>
-            <li><a href="/technician-profile" className={`sidebar-link ${activeLink === '/technician-profile' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();handleNavClick('/technician-profile');}}><img src={AccountSettingLogo} alt="Account Setting Icon" className="menu-icon" /><span>Account Setting</span></a></li>
+            <li>
+              <a
+                href="/dashboard-technician"
+                className={`sidebar-link ${activeLink === "/dashboard-technician" ? "active" : ""}`}
+              >
+                <img src={HouseLogo} className="menu-icon" alt="Home" />
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="/unit-status-technician"
+                className={`sidebar-link ${activeLink === "/unit-status-technician" ? "active" : ""}`}
+              >
+                <img src={MenuButtonWide} className="menu-icon" alt="Unit Status" />
+                <span>Unit Status</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="/reports-tech"
+                className={`sidebar-link ${activeLink === '/reports-tech' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/reports-tech');
+                }}
+              >
+                <img src={ClipboardX} alt="Reports Icon" className="menu-icon" />
+                <span>Reports</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="/technician-profile"
+                className={`sidebar-link ${activeLink === '/technician-profile' ? 'active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('/technician-profile');
+                }}
+              >
+                <img src={AccountSettingLogo} alt="Account Setting Icon" className="menu-icon" />
+                <span>Account Setting</span>
+              </a>
+            </li>
           </ul>
         </aside>
 
         <main className="main-content reports-tech-main-content">
           <div className="reports-tech-page-content">
-
             {/* ✅ Labs */}
             <div className="reports-tech-lab-panel">
               <button className="add-lab-button-reports">ADD LAB</button>
               <div className="lab-list-container-reports">
                 {labs.map((lab) => (
-                  <div key={lab._id} className={`lab-card-reports ${lab._id === selectedLab ? 'active' : ''}`} onClick={() => setSelectedLab(lab._id)}>
+                  <div
+                    key={lab._id}
+                    className={`lab-card-reports ${lab._id === selectedLab ? 'active' : ''}`}
+                    onClick={() => setSelectedLab(lab._id)}
+                  >
                     {lab.name}
                   </div>
                 ))}
@@ -180,17 +223,31 @@ const ReportsTech = () => {
             {/* ✅ Units */}
             <div className="reports-tech-middle-panel">
               <div className="middle-panel-header-reports">
-                <h2 className="panel-title">{labs.find(l => l._id === selectedLab)?.name || "Select a Lab"}</h2>
+                <h2 className="panel-title">
+                  {labs.find(l => l._id === selectedLab)?.name || "Select a Lab"}
+                </h2>
                 <div className="search-bar-reports">
-                  <input type="text" placeholder="Search units..." className="search-input" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+                  <input
+                    type="text"
+                    placeholder="Search units..."
+                    className="search-input"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
                 </div>
               </div>
               <div className="report-cards-grid">
                 {filteredUnits.length > 0 ? (
                   filteredUnits.map((unit) => (
-                    <div key={unit._id} className={`report-card ${unit._id === selectedUnit ? 'selected' : ''}`} onClick={() => setSelectedUnit(unit._id)}>
+                    <div
+                      key={unit._id}
+                      className={`report-card ${unit._id === selectedUnit ? 'selected' : ''}`}
+                      onClick={() => setSelectedUnit(unit._id)}
+                    >
                       <span>{unit.name}</span>
-                      <span className={`status-tag ${unit.status?.toLowerCase().replace(/\s+/g, '-')}`}>
+                      <span
+                        className={`status-tag ${unit.status?.toLowerCase().replace(/\s+/g, '-')}`}
+                      >
                         {unit.status}
                       </span>
                     </div>
@@ -203,70 +260,78 @@ const ReportsTech = () => {
 
             {/* ✅ Reports */}
             <div className="reports-tech-info-panel">
-  <h2 className="panel-title">REPORTS</h2>
+              <h2 className="panel-title">REPORTS</h2>
+              {loading ? (
+                <p>Loading reports...</p>
+              ) : reports.length > 0 ? (
+                <>
+                  <div className="report-list">
+                    {reports.map((report) => (
+                      <div
+                        key={report._id}
+                        className={`report-item ${selectedReport?._id === report._id ? "active" : ""}`}
+                        onClick={() => setSelectedReport(report)}
+                      >
+                        <div className="report-header">
+                          <strong>{report.auditor?.username || "Auditor Unknown"}</strong>
+                        </div>
+                        <div className="report-status">Status: {report.status}</div>
+                      </div>
+                    ))}
+                  </div>
 
-  {loading ? (
-    <p>Loading reports...</p>
-  ) : reports.length > 0 ? (
-    <>
-      <div className="report-list">
-        {reports.map((report) => (
-          <div
-            key={report._id}
-            className={`report-item ${selectedReport?._id === report._id ? "active" : ""}`}
-            onClick={() => setSelectedReport(report)}
-          >
-            <div className="report-header">
-              <strong>{report.auditor?.username || "Auditor Unknown"}</strong>
-              <span className="report-date">{new Date(report.createdAt).toLocaleDateString()}</span>
+                  {selectedReport && (
+                    <div className="report-details">
+                      <div className="report-detail-card-header">
+                        <span>{selectedReport.unit.name}</span>
+                        <span
+                          className={`status-tag ${selectedReport.unit.status?.toLowerCase().replace(/\s+/g, '-')}`}
+                        >
+                          {selectedReport.unit.status}
+                        </span>
+                      </div>
+
+                      <div className="info-item-reports">
+                        <strong>Auditor:</strong> {selectedReport.auditor?.username || "N/A"}
+                      </div>
+                      <div className="info-item-reports">
+                        <strong>Technician:</strong> {selectedReport.technician?.username || "N/A"}
+                      </div>
+                      <div className="info-item-reports">
+                        <strong>Date:</strong> {new Date(selectedReport.createdAt).toLocaleDateString()}
+                      </div>
+                      <div className="info-item-reports">
+                        <strong>Status:</strong> {selectedReport.status}
+                      </div>
+
+                      {selectedReport.issues && (
+                        <div className="issues-checkbox-grid">
+                          {Object.entries(selectedReport.issues).map(([key, value]) => (
+                            <div key={key}>
+                              <input type="checkbox" checked={value} disabled />
+                              <label>{key.replace(/([A-Z])/g, ' $1')}</label>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <textarea
+                        className="other-issues-textarea"
+                        value={selectedReport.otherIssues || "No other issues"}
+                        readOnly
+                      />
+                    </div>
+                  )}
+                </>
+              ) : (
+                <p>No reports found for this unit</p>
+              )}
             </div>
-            <div className="report-status">Status: {report.status}</div>
           </div>
-        ))}
+        </main>
       </div>
-
-      {selectedReport && (
-        <div className="report-details">
-          <div className="report-detail-card-header">
-            <span>{selectedReport.unit.name}</span>
-            <span className={`status-tag ${selectedReport.unit.status?.toLowerCase().replace(/\s+/g, '-')}`}>
-              {selectedReport.unit.status}
-            </span>
-          </div>
-
-          <div className="info-item-reports"><strong>Auditor:</strong> {selectedReport.auditor?.username || "N/A"}</div>
-          <div className="info-item-reports"><strong>Technician:</strong> {selectedReport.technician?.username || "N/A"}</div>
-          <div className="info-item-reports"><strong>Date:</strong> {new Date(selectedReport.createdAt).toLocaleDateString()}</div>
-          <div className="info-item-reports"><strong>Status:</strong> {selectedReport.status}</div>
-
-          {selectedReport.issues && (
-            <div className="issues-checkbox-grid">
-              {Object.entries(selectedReport.issues).map(([key, value]) => (
-                <div key={key}>
-                  <input type="checkbox" checked={value} disabled />
-                  <label>{key.replace(/([A-Z])/g, ' $1')}</label>
-                </div>
-              ))}
-            </div>
-          )}
-
-          <textarea
-            className="other-issues-textarea"
-            value={selectedReport.otherIssues || "No other issues"}
-            readOnly
-          />
-        </div>
-      )}
-        </>
-      ) : (
-        <p>No reports found for this unit</p>
-      )}
     </div>
-  </div>
-</main>
-</div>
-</div>
-);
+  );
 };
 
 export default ReportsTech;

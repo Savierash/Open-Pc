@@ -135,8 +135,10 @@ exports.getReports = async (req, res) => {
   try {
     const techId = req.user?.id || req.user?._id;
     const reports = await Report.find({ technician: techId })
-      .populate('unit', 'name status')
+      .populate('unit', 'name status lab')
+      .populate('auditor', 'username email') // ✅ add this too
       .sort({ createdAt: -1 });
+
     res.json(reports);
   } catch (err) {
     res.status(500).json({ message: 'Failed to load reports', error: err.message });
@@ -145,15 +147,27 @@ exports.getReports = async (req, res) => {
 
 exports.getReportsByUnit = async (req, res) => {
   try {
-    const { unitId } = req.params; // ✅ CORRECT
+    const { unitId } = req.params;
+
+    if (!unitId) {
+      return res.status(400).json({ message: 'Unit ID is required' });
+    }
+
+    // ✅ Include auditor data for technician visibility
     const reports = await Report.find({ unit: unitId })
-      .populate('unit technician', 'name username status')
+      .populate('unit', 'name status lab')
+      .populate('technician', 'username email')
+      .populate('auditor', 'username email') // ✅ important!
       .sort({ createdAt: -1 });
 
-    res.json(reports);
+    if (!reports.length) {
+      return res.status(404).json({ message: 'No reports found for this unit' });
+    }
+
+    res.status(200).json(reports);
   } catch (err) {
-    console.error('Error fetching unit reports:', err);
-    res.status(500).json({ message: 'Error fetching reports' });
+    console.error('❌ Technician getReportsByUnit error:', err);
+    res.status(500).json({ message: 'Failed to fetch reports', error: err.message });
   }
 };
 
@@ -201,18 +215,32 @@ exports.updateReportStatus = async (req, res) => {
 // ✅ Technician Profile
 exports.getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select('-password');
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    const user = await User.findById(req.user.id)
+      .select("-password"); // Exclude password, include everything else
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // ✅ Send full user info so frontend sees techId & gender
     res.json({
-      firstName: user.firstName,
-      lastName: user.lastName,
-      username: user.username,
-      email: user.email,
-      role: user.role?.name || "Technician",
+      user: {
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        username: user.username,
+        email: user.email,
+        gender: user.gender,
+        techId: user.techId,
+        contactNumber: user.contactNumber,
+        address: user.address,
+        avatar: user.avatar,
+        role: user.role?.name || "Technician",
+      },
     });
   } catch (err) {
-    console.error('getProfile error:', err);
-    res.status(500).json({ message: 'Failed to load profile', error: err.message });
+    console.error("getProfile error:", err);
+    res.status(500).json({ message: "Failed to load profile", error: err.message });
   }
 };
 

@@ -115,7 +115,7 @@ exports.getReports = async (req, res) => {
 
 exports.createReport = async (req, res) => {
   try {
-    const { unitId, technicianId, issues, otherIssues } = req.body;
+    const { unitId, technicianId, issues = {}, otherIssues = '' } = req.body;
 
     // Validate required fields
     if (!unitId || !technicianId) {
@@ -134,21 +134,32 @@ exports.createReport = async (req, res) => {
       return res.status(404).json({ message: 'Technician not found or invalid role' });
     }
 
-    // Create report
+    // ✅ Build complete issues object with defaults
+    const defaultIssues = {
+      ramIssue: false,
+      osIssue: false,
+      cpuIssue: false,
+      noInternet: false,
+      storageIssue: false,
+      virus: false,
+      ...issues, // merge true/false values coming from frontend
+    };
+
+    // ✅ Create and save report
     const newReport = new Report({
       unit: unitId,
-      technician: technicianId, // ✅ assigned technician
+      technician: technicianId,
       auditor: req.user._id,
-      issues,
+      issues: defaultIssues,
       otherIssues,
       status: 'open',
     });
 
-    await newReport.save();
+    const savedReport = await newReport.save();
 
-    // Populate for frontend response
-    const populatedReport = await newReport.populate([
-      { path: 'unit', select: 'name' },
+    // ✅ Populate for clean frontend response
+    const populatedReport = await savedReport.populate([
+      { path: 'unit', select: 'name status' },
       { path: 'technician', select: 'username email' },
       { path: 'auditor', select: 'username email' },
     ]);
@@ -158,7 +169,7 @@ exports.createReport = async (req, res) => {
       report: populatedReport,
     });
   } catch (err) {
-    console.error('Auditor createReport error:', err);
+    console.error('❌ Auditor createReport error:', err);
     res.status(500).json({
       message: 'Failed to create report',
       error: err.message,
