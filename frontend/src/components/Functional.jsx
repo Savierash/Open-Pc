@@ -17,6 +17,20 @@ import PersonLogo from '../assets/Person.png';
 import ToolsLogo from '../assets/tools_logo.png';
 import AccountSettingLogo from '../assets/GearFill.png'; // Account Setting icon
 
+// Recharts imports (fixes the ResponsiveContainer not defined error)
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Tooltip,
+  Cell,
+} from 'recharts';
+
+// simple color palette for slices
+const COLORS = [
+  '#4fff5bff', '#13bd04ff', '#84CC16', '#0c6b2aff', '#015503ff'
+];
+
 const Functional = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
 
@@ -27,13 +41,12 @@ const Functional = () => {
   const [loadingLabs, setLoadingLabs] = useState(false);
   const [loadingUnits, setLoadingUnits] = useState(false);
 
-  // useAuth may provide user info; guard in case context isn't wired
+  // safe useAuth usage — don't crash if context isn't provided
   let user = null;
   try {
-    const auth = useAuth?.();
+    const auth = typeof useAuth === 'function' ? useAuth() : null;
     user = auth?.user ?? null;
   } catch (e) {
-    // If useAuth isn't available at runtime, continue without user
     user = null;
   }
 
@@ -69,7 +82,7 @@ const Functional = () => {
     setLoadingLabs(true);
     try {
       const res = await api.get('/labs');
-      const labsData = res.data || [];
+      const labsData = Array.isArray(res?.data) ? res.data : (res?.data?.labs || []);
       setLabs(labsData);
       if (labsData.length > 0 && !selectedLabId) {
         setSelectedLabId(labsData[0]._id);
@@ -87,7 +100,7 @@ const Functional = () => {
     setLoadingUnits(true);
     try {
       const res = await api.get('/units', { params: { status: 'Functional' } });
-      const units = res.data || [];
+      const units = Array.isArray(res?.data) ? res.data : (res?.data?.units || []);
       setFunctionalUnits(units);
 
       // ensure a lab is selected if not set
@@ -110,11 +123,13 @@ const Functional = () => {
     try {
       const payload = { name: name.trim(), lab: selectedLabId, status: 'Functional' };
       const res = await api.post('/units', payload);
-      if (res.data) {
-        setFunctionalUnits(prev => [...prev, res.data]);
+      const created = res?.data || res;
+      if (created) {
+        setFunctionalUnits(prev => [...prev, created]);
         // if added in current selectedLab, update unitsForLab too
-        if (String(res.data.lab) === String(selectedLabId) || (res.data.lab && res.data.lab._id && String(res.data.lab._id) === String(selectedLabId))) {
-          setUnitsForLab(prev => [...prev, res.data]);
+        const createdLabId = created.lab && (created.lab._id || created.lab) ? (created.lab._id || created.lab) : null;
+        if (!createdLabId || String(createdLabId) === String(selectedLabId)) {
+          setUnitsForLab(prev => [...prev, created]);
         }
       }
       // optionally refresh labs counts
@@ -208,8 +223,8 @@ const Functional = () => {
               </a>
             </li>
             <li>
-              <a 
-                href="/unit-status-auditor" 
+              <a
+                href="/unit-status-auditor"
                 className={`sidebar-link ${activeLink === '/unit-status-auditor' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
@@ -221,8 +236,8 @@ const Functional = () => {
               </a>
             </li>
             <li>
-              <a 
-                href="/reports-auditor" 
+              <a
+                href="/reports-auditor"
                 className={`sidebar-link ${activeLink === '/reports-auditor' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
@@ -234,8 +249,8 @@ const Functional = () => {
               </a>
             </li>
             <li>
-              <a 
-                href="/technicians" 
+              <a
+                href="/technicians"
                 className={`sidebar-link ${activeLink === '/technicians' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
@@ -247,8 +262,8 @@ const Functional = () => {
               </a>
             </li>
             <li>
-              <a 
-                href="/auditor-profile" 
+              <a
+                href="/auditor-profile"
                 className={`sidebar-link ${activeLink === '/auditor-profile' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
