@@ -203,29 +203,70 @@ const ReportsTech = () => {
 
             {/* ✅ Reports */}
             <div className="reports-tech-info-panel">
-              <h2 className="panel-title">REPORTS</h2>
-              {selectedReport ? (
-                <>
-                  <div className="report-detail-card-header">
-                    <span>{selectedReport.unit.name}</span>
-                    <span className={`status-tag ${selectedReport.unit.status === 'out-of-order' ? 'out-of-order' : 'functional'}`}>
-                      {selectedReport.unit.status}
-                    </span>
-                  </div>
-                  <div className="info-item-reports"><span>Technician: {selectedReport.technician?.username || "N/A"}</span></div>
-                  <div className="info-item-reports"><span>Date Issued: {new Date(selectedReport.createdAt).toLocaleDateString()}</span></div>
-                  <div className="info-item-reports"><span>Status: {selectedReport.status}</span></div>
-                </>
-              ) : (
-                <p>Select a report to view details</p>
-              )}
-            </div>
+  <h2 className="panel-title">REPORTS</h2>
 
+  {loading ? (
+    <p>Loading reports...</p>
+  ) : reports.length > 0 ? (
+    <>
+      <div className="report-list">
+        {reports.map((report) => (
+          <div
+            key={report._id}
+            className={`report-item ${selectedReport?._id === report._id ? "active" : ""}`}
+            onClick={() => setSelectedReport(report)}
+          >
+            <div className="report-header">
+              <strong>{report.auditor?.username || "Auditor Unknown"}</strong>
+              <span className="report-date">{new Date(report.createdAt).toLocaleDateString()}</span>
+            </div>
+            <div className="report-status">Status: {report.status}</div>
           </div>
-        </main>
+        ))}
       </div>
+
+      {selectedReport && (
+        <div className="report-details">
+          <div className="report-detail-card-header">
+            <span>{selectedReport.unit.name}</span>
+            <span className={`status-tag ${selectedReport.unit.status?.toLowerCase().replace(/\s+/g, '-')}`}>
+              {selectedReport.unit.status}
+            </span>
+          </div>
+
+          <div className="info-item-reports"><strong>Auditor:</strong> {selectedReport.auditor?.username || "N/A"}</div>
+          <div className="info-item-reports"><strong>Technician:</strong> {selectedReport.technician?.username || "N/A"}</div>
+          <div className="info-item-reports"><strong>Date:</strong> {new Date(selectedReport.createdAt).toLocaleDateString()}</div>
+          <div className="info-item-reports"><strong>Status:</strong> {selectedReport.status}</div>
+
+          {selectedReport.issues && (
+            <div className="issues-checkbox-grid">
+              {Object.entries(selectedReport.issues).map(([key, value]) => (
+                <div key={key}>
+                  <input type="checkbox" checked={value} disabled />
+                  <label>{key.replace(/([A-Z])/g, ' $1')}</label>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <textarea
+            className="other-issues-textarea"
+            value={selectedReport.otherIssues || "No other issues"}
+            readOnly
+          />
+        </div>
+      )}
+        </>
+      ) : (
+        <p>No reports found for this unit</p>
+      )}
     </div>
-  );
+  </div>
+</main>
+</div>
+</div>
+);
 };
 
 export default ReportsTech;

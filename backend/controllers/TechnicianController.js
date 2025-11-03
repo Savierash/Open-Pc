@@ -145,7 +145,7 @@ exports.getReports = async (req, res) => {
 
 exports.getReportsByUnit = async (req, res) => {
   try {
-    const { unitId } = req.query; // ✅ Changed from req.params
+    const { unitId } = req.params; // ✅ CORRECT
     const reports = await Report.find({ unit: unitId })
       .populate('unit technician', 'name username status')
       .sort({ createdAt: -1 });
