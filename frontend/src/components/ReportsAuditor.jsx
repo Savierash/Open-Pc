@@ -385,12 +385,27 @@ const ReportsAuditor = () => {
               </div>
 
               <div className="info-item-auditor input-with-icon">
-                <select value={technicianId} onChange={(e) => setTechnicianId(e.target.value)}>
-                  <option value="">Select Technician</option>
-                  {technicians.map(tech => (
-                    <option key={tech._id} value={tech._id}>{tech.username} ({tech.email})</option>
-                  ))}
-                </select>
+                <select
+  value={technicianId}
+  onChange={(e) => setTechnicianId(e.target.value)}
+  style={{
+    backgroundColor: '#9900ffff', // light grey background
+    color: '#ffffffff',               // black text
+    border: '1px solid #ccc',
+    borderRadius: '6px',
+    padding: '6px 10px',
+    fontSize: '14px',
+    cursor: 'pointer',
+  }}
+>
+  <option value="">Select Technician</option>
+  {technicians.map(tech => (
+    <option key={tech._id} value={tech._id}>
+      {tech.username} ({tech.email})
+    </option>
+  ))}
+</select>
+
                 <img src={EditIcon} alt="Edit Icon" className="input-icon" />
               </div>
 

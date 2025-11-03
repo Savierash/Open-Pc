@@ -507,14 +507,18 @@ const Inventory = () => {
                   <div className="inventory-set-status-section">
                     <span>SET STATUS:</span>
                     <select
-                      className="inventory-status-dropdown"
-                      value={selectedUnit.status || 'Functional'}
-                      onChange={(e) => setSelectedUnit({ ...selectedUnit, status: e.target.value })}
-                    >
-                      <option value="Functional">Functional</option>
-                      <option value="Maintenance">Maintenance</option>
-                      <option value="Out Of Order">Out Of Order</option>
-                    </select>
+                    className="inventory-status-dropdown"
+                    value={selectedUnit.status || 'Functional'}
+                    onChange={(e) => setSelectedUnit({ ...selectedUnit, status: e.target.value })}
+                    style={{
+                      backgroundColor: '#9900ffff',
+                      color: '#ffffffff',  
+                      }}
+                      >
+                        <option value="Functional">Functional</option>
+                        <option value="Maintenance">Maintenance</option>
+                        <option value="Out Of Order">Out Of Order</option>
+                        </select>
                   </div>
                   <button
                     className="inventory-save-button"
