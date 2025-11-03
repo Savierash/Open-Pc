@@ -73,15 +73,9 @@ const Login = () => {
       console.log('✅ Login success:', res.data);
 
       // ✅ Added this: Extract user and token from response
-      const { user, token } = res.data;
+      const { user, token } = await login(usernameOrEmail, password);
 
-      if (!user || !token) {
-        throw new Error('Invalid login response from server');
-      }
 
-      // ✅ Save token and user in localStorage
-      localStorage.setItem('user', JSON.stringify(user));
-      localStorage.setItem('token', token);
 
       // ✅ Redirect based on role
       const dashboardPath = getDashboardPath(user.role);

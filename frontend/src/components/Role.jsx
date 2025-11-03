@@ -54,7 +54,7 @@ const Role = () => {
   const handleRoleClick = (roleKey) => {
     if (!roleKey) return;
     navigate(`/signup?role=${encodeURIComponent(roleKey)}`);
-  };
+  };w
 
   // Decide image for backend roles (if any extra)
   const roleImageForKey = (key) => {
@@ -166,7 +166,7 @@ const Role = () => {
                   ...(img ? { backgroundImage: `url(${img})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}),
                   transition: 'transform .18s, outline .12s',
                 }}
-                aria-label={`Select ${r.name} role`}
+                //aria-label={`Select ${r.name} role`}
                 title={r.name}
               >
                 {!img && (
