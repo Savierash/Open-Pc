@@ -18,22 +18,29 @@ export const AuthProvider = ({ children }) => {
     }
   }, [token]);
 
+  // ✅ Register function
   const register = async (userData) => {
     const response = await api.post('/auth/register', userData);
     return response.data;
   };
 
-  const login = async (credentials) => {
-    const response = await api.post('/auth/login', credentials);
-    const { token, user } = response.data;
+  // ✅ Login function (updated)
+  const login = async (usernameOrEmail, password) => {
+    try {
+      const response = await api.post('/auth/login', { usernameOrEmail, password });
+      const { token, user } = response.data;
 
-    localStorage.setItem('accessToken', token);
-    localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('accessToken', token);
+      localStorage.setItem('user', JSON.stringify(user));
 
-    setToken(token);
-    setUser(user);
+      setToken(token);
+      setUser(user);
 
-    return response.data;
+      return response.data;
+    } catch (error) {
+      console.error("Login error:", error);
+      throw error;
+    }
   };
 
   const logout = () => {
@@ -92,8 +99,8 @@ export const AuthProvider = ({ children }) => {
         updateProfile,
         sendOtp,
         resetPassword,
-        setUser,   // ✅ expose setUser for OTP flow
-        setToken,  // ✅ expose setToken for OTP flow
+        setUser,
+        setToken,
       }}
     >
       {children}
