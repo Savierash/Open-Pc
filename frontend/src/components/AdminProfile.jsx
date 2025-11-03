@@ -232,8 +232,8 @@ const AdminProfile = () => {
         </div>
         <div className="nav-actions">
           <img src={profile.avatar || PersonCircle} alt="Profile Icon" className="profile-icon-dashboard" />
-          <span className="profile-name">{profile.firstName ? `${profile.firstName} ${profile.lastName}` : profile.username}</span>
-          <span className="profile-role">{(profile.role && (profile.role.name || profile.role)) || 'Admin'}</span>
+          <span className="profile-name">{localStorage.getItem('username') || 'User'}</span>
+          <span className="profile-role">{localStorage.getItem('userRole') || 'Role'}</span>
         </div>
       </header>
 

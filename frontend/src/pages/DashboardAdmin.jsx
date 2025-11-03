@@ -118,8 +118,8 @@ const DashboardAdmin = () => {
         </div>
         <div className="nav-actions">
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
-          <span className="profile-name">Admin Name</span> {/* Example Admin Name */}
-          <span className="profile-role">Admin</span> {/* Example Admin Role */}
+          <span className="profile-name">{localStorage.getItem('username') || 'User'}</span>
+          <span className="profile-role">{localStorage.getItem('userRole') || 'Role'}</span>
         </div>
       </header>
 
