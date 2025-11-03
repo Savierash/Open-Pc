@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import '../styles/OTP.css';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import ComputerLogo1 from '../assets/LOGO1.png';

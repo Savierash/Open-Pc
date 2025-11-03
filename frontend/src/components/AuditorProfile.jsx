@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useAuth } from '../context/AuthContext';
 import "../styles/AuditorProfile.css";
 import PersonCircle from "../assets/PersonCircle.png";
 import PencilSquare from "../assets/pencilsquare.png"; // Edit icon
@@ -15,10 +16,39 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const AuditorProfile = () => {
   const navigate = useNavigate(); // Initialize useNavigate
+  const { user, fetchProfile, updateProfile, logout } = useAuth();
+  const [profile, setProfile] = useState(null);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await fetchProfile();
+        if (res && res.user) setProfile(res.user);
+      } catch (err) {
+        console.error('Failed to load profile', err);
+      }
+    };
+    load();
+  }, []);
 
   const handleLogout = () => {
-    // In a real application, you would clear user session/token here
-    navigate('/'); // Redirect to homepage
+    logout();
+    navigate('/');
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const payload = { phoneNumber: profile?.phoneNumber, username: profile?.username };
+      await updateProfile(payload);
+      const res = await fetchProfile();
+      if (res && res.user) setProfile(res.user);
+    } catch (err) {
+      console.error('Save profile failed', err);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -90,13 +120,13 @@ const AuditorProfile = () => {
               <div className="profile-avatar">
                 <img src={PersonCircle} alt="User Avatar" />
                 <div className="user-info">
-                  <p className="user-name">John Paul</p>
-                  <p className="user-detail">Male</p>
+                  <p className="user-name">{profile?.username || user?.username || '—'}</p>
+                  <p className="user-detail">{profile?.email || user?.email || '—'}</p>
                 </div>
               </div>
               <div className="contact-info">
-                <p>Dagupan USA Chicago</p>
-                <p>0918453982</p>
+                <p>{profile?.address || '—'}</p>
+                <p>{profile?.phoneNumber || user?.phoneNumber || '—'}</p>
               </div>
               <div className="profile-actions">
                 <button className="delete-button">Delete</button>
@@ -111,14 +141,14 @@ const AuditorProfile = () => {
                   <label>Full name</label>
                   <div className="input-with-icon">
                     <input type="text" value="John" readOnly />
-                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
+                    <img src={Lock} alt="Lock Icon" className="input-icon" />
                   </div>
                 </div>
                 <div className="form-group">
                   <label>Last Name</label>
                   <div className="input-with-icon">
                     <input type="text" value="Paul" readOnly />
-                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
+                    <img src={Lock} alt="Lock Icon" className="input-icon" />
                   </div>
                 </div>
               </div>
@@ -129,21 +159,21 @@ const AuditorProfile = () => {
                   <label>Email</label>
                   <div className="input-with-icon">
                     <input type="email" value="johnpaul@gmail.com" readOnly />
-                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
+                    <img src={Lock} alt="Lock Icon" className="input-icon" />
                   </div>
                 </div>
                 <div className="form-group">
                   <label>Contact No.</label>
                   <div className="input-with-icon">
                     <input type="text" value="0918453982" readOnly />
-                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
+                    <img src={Lock} alt="Lock Icon" className="input-icon" />
                   </div>
                 </div>
                 <div className="form-group">
                   <label>Address</label>
                   <div className="input-with-icon">
                     <input type="text" value="Dagupan USA Chicago" readOnly />
-                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
+                    <img src={Lock} alt="Lock Icon" className="input-icon" />
                   </div>
                 </div>
               </div>
@@ -157,6 +187,7 @@ const AuditorProfile = () => {
                   </div>
                 </div>
                 <button className="logout-button" onClick={handleLogout}>LOGOUT</button>
+                <button className="signup-button" style={{ marginLeft: 12 }} onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : 'Save'}</button>
               </div>
             </div>
           </div>

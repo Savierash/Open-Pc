@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useAuth } from '../context/AuthContext';
 import "../styles/TechnicianProfile.css";
 import PersonCircle from "../assets/PersonCircle.png";
 import PencilSquare from "../assets/pencilsquare.png"; // Edit icon
@@ -15,9 +16,23 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const TechnicianProfile = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
+  const { user, fetchProfile, updateProfile, logout } = useAuth();
+  const [profile, setProfile] = useState(null);
 
   useEffect(() => {
     setActiveLink(window.location.pathname);
+  }, []);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await fetchProfile();
+        if (res && res.user) setProfile(res.user);
+      } catch (err) {
+        console.error('Failed to load profile', err);
+      }
+    };
+    load();
   }, []);
 
   const navigate = useNavigate(); // Initialize useNavigate
@@ -28,8 +43,8 @@ const TechnicianProfile = () => {
   };
 
   const handleLogout = () => {
-    // In a real application, you would clear user session/token here
-    navigate('/'); // Redirect to homepage
+    logout();
+    navigate('/');
   };
 
   return (
@@ -79,13 +94,13 @@ const TechnicianProfile = () => {
               <div className="profile-avatar">
                 <img src={PersonCircle} alt="User Avatar" />
                 <div className="user-info">
-                  <p className="user-name">Kresner Leonardo</p>
-                  <p className="user-detail">Male</p>
+                  <p className="user-name">{profile?.username || user?.username || '—'}</p>
+                  <p className="user-detail">{profile?.email || user?.email || '—'}</p>
                 </div>
               </div>
               <div className="contact-info">
-                <p>Dagupan USA Chicago</p>
-                <p>0918453982</p>
+                <p>{profile?.address || '—'}</p>
+                <p>{profile?.phoneNumber || user?.phoneNumber || '—'}</p>
               </div>
               <div className="profile-actions">
                 <button className="delete-button">Delete</button>
@@ -100,21 +115,14 @@ const TechnicianProfile = () => {
                   <label>Full name</label>
                   <div className="input-with-icon">
                     <input type="text" value="Kresner" readOnly />
-                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
+                    <img src={Lock} alt="Lock Icon" className="input-icon" />
                   </div>
                 </div>
                 <div className="form-group">
                   <label>Last Name</label>
                   <div className="input-with-icon">
                     <input type="text" value="Leonardo" readOnly />
-                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label>Tech ID</label>
-                  <div className="input-with-icon">
-                    <input type="text" value="01593" readOnly />
-                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
+                    <img src={Lock} alt="Lock Icon" className="input-icon" />
                   </div>
                 </div>
               </div>
@@ -125,21 +133,21 @@ const TechnicianProfile = () => {
                   <label>Email</label>
                   <div className="input-with-icon">
                     <input type="email" value="kresnerleonardo@gmail.com" readOnly />
-                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
+                    <img src={Lock} alt="Lock Icon" className="input-icon" />
                   </div>
                 </div>
                 <div className="form-group">
                   <label>Contact No.</label>
                   <div className="input-with-icon">
                     <input type="text" value="0918453982" readOnly />
-                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
+                    <img src={Lock} alt="Lock Icon" className="input-icon" />
                   </div>
                 </div>
                 <div className="form-group">
                   <label>Address</label>
                   <div className="input-with-icon">
                     <input type="text" value="Dagupan USA Chicago" readOnly />
-                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
+                    <img src={Lock} alt="Lock Icon" className="input-icon" />
                   </div>
                 </div>
               </div>
