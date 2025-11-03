@@ -146,8 +146,8 @@ const Technicians = () => {
         </div>
         <div className="nav-actions">
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
-          <span className="profile-name">{user?.username || 'John Paul'}</span>
-          <span className="profile-role">{user?.role?.name || user?.role || 'Auditor'}</span>
+           <span className="profile-name">{localStorage.getItem('username') || 'User'}</span>
+          <span className="profile-role">{localStorage.getItem('userRole') || 'Role'}</span>
         </div>
       </header>
 
