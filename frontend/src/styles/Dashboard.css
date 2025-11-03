@@ -1382,3 +1382,10 @@
   padding: 0 20px;
   overflow: hidden;
 }
+
+.system-status-card {
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}

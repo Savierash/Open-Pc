@@ -1,21 +1,22 @@
 // src/pages/Dashboard.jsx
+import api from "../api";
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext"; //
-import { Link, useNavigate } from "react-router-dom";
-import api from '../services/api';
-import "../styles/Dashboard.css";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import "../styles/DashboardTechnician.css"; // ✅ same layout styling for visual consistency
+
+// 🖼️ Assets
 import ComputerLogo1 from "../assets/LOGO1.png";
 import HouseLogo from "../assets/HouseFill.png";
 import PcDisplayLogo from "../assets/PcDisplayHorizontal.png";
 import ClipboardLogo from "../assets/ClipboardCheck.png";
 import GearLogo from "../assets/GearFill.png";
-import OctagonLogo from "../assets/XOctagonFill.png";
-import StackLogo from "../assets/icon_6.png"; // Inventory icon
+import MenuButtonWide from "../assets/menubuttonwide.png";
+import ClipboardX from "../assets/clipboardx.png";
+import StackLogo from "../assets/Stack.png";
 import PersonLogo from "../assets/Person.png";
 import ToolsLogo from "../assets/tools_logo.png";
-import AccountSettingLogo from "../assets/GearFill.png"; // Re-using GearFill for Account Setting
-import MenuButtonWide from "../assets/menubuttonwide.png"; // Unit Status icon
-import ClipboardX from "../assets/clipboardx.png"; // Reports icon
+
 import {
   ResponsiveContainer,
   LineChart,
@@ -27,135 +28,96 @@ import {
 } from "recharts";
 
 const Dashboard = () => {
-  const { user, accessToken, loading } = useAuth();
   const navigate = useNavigate();
+  const { user, accessToken, loading: authLoading } = useAuth();
 
+  const [activeLink, setActiveLink] = useState(window.location.pathname);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [data, setData] = useState({
+    totalUnits: 0,
+    counts: { functional: 0, maintenance: 0, outOfOrder: 0 },
+    percentFunctional: 0,
+    perLab: [],
+    recentUnits: [],
+    trend: [],
+  });
+
+  // ✅ Load data after user and token available
   useEffect(() => {
-    if (loading) return; // wait for context to finish loading
-
-    if (!accessToken || user?.role?.toLowerCase() !== "auditor") {
-      navigate("/login");
-      return;
+    if (!authLoading && accessToken && user) {
+      setActiveLink(window.location.pathname);
+      fetchDashboard();
     }
-
-    fetchDashboard();
-  }, [user, accessToken, loading, navigate]);
-
-  const [activeLink, setActiveLink] = useState(window.location.pathname || "/dashboard");
-  const [isDashboardLoading, setIsDashboardLoading] = useState(false); // ✅ renamed to avoid conflict
-
-  const [totalUnits, setTotalUnits] = useState(0);
-  const [counts, setCounts] = useState({ functional: 0, maintenance: 0, outOfOrder: 0 });
-  const [percentFunctional, setPercentFunctional] = useState(0);
-  const [perLab, setPerLab] = useState([]);
-  const [recentUnits, setRecentUnits] = useState([]);
-  const [trend, setTrend] = useState([]);
+  }, [authLoading, accessToken, user]);
 
   async function fetchDashboard() {
-    setIsDashboardLoading(true);
     try {
-      const res = await api.get('/auditor/dashboard');
-      const data = res.data;
+      setLoading(true);
+      const res = await api.get("/auditor/dashboard", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
 
-      setTotalUnits(data.totalUnits || 0);
-      setCounts(data.counts || { functional: 0, maintenance: 0, outOfOrder: 0 });
-      setPercentFunctional(data.percentFunctional || 0);
-      setPerLab(data.perLab || []);
-      setRecentUnits(data.recentUnits || []);
-      setTrend(data.trend || []);
+      const backendData = res.data || {};
+      setData({
+        totalUnits: backendData.totalUnits || 0,
+        counts: backendData.counts || {
+          functional: 0,
+          maintenance: 0,
+          outOfOrder: 0,
+        },
+        percentFunctional: backendData.percentFunctional || 0,
+        perLab: backendData.perLab || [],
+        recentUnits: backendData.recentUnits || [],
+        trend: backendData.trend || [],
+      });
     } catch (err) {
-      console.error("fetchDashboard error:", err);
-      window.alert("Failed to load dashboard data. See console.");
+      console.error("❌ fetchDashboard error:", err?.response ?? err);
+      setError("Failed to load dashboard data.");
     } finally {
-      setIsDashboardLoading(false);
+      setLoading(false);
     }
   }
 
-  // improved StatusChart for dark background & reliable height
-  const StatusChart = ({ dataPoints = [] }) => {
-    const data = (Array.isArray(dataPoints) ? dataPoints : []).map(d => ({
-      date: d.date || '',
-      value: typeof d.value === 'number' ? d.value : Number(d.value) || 0
-    }));
-
-    if (!data.length) {
-      // Render a small placeholder so container still occupies space
-      return (
-        <div style={{ width: '100%', height: 220, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9aa7b2' }}>
-          <div>No trend data available</div>
-        </div>
-      );
-    }
-
-    const values = data.map(d => d.value);
-    const maxVal = values.length ? Math.max(...values) : 100;
-    const minVal = values.length ? Math.min(...values) : 0;
-    // small padding so line isn't flush to edges
-    const pad = Math.max(5, Math.round((maxVal - minVal) * 0.12));
-    const domainTop = Math.max(100, maxVal + pad);
-    const domainBottom = Math.max(0, minVal - pad);
-
-    const CustomTooltipSmall = ({ active, payload }) => {
-      if (!active || !payload || !payload.length) return null;
-      const p = payload[0];
-      return (
-        <div style={{
-          background: 'rgba(8,12,16,0.95)',
-          color: '#fff',
-          padding: 8,
-          borderRadius: 6,
-          boxShadow: '0 6px 18px rgba(0,0,0,0.4)',
-          fontSize: 12,
-          minWidth: 90,
-        }}>
-          <div style={{ fontWeight: 700 }}>{p.payload.date}</div>
-          <div style={{ opacity: 0.9 }}>{p.value}</div>
-        </div>
-      );
-    };
-
-    return (
-      <div style={{ width: '100%', height: 220 }}>
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 6, right: 12, left: -8, bottom: 6 }}>
-            <CartesianGrid stroke="rgba(255,255,255,0.06)" strokeDasharray="3 6" vertical={false} />
-            <XAxis
-              dataKey="date"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: 'rgba(255,255,255,0.75)', fontSize: 12 }}
-              interval="preserveStartEnd"
-              padding={{ left: 6, right: 6 }}
-            />
-            <YAxis
-              domain={[domainBottom, domainTop]}
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 12 }}
-            />
-            <Tooltip content={<CustomTooltipSmall />} cursor={{ stroke: 'rgba(255,255,255,0.06)', strokeWidth: 1 }} />
-            <Line
-              type="monotone"
-              dataKey="value"
-              stroke="#FFFFFF"
-              strokeWidth={3}
-              dot={{ r: 5, stroke: '#0b1220', strokeWidth: 2, fill: '#fff' }}
-              activeDot={{ r: 7 }}
-              strokeLinecap="round"
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-    );
-  };
+  // ✅ Chart identical to Technician Dashboard
+  const StatusChart = ({ dataPoints }) => (
+    <div style={{ width: "100%", height: 200 }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={dataPoints}>
+          <CartesianGrid stroke="#1b2630" strokeDasharray="3 3" vertical={false} />
+          <XAxis dataKey="date" tick={{ fill: "#a5b3c2", fontSize: 12 }} />
+          <YAxis domain={[0, 100]} tick={{ fill: "#a5b3c2", fontSize: 12 }} />
+          <Tooltip
+            contentStyle={{
+              background: "#071019",
+              border: "none",
+              color: "#fff",
+            }}
+            formatter={(v) => `${v}% Functional`}
+          />
+          <Line
+            type="monotone"
+            dataKey="value"
+            stroke="#38bdf8"
+            strokeWidth={3}
+            dot={{ r: 4, fill: "#38bdf8" }}
+            activeDot={{ r: 6 }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
 
   const handleNavClick = (path) => {
     setActiveLink(path);
     navigate(path);
   };
 
+  const { totalUnits, counts, percentFunctional, recentUnits } = data;
+
   return (
     <div className="dashboard">
+      {/* HEADER */}
       <header className="top-bar-dashboard">
         <div className="logo-and-nav">
           <div className="logo">
@@ -163,30 +125,105 @@ const Dashboard = () => {
             <span className="logo-text">OpenPC</span>
             <span className="logo-line">|</span>
           </div>
-          <span className="page-title">Dashboard</span>
+          <span className="page-title">Auditor Dashboard</span>
         </div>
+
+        {/* ✅ Display authenticated user info */}
         <div className="nav-actions">
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
-          <span className="profile-name">{localStorage.getItem('username') || 'User'}</span>
-          <span className="profile-role">{localStorage.getItem('userRole') || 'Role'}</span>
+          <span className="profile-name">
+            {user
+              ? `${user.firstName || user.username || ""} ${user.lastName || ""}`.trim()
+              : "Auditor"}
+          </span>
+          <span className="profile-role">{user?.role?.name || "Auditor"}</span>
         </div>
       </header>
 
+      {/* MAIN */}
       <div className="main-layout three-column">
+        {/* Sidebar */}
         <aside className="sidebar">
           <ul className="sidebar-menu">
-            <li><a href="/dashboard" className={`sidebar-link ${activeLink === "/dashboard" ? "active" : ""}`}><img src={HouseLogo} className="menu-icon" alt="Home" /><span>Dashboard</span></a></li>
-            <li><a href="/inventory" className={`sidebar-link ${activeLink === "/inventory" ? "active" : ""}`}><img src={StackLogo} className="menu-icon" alt="Inventory" /><span>Inventory</span></a></li>
-            <li><a href="/reports-auditor" className={`sidebar-link ${activeLink === '/reports-auditor' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/reports-auditor'); }}><img src={ClipboardLogo} alt="Reports Icon" className="menu-icon" /><span>Reports</span></a></li>
-            <li><a href="/technicians" className={`sidebar-link ${activeLink === '/technicians' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/technicians'); }}><img src={ToolsLogo} alt="Technicians Icon" className="menu-icon" /><span>Technicians</span></a></li>
-            <li><a href="/auditor-profile" className={`sidebar-link ${activeLink === '/auditor-profile' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/auditor-profile'); }}><img src={AccountSettingLogo} alt="Account Setting Icon" className="menu-icon" /><span>Account Setting</span></a></li>
+            <li>
+              <a
+                href="/dashboard"
+                className={`sidebar-link ${activeLink === "/dashboard" ? "active" : ""}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick("/dashboard");
+                }}
+              >
+                <img src={HouseLogo} className="menu-icon" alt="Home" />
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="/inventory"
+                className={`sidebar-link ${activeLink === "/inventory" ? "active" : ""}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick("/inventory");
+                }}
+              >
+                <img src={StackLogo} className="menu-icon" alt="Inventory" />
+                <span>Inventory</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="/reports-auditor"
+                className={`sidebar-link ${
+                  activeLink === "/reports-auditor" ? "active" : ""
+                }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick("/reports-auditor");
+                }}
+              >
+                <img src={ClipboardX} className="menu-icon" alt="Reports" />
+                <span>Reports</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="/technicians"
+                className={`sidebar-link ${activeLink === "/technicians" ? "active" : ""}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick("/technicians");
+                }}
+              >
+                <img src={ToolsLogo} className="menu-icon" alt="Technicians" />
+                <span>Technicians</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="/auditor-profile"
+                className={`sidebar-link ${
+                  activeLink === "/auditor-profile" ? "active" : ""
+                }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick("/auditor-profile");
+                }}
+              >
+                <img src={GearLogo} className="menu-icon" alt="Account Setting" />
+                <span>Account Setting</span>
+              </a>
+            </li>
           </ul>
         </aside>
 
+        {/* Main Content */}
         <main className="main-content">
           <div className="dashboard-main-content">
+            {error && <div className="error-box">⚠️ {error}</div>}
+
             <div className="dashboard-cards">
-              <div className="card total-units clickable-card" onClick={() => handleNavClick('/total-units')}>
+              <div className="card total-units clickable-card">
                 <img src={PcDisplayLogo} alt="PC Display Icon" className="card-icon" />
                 <div className="card-content">
                   <h3>Total Units</h3>
@@ -194,7 +231,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="card functional clickable-card" onClick={() => handleNavClick('/functional')}>
+              <div className="card functional clickable-card">
                 <img src={ClipboardLogo} alt="Clipboard Icon" className="card-icon" />
                 <div className="card-content">
                   <h3>Functional Units</h3>
@@ -202,7 +239,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="card maintenance clickable-card" onClick={() => handleNavClick('/maintenance')}>
+              <div className="card maintenance clickable-card">
                 <img src={ToolsLogo} alt="Tools Icon" className="card-icon" />
                 <div className="card-content">
                   <h3>Under Maintenance</h3>
@@ -211,42 +248,37 @@ const Dashboard = () => {
               </div>
             </div>
 
-
+            {/* Bottom Row */}
             <div className="dashboard-bottom-row">
               <div className="recent-activity-card card" style={{ flex: "0 0 60%" }}>
                 <h3>Recent Units</h3>
                 <ul className="recent-list">
                   {recentUnits.length === 0 ? (
-                    <li style={{ padding: 8 }}>{loading ? "Loading..." : "No recent activity"}</li>
+                    <li>{loading ? "Loading..." : "No recent activity"}</li>
                   ) : (
                     recentUnits.map((u) => (
-                      <li key={u._id} className="recent-item">
-                        <strong>{u.name}</strong> — <span style={{ textTransform: "capitalize" }}>{u.status}</span>
+                      <li key={u._id}>
+                        <strong>{u.name}</strong> —{" "}
+                        <span style={{ textTransform: "capitalize" }}>{u.status}</span>
                         {u.lab?.name && <span> • {u.lab.name}</span>}
-                        <div style={{ fontSize: 12, color: "#666" }}>{u.updatedAt ? new Date(u.updatedAt).toLocaleString() : ''}</div>
+                        <div className="timestamp">
+                          {new Date(u.updatedAt).toLocaleString()}
+                        </div>
                       </li>
                     ))
                   )}
                 </ul>
               </div>
-              
 
               <div className="system-status-card card" style={{ flex: "0 0 35%" }}>
                 <h3>System Status</h3>
                 <p>Database: <strong>Connected</strong></p>
                 <p>API: <strong>{loading ? "Loading..." : "OK"}</strong></p>
-
-                <div style={{ marginTop: 12, background: "transparent" }}>
-                  <StatusChart dataPoints={trend} />
+                <StatusChart dataPoints={data.trend || []} />
+                <div className="status-summary">
+                  <strong>{percentFunctional}%</strong> functional units
                 </div>
-
-                <div style={{ marginTop: 12, textAlign: "center", color: "#ccc" }}>
-                  <strong>{percentFunctional}%</strong> functional
-                </div>
-
-                <div style={{ marginTop: 8, textAlign: "center" }}>
-                  <button onClick={fetchDashboard} className="btn small">Refresh</button>
-                </div>
+                <button onClick={fetchDashboard} className="btn small">Refresh</button>
               </div>
             </div>
           </div>

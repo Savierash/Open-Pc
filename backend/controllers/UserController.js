@@ -59,10 +59,15 @@ exports.get = async (req, res) => {
 // ✅ GET /api/users/me
 exports.getMe = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select('-password');
+    const user = await User.findById(req.user._id)
+      .select('-password')
+      .populate('role', 'name key');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
     res.json(user);
   } catch (err) {
-    console.error('Get me error', err);
+    console.error('Get me error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
