@@ -1,5 +1,6 @@
 // src/pages/unit-status/UnitStatusAuditor.jsx
 import React, { useState, useEffect } from 'react';
+import api from '../api';
 import axios from 'axios';
 import '../styles/Dashboard.css';
 import '../styles/UnitStatusAuditor.css';
@@ -64,7 +65,7 @@ const UnitStatusAuditor = () => {
   async function fetchLabs() {
     setLoading(true);
     try {
-      const res = await axios.get(`${API_BASE}/labs`);
+      const res = await api.get('/labs');
       const list = Array.isArray(res.data) ? res.data : [];
       setLabs(list);
       // prefer 'ITS 300' if present
@@ -81,13 +82,14 @@ const UnitStatusAuditor = () => {
   async function fetchUnits(labId) {
     setLoading(true);
     try {
-      const res = await axios.get(`${API_BASE}/units?labId=${labId}`);
+      const res = await api.get(`/units?labId=${labId}`); 
+      console.log("✅ Units API response:", res.data);
       // backend returns array of units
       const list = Array.isArray(res.data) ? res.data : [];
       // normalize to { id, status } shape for UI compatibility
       setUnits(list.map(u => ({
         _id: u._id,
-        id: u.name || u._id,
+        name: u.name,
         status: u.status || 'Functional',
         raw: u
       })));
@@ -205,7 +207,7 @@ const UnitStatusAuditor = () => {
                 <div className="auditor-pc-card" key={unit.id}>
                   <img src={PcDisplayIcon} alt="PC Icon" className="auditor-pc-card-icon" />
                   <div className="auditor-pc-card-content">
-                    <span>{unit.id}</span>
+                    <span>{unit.name}</span>
                     <div className="status-indicator">
                       <span>{unit.status}</span>
                       <span className={`status-dot ${unit.status.toLowerCase().replace(/ /g, '-')}`}></span>

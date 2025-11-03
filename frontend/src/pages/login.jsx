@@ -48,16 +48,6 @@ const Login = () => {
 
   const handleNavClick = (path) => navigate(path);
 
-  // --- Helper: Extract roles from the returned user object ---
-  const getDashboardPath = (role) => {
-    if (!role) return '/dashboard';
-    const r = role.toLowerCase();
-    if (r === 'admin') return '/Dashboard-admin';
-    if (r === 'auditor') return '/Dashboard';
-    if (r === 'tech' || r === 'technician') return '/Dashboard-technician';
-    return '/dashboard';
-  };
-
   // --- Login Submit ---
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -73,13 +63,21 @@ const Login = () => {
       console.log('✅ Login success:', res.data);
 
       // ✅ Added this: Extract user and token from response
-      const { user, token } = await login(usernameOrEmail, password);
+      const { user, token } = res.data;
+      
+      localStorage.clear();
+      localStorage.setItem('token', token);
+      localStorage.setItem('userRole', user.role);
+      localStorage.setItem('username', user.username);
 
-
+      login(user, token);
 
       // ✅ Redirect based on role
-      const dashboardPath = getDashboardPath(user.role);
-      navigate(dashboardPath);
+      const role = user.role?.toLowerCase();
+      if (role === 'auditor') navigate('/dashboard');
+      else if (role === 'technician') navigate('/dashboard-technician');
+      else if (role === 'admin') navigate('/dashboard-admin');
+      else navigate('/dashboard'); // default fallback
     } catch (err) {
       console.error('Login error:', err);
       setError(err.response?.data?.message || 'Login failed — please check your credentials.');

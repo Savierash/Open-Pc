@@ -1,7 +1,6 @@
 // src/pages/Dashboard.jsx
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from 'axios';
 import api from '../services/api';
 import "../styles/Dashboard.css";
 import ComputerLogo1 from "../assets/LOGO1.png";
@@ -30,13 +29,15 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userRole = localStorage.getItem('userRole');
+  const token = localStorage.getItem('token');
+  const userRole = localStorage.getItem('userRole');
 
-    if (!token || userRole?.toLowerCase() !== 'auditor') {
-      navigate('/login'); // Redirect unauthorized access
-    }
-  }, [navigate]);
+  if (!token || userRole?.toLowerCase() !== 'auditor') {
+    navigate('/login');
+  } else {
+    fetchDashboard(); // ✅ load dashboard right away
+  }
+}, [navigate]);
   
   const [activeLink, setActiveLink] = useState(window.location.pathname || "/dashboard");
   const [loading, setLoading] = useState(false);
@@ -51,88 +52,24 @@ const Dashboard = () => {
 
 
   async function fetchDashboard() {
-    setLoading(true);
-    try {
-      const labsPromise = api.get('/labs');
-      const recentPromise = api.get('/units', { params: { limit: 8, sort: "-updatedAt" } });
-      const allUnitsPromise = api.get('/units');
+  setLoading(true);
+  try {
+    const res = await api.get('/auditor/dashboard');
+    const data = res.data;
 
-      const [labsRes, recentRes, allUnitsRes] = await Promise.allSettled([
-        labsPromise,
-        recentPromise,
-        allUnitsPromise,
-      ]);
-
-      // labs
-      let labsData = [];
-      if (labsRes.status === "fulfilled") {
-        labsData = labsRes.value?.data || [];
-        setPerLab(labsData);
-        const total = labsData.reduce((acc, l) => acc + (Number(l.unitCount) || 0), 0);
-        setTotalUnits(total);
-      } else {
-        console.error("labs fetch failed:", labsRes.reason);
-        setPerLab([]);
-        setTotalUnits(0);
-      }
-
-      // recent
-      if (recentRes.status === "fulfilled") {
-        const rec = recentRes.value?.data || [];
-        const sorted = Array.isArray(rec)
-          ? rec.slice().sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)).slice(0, 8)
-          : [];
-        setRecentUnits(sorted);
-      } else {
-        console.error("recent units fetch failed:", recentRes.reason);
-        setRecentUnits([]);
-      }
-
-      // all units -> counts
-      if (allUnitsRes.status === "fulfilled") {
-        const all = allUnitsRes.value?.data || [];
-        const byStatus = { functional: 0, maintenance: 0, outOfOrder: 0 };
-        all.forEach((u) => {
-          const s = (u.status || "").toLowerCase();
-          if (s === "functional" || s === "function") byStatus.functional += 1;
-          else if (s === "maintenance") byStatus.maintenance += 1;
-          else if (s === "outoforder" || s === "out-of-order" || s === "out of order") byStatus.outOfOrder += 1;
-        });
-
-        const allUnitsCount = all.length;
-        if (allUnitsCount > 0 && byStatus.functional === 0 && byStatus.maintenance === 0 && byStatus.outOfOrder === 0) {
-          setCounts({ functional: 0, maintenance: 0, outOfOrder: 0 });
-          setPercentFunctional(0);
-        } else {
-          setCounts(byStatus);
-          const denom = byStatus.functional + byStatus.maintenance + byStatus.outOfOrder;
-          const pf = denom ? Math.round((byStatus.functional / denom) * 100) : 0;
-          setPercentFunctional(pf);
-        }
-
-        if (!totalUnits && allUnitsCount > 0) {
-          setTotalUnits(allUnitsCount);
-        }
-      } else {
-        console.error("all units fetch failed:", allUnitsRes.reason);
-      }
-
-      // trend: use backend if available, else mock (ensure numeric values)
-      const trendMock = [
-        { date: "Sept 10", value: 25 },
-        { date: "Sept 11", value: 45 },
-        { date: "Sept 12", value: 50 },
-        { date: "Sept 13", value: 55 },
-        { date: "Sept 14", value: 75 },
-      ];
-      setTrend(trendMock.map(t => ({ date: t.date, value: Number(t.value) || 0 })));
-    } catch (err) {
-      console.error("fetchDashboard error:", err);
-      window.alert("Failed to load dashboard data. See console.");
-    } finally {
-      setLoading(false);
-    }
+    setTotalUnits(data.totalUnits || 0);
+    setCounts(data.counts || { functional: 0, maintenance: 0, outOfOrder: 0 });
+    setPercentFunctional(data.percentFunctional || 0);
+    setPerLab(data.perLab || []);
+    setRecentUnits(data.recentUnits || []);
+    setTrend(data.trend || []);
+  } catch (err) {
+    console.error("fetchDashboard error:", err);
+    window.alert("Failed to load dashboard data. See console.");
+  } finally {
+    setLoading(false);
   }
+}
 
   // improved StatusChart for dark background & reliable height
   const StatusChart = ({ dataPoints = [] }) => {
@@ -230,8 +167,8 @@ const Dashboard = () => {
         </div>
         <div className="nav-actions">
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
-          <span className="profile-name">John Paul</span>
-          <span className="profile-role">Auditor</span>
+          <span className="profile-name">{localStorage.getItem('username') || 'User'}</span>
+          <span className="profile-role">{localStorage.getItem('userRole') || 'Role'}</span>
         </div>
       </header>
 
@@ -274,6 +211,7 @@ const Dashboard = () => {
               </div>
             </div>
 
+
             <div className="dashboard-bottom-row">
               <div className="recent-activity-card card" style={{ flex: "0 0 60%" }}>
                 <h3>Recent Units</h3>
@@ -291,6 +229,7 @@ const Dashboard = () => {
                   )}
                 </ul>
               </div>
+              
 
               <div className="system-status-card card" style={{ flex: "0 0 35%" }}>
                 <h3>System Status</h3>

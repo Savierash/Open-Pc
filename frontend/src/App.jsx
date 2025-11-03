@@ -1,6 +1,7 @@
 import React from 'react';
-import { AuthProvider } from './context/AuthContext';
-import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuditorProvider } from './context/AuditorContext';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 // Page Imports
 import Homepage from './pages/Homepage';  
@@ -20,7 +21,7 @@ import OTP from './components/OTP.jsx';
 import ForgotPasswordOTP from './components/ForgotPasswordOTP.jsx';
 import ResetPassword from './components/ResetPassword.jsx';
 import ForgotPassword from './components/ForgotPassword.jsx';
-import ReportsAuditor from './components/ReportsAuditor.jsx'
+import ReportsAuditor from './components/ReportsAuditor.jsx';
 import ReportsTech from './components/ReportsTech.jsx';
 import PrivateRoute from './components/PrivateRoute';
 import RoleRoute from './components/RoleRoute';
@@ -33,12 +34,12 @@ import TechnicianProfile from './components/TechnicianProfile.jsx';
 import AdminProfile from './components/AdminProfile.jsx';
 import UnitStatusTechnician from './components/UnitStatusTechnician.jsx';
 import UnitStatusAuditor from './components/UnitStatusAuditor.jsx';
-import AdminTechnicians from './components/AdminTechnicians.jsx'; // Import AdminTechnicians
-import AdminTechRequests from './components/AdminTechRequests.jsx'; // Import AdminTechRequests
+import AdminTechnicians from './components/AdminTechnicians.jsx';
+import AdminTechRequests from './components/AdminTechRequests.jsx';
 import DocumentPage from './pages/document.jsx';
 import Pending from './components/Pending';
 
-/*STYLES*/
+// STYLES
 import './styles/Homepage.css';
 import './styles/Dashboard.css';  
 import './styles/Services.css';
@@ -58,45 +59,61 @@ import './styles/AdminProfile.css';
 import './styles/UnitStatusAuditor.css';
 import './styles/Pending.css';
 
+// 🔹 Helper wrapper for conditional context
+const AppRoutes = () => {
+  const { user } = useAuth();
+
+  // If logged in as auditor, wrap routes in AuditorProvider
+  const Wrapper = user?.role === 'auditor' ? AuditorProvider : React.Fragment;
+
+  return (
+    <Wrapper>
+      <Routes>
+        <Route path="/document" element={<DocumentPage />} />
+        <Route path="/" element={<Homepage />} />
+        <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+        <Route path="/services" element={<Services />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/otp" element={<OTP />} />
+        <Route path="/forgot-password-otp" element={<ForgotPasswordOTP />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/inventory" element={<Inventory />} />
+        <Route path="/total-units" element={<TotalUnits />} />
+        <Route path="/functional" element={<Functional />} />
+        <Route path="/maintenance" element={<Maintenance />} />
+        <Route path="/out-of-order" element={<OutOfOrder />} />
+
+        {/* ✅ Role-based routes */}
+        <Route path="/reports-tech" element={<RoleRoute allowed={["technician","admin"]}><ReportsTech /></RoleRoute>} />
+        <Route path="/reports-auditor" element={<RoleRoute allowed={["auditor","admin"]}><ReportsAuditor /></RoleRoute>} />
+
+        <Route path="/role" element={<Role />} /> 
+        <Route path="/technicians" element={<Technicians />} /> 
+        <Route path="/auditor-profile" element={<AuditorProfile />} />
+        <Route path="/dashboard-technician" element={<DashboardTechnician />} />
+        <Route path="/unit-status-technician" element={<UnitStatusTechnician />} />
+        <Route path="/technician-profile" element={<TechnicianProfile />} />
+        <Route path="/dashboard-admin" element={<DashboardAdmin />} />
+        <Route path="/admin-profile" element={<AdminProfile />} />
+        <Route path="/unit-status-auditor" element={<UnitStatusAuditor />} />
+        <Route path="/admin-technicians" element={<AdminTechnicians />} />
+        <Route path="/admin-tech-requests" element={<AdminTechRequests />} />
+        <Route path="/pending" element={<Pending />} />
+      </Routes>
+    </Wrapper>
+  );
+};
 
 function App() {
   return (
     <AuthProvider>
-    <Router>
-      <Routes>
-          <Route path="/document" element={<DocumentPage />} />
-          <Route path="/" element={<Homepage />} />
-          <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/otp" element={<OTP />} />
-          <Route path="/forgot-password-otp" element={<ForgotPasswordOTP />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/inventory" element={<Inventory />} />
-          <Route path="/total-units" element={<TotalUnits />} />
-          <Route path="/functional" element={<Functional />} />
-          <Route path="/maintenance" element={<Maintenance />} />
-          <Route path="/out-of-order" element={<OutOfOrder />} />
-          <Route path="/reports-tech" element={<RoleRoute allowed={["technician","admin"]}><ReportsTech /></RoleRoute>} />
-          <Route path="/reports-auditor" element={<RoleRoute allowed={["auditor","admin"]}><ReportsAuditor /></RoleRoute>} />
-          <Route path="/role" element={<Role />} /> 
-          <Route path="/technicians" element={<Technicians />} /> 
-          <Route path="/auditor-profile" element={<AuditorProfile />} />
-          <Route path="/dashboard-technician" element={<DashboardTechnician />} />
-          <Route path="/unit-status-technician" element={<UnitStatusTechnician />} />
-          <Route path="/technician-profile" element={<TechnicianProfile />} />
-          <Route path="/dashboard-admin" element={<DashboardAdmin />} />
-          <Route path="/admin-profile" element={<AdminProfile />} />
-          <Route path="/unit-status-auditor" element={<UnitStatusAuditor />} />
-          <Route path="/admin-technicians" element={<AdminTechnicians />} />
-          <Route path="/admin-tech-requests" element={<AdminTechRequests />} />
-          <Route path="/pending" element={<Pending />} />
-        </Routes>
+      <Router>
+        <AppRoutes />
       </Router>
-      </AuthProvider>
+    </AuthProvider>
   );
 }
 

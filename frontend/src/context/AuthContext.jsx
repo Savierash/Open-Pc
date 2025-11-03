@@ -1,108 +1,42 @@
 // src/context/AuthContext.jsx
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import api from '../api';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import api from '../services/api';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('accessToken'));
+  const [token, setToken] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
 
-  // Fetch user profile on initial load if token exists
   useEffect(() => {
-    if (token) {
-      fetchProfile();
-    } else {
-      setLoading(false);
+    const savedToken = localStorage.getItem('token');
+    const savedUser = localStorage.getItem('username');
+    if (savedToken && savedUser) {
+      setToken(savedToken);
+      setUser({ username: savedUser, role: localStorage.getItem('userRole') });
     }
-  }, [token]);
+    setLoading(false);
+  }, []);
 
-  // ✅ Register function
-  const register = async (userData) => {
-    const response = await api.post('/auth/register', userData);
-    return response.data;
-  };
-
-  // ✅ Login function (updated)
-  const login = async (usernameOrEmail, password) => {
-    try {
-      const response = await api.post('/auth/login', { usernameOrEmail, password });
-      const { token, user } = response.data;
-
-      localStorage.setItem('accessToken', token);
-      localStorage.setItem('user', JSON.stringify(user));
-
-      setToken(token);
-      setUser(user);
-
-      return response.data;
-    } catch (error) {
-      console.error("Login error:", error);
-      throw error;
-    }
+  // ✅ This function no longer makes an API call.
+  // It just updates context when login succeeds in Login.jsx.
+  const login = (userData, tokenData) => {
+    setUser(userData);
+    setToken(tokenData);
+    localStorage.setItem('token', tokenData);
+    localStorage.setItem('username', userData.username);
+    localStorage.setItem('userRole', userData.role);
   };
 
   const logout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('user');
-    setToken(null);
     setUser(null);
-  };
-
-  const fetchProfile = async () => {
-    try {
-      const response = await api.get('/users/me', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setUser(response.data);
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-      logout();
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateProfile = async (updatedData) => {
-    const response = await api.put('/auth/profile', updatedData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    setUser(response.data);
-    return response.data;
-  };
-
-  const sendOtp = async (email) => {
-    const response = await api.post('/auth/send-otp', { email });
-    return response.data;
-  };
-
-  const resetPassword = async (data) => {
-    const response = await api.post('/auth/reset-password', data);
-    return response.data;
+    setToken(null);
+    localStorage.clear();
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        token,
-        loading,
-        register,
-        login,
-        logout,
-        fetchProfile,
-        updateProfile,
-        sendOtp,
-        resetPassword,
-        setUser,
-        setToken,
-      }}
-    >
+    <AuthContext.Provider value={{ user, token, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

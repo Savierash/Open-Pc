@@ -21,6 +21,7 @@ const forgetPasswordRouter = require('./routes/forgetPassword');
 const reportRouter = require('./routes/reports');
 const userRoutes = require('./routes/userRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const auditorRouter = require('./routes/auditor');
 
 // ✅ Safety logs
 process.on('uncaughtException', (err) => {
@@ -61,6 +62,7 @@ app.use('/api/units', unitsRouter);
 app.use('/api/labs', labsRouter);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/auditor', auditorRouter);
 
 // ✅ Nested Lab --> Units Route
 app.get('/api/labs/:labId/units', (req, res, next) => {

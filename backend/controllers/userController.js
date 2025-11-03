@@ -4,11 +4,34 @@ const User = require('../models/Users');
 const fs = require('fs');
 const path = require('path');
 
-// GET /api/users?role=technician&q=search
-exports.list = async (req, res) => { /* ...existing code... */ };
+// ✅ GET /api/users?role=technician&q=search
+exports.list = async (req, res) => {
+  try {
+    const { role, q } = req.query;
+    const filter = {};
 
-// GET /api/users/:id
-exports.get = async (req, res) => { /* ...existing code... */ };
+    if (role) filter.role = role;
+    if (q) filter.name = { $regex: q, $options: 'i' };
+
+    const users = await User.find(filter).select('-password');
+    res.json(users);
+  } catch (err) {
+    console.error('User list error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// ✅ GET /api/users/:id
+exports.get = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json(user);
+  } catch (err) {
+    console.error('User get by ID error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
 
 // ✅ GET /api/users/me
 exports.getMe = async (req, res) => {
@@ -43,7 +66,7 @@ exports.uploadProfileImage = async (req, res) => {
 
     res.json({ message: 'Image uploaded', user });
   } catch (err) {
-    console.error('Upload profile image error', err);
+    console.error('Upload profile image error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
