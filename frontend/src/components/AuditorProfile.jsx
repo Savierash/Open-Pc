@@ -67,7 +67,7 @@ const AuditorProfile = () => {
     }
 
     // 2) try candidate API endpoints (common variants)
-    const token = localStorage.getItem("token");
+     const token = localStorage.getItem("token");
     const candidates = [
    `${API_BASE}/users/me`,
    `${API_BASE}/auth/me`,
@@ -173,6 +173,7 @@ const AuditorProfile = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // ====== LOGOUT ======
   const handleLogout = () => {
     if (typeof ctxLogout === "function") {
       try { ctxLogout(); } catch (err) { console.warn('ctxLogout failed', err); }
@@ -183,6 +184,7 @@ const AuditorProfile = () => {
     navigate("/");
   };
 
+  // ====== SAVE PROFILE ======
   const handleSave = async () => {
     setSaving(true);
     try {
