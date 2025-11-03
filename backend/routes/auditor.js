@@ -14,6 +14,7 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
+router.use(protect, requireRole('auditor'));
 
 
 // Dashboard

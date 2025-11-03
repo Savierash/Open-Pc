@@ -1,8 +1,7 @@
-// src/pages/inventory/Inventory.jsx
+// src/components/Inventory.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios'; // Add this import
-import api from '../services/api';
+import api from "../services/api";
 import '../styles/Inventory.css'; // Changed from Dashboard.css
 import ComputerLogo1 from '../assets/LOGO1.png';
 import HouseLogo from '../assets/HouseFill.png';
@@ -18,10 +17,19 @@ import PcDisplayLogo from "../assets/PcDisplayHorizontal.png"; // Added for unit
 import MenuButtonWide from "../assets/menubuttonwide.png"; // Unit Status icon
 import ClipboardX from "../assets/clipboardx.png"; // Reports icon
 
-// Use Vite env style and ensure no trailing slash
-const RAW_API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
-const API_BASE = RAW_API_BASE.replace(/\/+$/, ''); // remove trailing slash if any
-console.log('Inventory: API_BASE =', API_BASE);
+const getStatusColor = (status) => {
+  switch (status?.toLowerCase()) {
+    case 'functional':
+      return '#22c55e'; // green-500
+    case 'maintenance':
+      return '#f97316'; // orange-500
+    case 'out of order':
+      return '#ef4444'; // red-500
+    default:
+      return '#6b7280'; // gray-500
+  }
+};
+
 
 const Inventory = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
@@ -44,10 +52,15 @@ const Inventory = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setActiveLink(window.location.pathname);
-    fetchLabs();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const token = localStorage.getItem('accessToken');
+  const role = localStorage.getItem('userRole');
+  if (!token || role?.toLowerCase() !== 'auditor') {
+    navigate('/login');
+    return;
+  }
+  setActiveLink(window.location.pathname);
+  fetchLabs();
+}, []);
 
   const handleNavClick = (path) => {
     setActiveLink(path);
@@ -58,7 +71,7 @@ const Inventory = () => {
   const fetchLabs = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API_BASE}/labs`);
+      const res = await api.get('/labs');
       setLabs(res.data || []);
       if (res.data && res.data.length > 0 && !selectedLab) {
         setSelectedLab(res.data[0]); // Select the first lab by default
@@ -113,7 +126,7 @@ const Inventory = () => {
     setCreatingLab(true);
     try {
       // create lab (includes location in body; server may ignore additional fields)
-      const res = await axios.post(`${API_BASE}/labs`, { name: trimmed, location: newLabLocation || '' });
+      const res = await api.post('/labs', { name: trimmed, location: newLabLocation || '' });
       const createdLab = res.data;
       // create units if requested
       if (total > 0) {
@@ -124,7 +137,7 @@ const Inventory = () => {
           const num = String(i).padStart(3, '0'); // 001
           const unitName = `${prefix}-PC-${num}`; // e.g., ITS300-PC-001
           try {
-            const ures = await axios.post(`${API_BASE}/units`, { name: unitName, lab: createdLab._id, status: 'Functional' });
+            const ures = await api.post('/units', { name: unitName, lab: createdLab._id, status: 'Functional' });
             createdUnits.push(ures.data);
           } catch (uerr) {
             // log and continue - maybe unit exists already
@@ -139,7 +152,7 @@ const Inventory = () => {
       await fetchLabs();
       // select created lab (by id) to ensure it's selected
       if (createdLab && createdLab._id) {
-        const found = (await axios.get(`${API_BASE}/labs`)).data || [];
+        const found = (await api.get('/labs')).data || [];
         const picked = found.find(l => String(l._id) === String(createdLab._id));
         if (picked) {
           setSelectedLab(picked);
@@ -172,7 +185,7 @@ const Inventory = () => {
     if (!confirmed) return;
 
     try {
-      await axios.delete(`${API_BASE}/labs/${lab._id}`);
+      await api.delete(`/labs/${lab._id}`);
       const newLabs = labs.filter((_, i) => i !== index);
       setLabs(newLabs);
       if (selectedLab?._id === lab._id) {
@@ -195,7 +208,7 @@ const Inventory = () => {
     setLoading(true);
     try {
       // Prefer nested path that server handles: /api/labs/:labId/units
-      const res = await axios.get(`${API_BASE}/labs/${labId}/units`);
+      const res = await api.get(`/labs/${labId}/units`);
       setUnits(res.data || []);
       if (res.data && res.data.length > 0 && !selectedUnit) {
         setSelectedUnit(res.data[0]);
@@ -219,7 +232,7 @@ const Inventory = () => {
     if (trimmed === '') return window.alert('Unit name cannot be empty.');
 
     try {
-      const res = await axios.post(`${API_BASE}/units`, { name: trimmed, lab: selectedLab._id });
+      const res = await api.post('/units', { name: trimmed, lab: selectedLab._id });
       setUnits(prev => [...prev, res.data]);
       setSelectedUnit(res.data);
     } catch (err) {
@@ -258,8 +271,8 @@ const Inventory = () => {
         </div>
         <div className="nav-actions">
           <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
-          <span className="profile-name">John Paul</span>
-          <span className="profile-role">Auditor</span>
+          <span className="profile-name">{localStorage.getItem('username') || 'User'}</span>
+          <span className="profile-role">{localStorage.getItem('userRole') || 'Role'}</span>
         </div>
       </header>
 
@@ -419,7 +432,7 @@ const Inventory = () => {
                     >
                       <img src={PcDisplayLogo} alt="PC Icon" className="inventory-pc-card-icon" />
                       <span className="inventory-pc-name">{unit.name}</span>
-                      <span className="inventory-pc-status">{unit.status} &#x25cf;</span>
+                      <span className="inventory-pc-status"style={{color: getStatusColor(unit.status),fontWeight: 600,}}>{unit.status} &#x25cf;</span>
                     </div>
                   ))
                 )}
@@ -511,7 +524,7 @@ const Inventory = () => {
                         const payload = { ...selectedUnit };
                         // send to API (assumes PUT /units/:id exists)
                         if (selectedUnit._id) {
-                          await axios.put(`${API_BASE}/units/${selectedUnit._id}`, payload);
+                          await api.put(`/units/${selectedUnit._id}`, payload);
                           // update units list locally
                           setUnits(prev => prev.map(u => (u._id === selectedUnit._id ? selectedUnit : u)));
                           window.alert('Unit saved');

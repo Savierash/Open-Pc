@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext'; // ✅ import context
-import api from '../api';
 import axios from 'axios';
 import '../styles/OTP.css';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -10,11 +9,10 @@ import ChatLogo from '../assets/chat_logo.png';
 import BroadcastLogo from '../assets/broadcast_logo.png';
 import ToolsLogo from '../assets/tools_logo.png';
 
-
 const apiBase = import.meta.env.VITE_APP_API_URL || 'http://localhost:5000';
 
 const OTP = () => {
-  const { setUser, setToken } = useAuth();
+  const { login } = useAuth(); // ✅ use login only
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [activeLink, setActiveLink] = useState('');
   const [error, setError] = useState('');
@@ -29,13 +27,9 @@ const OTP = () => {
   }, [location.pathname]);
 
   const handleOtpChange = (element, index) => {
-    if (isNaN(element.value)) return false;
-
-    setOtp([...otp.map((d, idx) => (idx === index ? element.value : d))]);
-
-    if (element.nextSibling) {
-      element.nextSibling.focus();
-    }
+    if (isNaN(element.value)) return;
+    setOtp((prev) => prev.map((d, idx) => (idx === index ? element.value : d)));
+    if (element.nextSibling) element.nextSibling.focus();
   };
 
   const handleSubmit = async (e) => {
@@ -50,34 +44,28 @@ const OTP = () => {
 
       console.log('✅ OTP verification success:', res.data);
 
-      // ✅ Save token + user object
       const { token, user } = res.data;
-      setToken(token);
-      setUser(user);
-      localStorage.setItem('accessToken', token);
-      localStorage.removeItem('accessToken'); 
-      localStorage.setItem('user', JSON.stringify(user));
-      localStorage.setItem('userName', user.username)
-      
+
+      // ✅ Save token + user using context
+      login(user, token);
 
       alert('✅ Your account has been successfully verified!');
 
       // ✅ Redirect based on role
-      let roleKey = typeof user?.role === 'string' 
-        ? user.role.toLowerCase() 
-        : user.role.key?.toLowerCase();
-
-      localStorage.setItem('userRole', roleKey);
+      const roleKey =
+        typeof user?.role === 'string'
+          ? user.role.toLowerCase()
+          : user.role?.key?.toLowerCase();
 
       switch (roleKey) {
         case 'technician':
-          navigate('/Dashboard-technician');
+          navigate('/dashboard-technician');
           break;
         case 'auditor':
           navigate('/dashboard');
           break;
         case 'admin':
-          navigate('/Dashboard-Admin');
+          navigate('/dashboard-admin');
           break;
         default:
           console.warn(`⚠️ Unknown role: ${roleKey}, redirecting home...`);
@@ -92,9 +80,7 @@ const OTP = () => {
     }
   };
 
-  const handleNavClick = (path) => {
-    navigate(path);
-  };
+  const handleNavClick = (path) => navigate(path);
 
   return (
     <div className="otp-page">
@@ -126,7 +112,6 @@ const OTP = () => {
             </a>
           </nav>
         </div>
-        <div className="nav-actions"></div>
       </header>
 
       {/* Background decorative logos */}
@@ -136,7 +121,7 @@ const OTP = () => {
       <img src={ToolsLogo} alt="" className="bg-logo bg-logo-bottom-right" />
 
       <main className="main">
-        <h1 className="welcome-title">Get started with your account</h1>
+        <h1 className="welcome-title">Verify Your Account</h1>
 
         <div className="otp-container">
           <form onSubmit={handleSubmit} className="otp-form">

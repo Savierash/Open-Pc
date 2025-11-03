@@ -43,7 +43,7 @@ router.post('/', async (req, res) => {
 
     const unit = new Unit({ name: name.trim(), lab, status, notes });
     const saved = await unit.save();
-    const populated = await saved.populate('lab', 'name').execPopulate();
+    const populated = await saved.populate('lab', 'name'); // ✅ No execPopulate()
     res.status(201).json(populated);
   } catch (err) {
     console.error('POST /units error', err);
@@ -53,18 +53,42 @@ router.post('/', async (req, res) => {
 
   // PUT /api/units/:id
   router.put('/:id', async (req, res) => {
-    try {
-      const id = req.params.id;
-      if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ message: 'Invalid id' });
-      const updates = req.body;
-      const updated = await Unit.findByIdAndUpdate(id, updates, { new: true, runValidators: true });
-      if (!updated) return res.status(404).json({ message: 'Unit not found' });
-      res.json(updated);
-    } catch (err) {
-      console.error('PUT /api/units/:id', err);
-      res.status(500).json({ message: 'Server error' });
+  try {
+    const id = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid unit ID' });
     }
-  });
+
+    const existingUnit = await Unit.findById(id);
+    if (!existingUnit) {
+      return res.status(404).json({ message: 'Unit not found' });
+    }
+
+    const updates = req.body || {};
+
+    // ✅ Preserve the lab reference if not provided
+    if (!updates.lab) {
+      updates.lab = existingUnit.lab;
+    }
+
+    // ✅ Update unit safely with schema validation
+    const updatedUnit = await Unit.findByIdAndUpdate(id, updates, {
+      new: true,
+      runValidators: true,
+    });
+
+    res.status(200).json({
+      message: 'Unit updated successfully',
+      unit: updatedUnit,
+    });
+  } catch (err) {
+    console.error('PUT /api/units/:id error:', err.message, err.stack);
+    res.status(500).json({
+      message: 'Failed to update unit',
+      error: err.message,
+    });
+  }
+});
 
   /**
  * DELETE /api/units/:id

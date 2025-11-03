@@ -30,7 +30,7 @@ export function setAuthToken(token) {
 }
 
 // initialize from storage
-const existing = localStorage.getItem('token');
+const existing = localStorage.getItem('accessToken');
 if (existing) setAuthToken(existing);
 
 api.interceptors.response.use(

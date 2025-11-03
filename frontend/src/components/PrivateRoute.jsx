@@ -3,8 +3,8 @@ import { useAuth } from '../context/AuthContext';
 import { Navigate } from 'react-router-dom';
 
 const PrivateRoute = ({ children }) => {
-  const { user, token } = useAuth();
-  if (!token || !user) {
+  const { user, accessToken } = useAuth();
+  if (!accessToken || !user) {
     return <Navigate to="/login" replace />;
   }
   return children;

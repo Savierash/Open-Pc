@@ -1,32 +1,41 @@
-// backend/middleware/authMiddleware.js
-const jwt = require('jsonwebtoken');
-const User = require('../models/Users');
+const jwt = require("jsonwebtoken");
+const User = require("../models/Users");
 
 exports.protect = async (req, res, next) => {
   let token;
   try {
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-      token = req.headers.authorization.split(' ')[1];
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")
+    ) {
+      token = req.headers.authorization.split(" ")[1];
     }
 
     if (!token) {
-      return res.status(401).json({ message: 'Not authorized, no token' });
+      return res.status(401).json({ message: "Not authorized, no token" });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // ✅ Populate role name when fetching user
+    // ✅ Populate role name (since role is an ObjectId)
     req.user = await User.findById(decoded.id)
-      .select('-password')
-      .populate('role', 'name'); // <--- Added this
+      .select("-password")
+      .populate("role", "key name");
 
     if (!req.user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
+
+    // ✅ Normalize role to lowercase string
+    const rawRole =
+      req.user.role?.key || req.user.role?.name || req.user.role || decoded.role;
+    req.user.role = (rawRole || "").toLowerCase();
 
     next();
   } catch (err) {
-    console.error('Auth error:', err);
-    res.status(401).json({ message: 'Not authorized, token failed', error: err.message });
+    console.error("Auth error:", err);
+    res
+      .status(401)
+      .json({ message: "Not authorized, token failed", error: err.message });
   }
 };

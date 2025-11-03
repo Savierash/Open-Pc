@@ -1,5 +1,6 @@
 // src/pages/Dashboard.jsx
 import React, { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext"; //
 import { Link, useNavigate } from "react-router-dom";
 import api from '../services/api';
 import "../styles/Dashboard.css";
@@ -26,23 +27,23 @@ import {
 } from "recharts";
 
 const Dashboard = () => {
+  const { user, accessToken, loading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-  const token = localStorage.getItem('token');
-  const userRole = localStorage.getItem('userRole');
+    if (loading) return; // wait for context to finish loading
 
-  if (!token || userRole?.toLowerCase() !== 'auditor') {
-    navigate('/login');
-  } else {
-    fetchDashboard(); // ✅ load dashboard right away
-  }
-}, [navigate]);
-  
+    if (!accessToken || user?.role?.toLowerCase() !== "auditor") {
+      navigate("/login");
+      return;
+    }
+
+    fetchDashboard();
+  }, [user, accessToken, loading, navigate]);
+
   const [activeLink, setActiveLink] = useState(window.location.pathname || "/dashboard");
-  const [loading, setLoading] = useState(false);
+  const [isDashboardLoading, setIsDashboardLoading] = useState(false); // ✅ renamed to avoid conflict
 
-  // dashboard data
   const [totalUnits, setTotalUnits] = useState(0);
   const [counts, setCounts] = useState({ functional: 0, maintenance: 0, outOfOrder: 0 });
   const [percentFunctional, setPercentFunctional] = useState(0);
@@ -50,26 +51,25 @@ const Dashboard = () => {
   const [recentUnits, setRecentUnits] = useState([]);
   const [trend, setTrend] = useState([]);
 
-
   async function fetchDashboard() {
-  setLoading(true);
-  try {
-    const res = await api.get('/auditor/dashboard');
-    const data = res.data;
+    setIsDashboardLoading(true);
+    try {
+      const res = await api.get('/auditor/dashboard');
+      const data = res.data;
 
-    setTotalUnits(data.totalUnits || 0);
-    setCounts(data.counts || { functional: 0, maintenance: 0, outOfOrder: 0 });
-    setPercentFunctional(data.percentFunctional || 0);
-    setPerLab(data.perLab || []);
-    setRecentUnits(data.recentUnits || []);
-    setTrend(data.trend || []);
-  } catch (err) {
-    console.error("fetchDashboard error:", err);
-    window.alert("Failed to load dashboard data. See console.");
-  } finally {
-    setLoading(false);
+      setTotalUnits(data.totalUnits || 0);
+      setCounts(data.counts || { functional: 0, maintenance: 0, outOfOrder: 0 });
+      setPercentFunctional(data.percentFunctional || 0);
+      setPerLab(data.perLab || []);
+      setRecentUnits(data.recentUnits || []);
+      setTrend(data.trend || []);
+    } catch (err) {
+      console.error("fetchDashboard error:", err);
+      window.alert("Failed to load dashboard data. See console.");
+    } finally {
+      setIsDashboardLoading(false);
+    }
   }
-}
 
   // improved StatusChart for dark background & reliable height
   const StatusChart = ({ dataPoints = [] }) => {

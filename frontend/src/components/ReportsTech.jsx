@@ -31,7 +31,7 @@ const ReportsTech = () => {
   const [profile, setProfile] = useState(null); // ✅ Stores dynamic technician profile
   
   const navigate = useNavigate();
-  const token = localStorage.getItem("token"); // ✅ Added for auth
+  const token = localStorage.getItem("accessToken"); // ✅ Added for auth
   const config = { headers: { Authorization: `Bearer ${token}` } }; // ✅ Axios config
 
   // ✅ Fetch technician profile for dynamic name

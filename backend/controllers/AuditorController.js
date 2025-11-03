@@ -1,4 +1,5 @@
 // backend/controllers/AuditorController.js
+const mongoose = require('mongoose');
 const Unit = require('../models/unit');
 const Lab = require('../models/lab');
 const Report = require('../models/report');
@@ -50,11 +51,38 @@ exports.getUnits = async (req, res) => {
 
 exports.updateUnit = async (req, res) => {
   try {
-    const updated = await Unit.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updated) return res.status(404).json({ message: 'Unit not found' });
-    res.json(updated);
+    const id = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid unit ID' });
+    }
+
+    const existingUnit = await Unit.findById(id);
+    if (!existingUnit) {
+      return res.status(404).json({ message: 'Unit not found' });
+    }
+
+    const updates = req.body || {};
+
+    // Preserve lab reference if not provided
+    if (!updates.lab) {
+      updates.lab = existingUnit.lab;
+    }
+
+    const updatedUnit = await Unit.findByIdAndUpdate(id, updates, {
+      new: true,
+      runValidators: true,
+    });
+
+    res.status(200).json({
+      message: 'Unit updated successfully',
+      unit: updatedUnit,
+    });
   } catch (err) {
-    res.status(500).json({ message: 'Failed to update unit', error: err.message });
+    console.error('Auditor updateUnit error:', err.message, err.stack);
+    res.status(500).json({
+      message: 'Failed to update unit',
+      error: err.message,
+    });
   }
 };
 
@@ -87,21 +115,53 @@ exports.getReports = async (req, res) => {
 
 exports.createReport = async (req, res) => {
   try {
-    const { unitId, issues, otherIssues } = req.body;
-    if (!unitId) return res.status(400).json({ message: 'Unit ID is required' });
+    const { unitId, technicianId, issues, otherIssues } = req.body;
 
+    // Validate required fields
+    if (!unitId || !technicianId) {
+      return res.status(400).json({ message: 'Unit ID and Technician ID are required' });
+    }
+
+    // Verify the Unit exists
+    const unit = await Unit.findById(unitId);
+    if (!unit) {
+      return res.status(404).json({ message: 'Unit not found' });
+    }
+
+    // Verify the Technician exists and has the correct role
+    const technician = await User.findById(technicianId).populate('role', 'name');
+    if (!technician || technician.role?.name?.toLowerCase() !== 'technician') {
+      return res.status(404).json({ message: 'Technician not found or invalid role' });
+    }
+
+    // Create report
     const newReport = new Report({
       unit: unitId,
-      technician: req.user._id,
+      technician: technicianId, // ✅ assigned technician
+      createdBy: req.user._id,  // ✅ auditor who created the report
       issues,
       otherIssues,
-      status: 'open',
+      status: 'Open',
     });
+
     await newReport.save();
 
-    res.status(201).json({ message: 'Report submitted successfully', report: newReport });
+    // Populate for frontend response
+    const populatedReport = await newReport.populate([
+      { path: 'unit', select: 'name' },
+      { path: 'technician', select: 'username email' },
+    ]);
+
+    res.status(201).json({
+      message: 'Report successfully created and assigned to technician.',
+      report: populatedReport,
+    });
   } catch (err) {
-    res.status(500).json({ message: 'Failed to create report', error: err.message });
+    console.error('Auditor createReport error:', err);
+    res.status(500).json({
+      message: 'Failed to create report',
+      error: err.message,
+    });
   }
 };
 

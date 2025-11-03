@@ -9,7 +9,7 @@ const sendEmail = require('../utils/sendEmail');
 // ✅ Generate random 6-digit OTP
 const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
 
-// ✅ Generate unique technician ID (e.g. TECH-XYZ123)
+// ✅ Generate unique technician ID
 const generateTechId = () => {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let randomPart = '';
@@ -20,14 +20,13 @@ const generateTechId = () => {
 };
 
 /**
- * Register
- * 🚀 Creates user and sends OTP to email
+ * Register - Creates user and sends OTP to email
  */
 exports.register = async (req, res) => {
   try {
-    const { email, username, password, confirmPassword, roleKey, firstName, lastName, gender , contactNumber } = req.body;
+    const { email, username, password, confirmPassword, roleKey, firstName, lastName, gender, contactNumber } = req.body;
 
-    if (!email || !username || !password || !firstName || !lastName || !gender)
+    if (!email || !username || !password || !firstName || !lastName || !gender || !roleKey)
       return res.status(400).json({ message: 'Missing required fields' });
 
     if (password !== confirmPassword)
@@ -52,10 +51,10 @@ exports.register = async (req, res) => {
       firstName,
       lastName,
       gender,
-      contactNumber, // ✅ Save it here
+      contactNumber,
     });
 
-    if (role.key === 'technician') {
+    if (role.key.toLowerCase() === 'technician') {
       user.techId = generateTechId();
     }
 
@@ -105,8 +104,9 @@ exports.verifyOtp = async (req, res) => {
 
     if (!user) return res.status(404).json({ message: 'User not found' });
 
+    // ✅ Lowercase role when creating token
     const token = jwt.sign(
-      { id: user._id, role: user.role.key },
+      { id: user._id, role: (user.role?.key || user.role?.name || '').toLowerCase() },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -118,7 +118,7 @@ exports.verifyOtp = async (req, res) => {
         id: user._id,
         email: user.email,
         username: user.username,
-        role: user.role.key,
+        role: user.role.key.toLowerCase(), // ✅ frontend consistency
       },
     });
 
@@ -129,8 +129,7 @@ exports.verifyOtp = async (req, res) => {
 };
 
 /**
- * Login
- * 🚪 Only verified users can log in
+ * Login - Only verified users can log in
  */
 exports.login = async (req, res) => {
   try {
@@ -155,9 +154,10 @@ exports.login = async (req, res) => {
     if (!matched)
       return res.status(401).json({ message: 'Invalid credentials' });
 
+    // ✅ Fix here: use role.key (not role.name)
     const token = jwt.sign(
-      { id: user._id, role: user.role.key },
-      process.env.JWT_SECRET || 'secret',
+      { id: user._id, role: (user.role?.key || user.role?.name || '').toLowerCase() },
+      process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
 
@@ -167,7 +167,7 @@ exports.login = async (req, res) => {
         id: user._id,
         email: user.email,
         username: user.username,
-        role: user.role.key,
+        role: user.role.key.toLowerCase(), // ✅ return lowercase for frontend
       },
     });
 
@@ -189,7 +189,7 @@ exports.getRoles = async (req, res) => {
   }
 };
 
-// Get profile for authenticated user
+// ✅ Get profile for authenticated user
 exports.getProfile = async (req, res) => {
   try {
     const userId = req.user && req.user.id;
@@ -205,7 +205,7 @@ exports.getProfile = async (req, res) => {
   }
 };
 
-// Update profile (phone number, username)
+// ✅ Update profile (phone number, username)
 exports.updateProfile = async (req, res) => {
   try {
     const userId = req.user && req.user.id;

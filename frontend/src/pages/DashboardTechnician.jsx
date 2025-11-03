@@ -72,7 +72,7 @@ const DashboardTechnician = () => {
   async function fetchDashboard() {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("accessToken");
 
       const res = await api.get("/dashboard", {
         headers: { Authorization: `Bearer ${token}` },

@@ -66,7 +66,7 @@ const Login = () => {
       const { user, token } = res.data;
       
       localStorage.clear();
-      localStorage.setItem('token', token);
+      localStorage.setItem('accessToken', token);
       localStorage.setItem('userRole', user.role);
       localStorage.setItem('username', user.username);
 

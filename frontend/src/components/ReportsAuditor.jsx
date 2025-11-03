@@ -1,4 +1,5 @@
 // src/pages/reports/ReportsAuditor.jsx
+import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
@@ -19,6 +20,8 @@ import EditIcon from '../assets/GearFill.png'; // Using GearFill.png as an edit 
 import MenuButtonWide from '../assets/menubuttonwide.png'; // Unit Status icon
 import ClipboardX from '../assets/clipboardx.png'; // Reports icon
 
+const API_BASE = 'http://localhost:5000/api';
+
 const ReportsAuditor = () => {
   const navigate = useNavigate();
   const [activeLink, setActiveLink] = useState(window.location.pathname || '/reports-auditor');
@@ -26,6 +29,7 @@ const ReportsAuditor = () => {
   // data
   const [labs, setLabs] = useState([]); // { _id, name }
   const [units, setUnits] = useState([]); // [{ _id, name, status, ... }]
+  const [technicians, setTechnicians] = useState([]);
 
   // selection & UI
   const [selectedLab, setSelectedLab] = useState(null); // lab object
@@ -34,9 +38,9 @@ const ReportsAuditor = () => {
 
   // form fields
   const [technicianId, setTechnicianId] = useState('');
+  const [otherIssues, setOtherIssues] = useState('');
   const [dateIssued, setDateIssued] = useState('');
   const [lastIssued, setLastIssued] = useState('');
-  const [otherIssues, setOtherIssues] = useState('');
   const [reportIssues, setReportIssues] = useState({
     ramIssue: false,
     osIssue: false,
@@ -54,9 +58,22 @@ const ReportsAuditor = () => {
   const [reports, setReports] = useState([]);
 
   useEffect(() => {
+  const fetchTechnicians = async () => {
+    try {
+      const res = await api.get('/auditor/technicians');
+      setTechnicians(res.data || []);
+    } catch (err) {
+      console.error('Failed to fetch technicians', err);
+    }
+  };
+  fetchTechnicians();
+}, []);
+
+
+  useEffect(() => {
     const load = async () => {
       try {
-        const res = await api.get('/reports');
+        const res = await api.get('/auditor/reports');
         setReports(res.data || []);
       } catch (err) {
         console.error('Failed to fetch reports', err);
@@ -125,76 +142,73 @@ const ReportsAuditor = () => {
   // ---------- API calls ----------
 
   const fetchLabs = async () => {
-    setLoading(true);
-    try {
-      const res = await axios.get(`${API_BASE}/labs`);
-      setLabs(res.data || []);
-      if (res.data && res.data.length > 0) {
-        // choose previously selected lab name if exists, else first one
-        const prefer = res.data.find(l => l.name === 'ITS 300') || res.data[0];
-        setSelectedLab(prefer);
-      }
-    } catch (err) {
-      console.error('Failed to fetch labs', err);
-      window.alert('Failed to load labs. See console.');
-    } finally {
-      setLoading(false);
+  setLoading(true);
+  try {
+    const res = await api.get('/labs'); // ✅ added res
+    setLabs(res.data || []);
+    if (res.data && res.data.length > 0) {
+      const prefer = res.data.find(l => l.name === 'ITS 300') || res.data[0];
+      setSelectedLab(prefer);
     }
-  };
+  } catch (err) {
+    console.error('Failed to fetch labs', err);
+    alert('Failed to load labs.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const fetchUnitsByLab = async (labId) => {
-    setLoading(true);
-    try {
-      // units route supports query param labId
-      const res = await axios.get(`${API_BASE}/units?labId=${labId}`);
-      setUnits(res.data || []);
-    } catch (err) {
-      console.error('Failed to fetch units', err);
-      window.alert('Failed to load units. See console.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  setLoading(true);
+  try {
+    const res = await api.get(`/auditor/units?labId=${labId}`); // ✅ added res
+    setUnits(res.data || []);
+  } catch (err) {
+    console.error('Failed to fetch units', err);
+    alert('Failed to load units.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const fetchReportsByLab = async (labId) => {
-    setLoading(true);
-    try {
-      const res = await axios.get(`${API_BASE}/reports?labId=${labId}`);
-      setReports(res.data || []);
-    } catch (err) {
-      console.error('Failed to fetch reports', err);
-      window.alert('Failed to load reports. See console.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  setLoading(true);
+  try {
+    const res = await api.get(`/auditor/reports?labId=${labId}`); // ✅ added res
+    setReports(res.data || []);
+  } catch (err) {
+    console.error('Failed to fetch reports', err);
+    alert('Failed to load reports.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const submitReport = async () => {
     if (!selectedLab || !selectedUnit) return window.alert('Please select a lab and a unit before submitting.');
     setSaving(true);
     try {
       const payload = {
-        unit: selectedUnit._id,
-        lab: selectedLab._id,
-        technicianId,
-        dateIssued,
-        lastIssued,
-        issues: reportIssues,
-        otherIssues
-      };
+      unitId: selectedUnit._id,
+      technicianId,
+      issues: Object.keys(reportIssues).filter(k => reportIssues[k]), // ✅ only send checked issues
+      otherIssues
+};
 
       // If editing an existing report (selectedReport), we update it instead:
       if (selectedReport && selectedReport._id) {
-        await axios.put(`${API_BASE}/reports/${selectedReport._id}`, payload);
-        window.alert('Report updated');
+        await api.put(`/auditor/reports/${selectedReport._id}`, payload);
+        alert('Report updated successfully!');
       } else {
-        await axios.post(`${API_BASE}/reports`, payload);
+        await api.post('/auditor/reports', payload)
         window.alert('Report submitted');
       }
 
       // refresh reports and units
       await fetchReportsByLab(selectedLab._id);
       await fetchUnitsByLab(selectedLab._id);
+      resetForm();
+      setSelectedUnit(null);
 
     } catch (err) {
       console.error('Failed to submit report', err);
@@ -304,7 +318,7 @@ const ReportsAuditor = () => {
                     <div
                       key={lab._id}
                       className={`lab-card-auditor ${selectedLab && selectedLab._id === lab._id ? 'active' : ''}`}
-                      onClick={() => { setSelectedLab(lab); setSelectedPC(null); }}
+                      onClick={() => { setSelectedLab(lab); setSelectedUnit(null); }}
                     >
                       {lab.name}
                     </div>
@@ -371,7 +385,12 @@ const ReportsAuditor = () => {
               </div>
 
               <div className="info-item-auditor input-with-icon">
-                <input type="text" placeholder="Technician ID:" value={technicianId} onChange={(e) => setTechnicianId(e.target.value)} />
+                <select value={technicianId} onChange={(e) => setTechnicianId(e.target.value)}>
+                  <option value="">Select Technician</option>
+                  {technicians.map(tech => (
+                    <option key={tech._id} value={tech._id}>{tech.username} ({tech.email})</option>
+                  ))}
+                </select>
                 <img src={EditIcon} alt="Edit Icon" className="input-icon" />
               </div>
 

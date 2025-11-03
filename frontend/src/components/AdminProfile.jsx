@@ -23,7 +23,7 @@ const api = axios.create({
   timeout: 10000,
 });
 api.interceptors.request.use((cfg) => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('accessToken');
   if (token) cfg.headers = { ...(cfg.headers || {}), Authorization: `Bearer ${token}` };
   return cfg;
 }, (err) => Promise.reject(err));

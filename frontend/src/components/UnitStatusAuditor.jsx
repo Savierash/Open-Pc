@@ -21,7 +21,7 @@ import PcDisplayIcon from "../assets/pcdisplay.png"; // PC card icon
 
 const UnitStatusAuditor = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
-  const [filter, setFilter] = useState('Functional');
+  const [filter, setFilter] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -106,7 +106,7 @@ const UnitStatusAuditor = () => {
   const unitData = units.length > 0 ? units : []; // fallback to empty if none
   const filteredUnits = unitData.filter(unit =>
     (filter ? unit.status === filter : true) &&
-    unit.id.toLowerCase().includes(searchTerm.toLowerCase())
+    unit.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (

@@ -1,42 +1,38 @@
 // src/context/AuthContext.jsx
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import api from '../services/api';
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [accessToken, setAccessToken] = useState(localStorage.getItem("accessToken"));
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedToken = localStorage.getItem('token');
-    const savedUser = localStorage.getItem('username');
-    if (savedToken && savedUser) {
-      setToken(savedToken);
-      setUser({ username: savedUser, role: localStorage.getItem('userRole') });
+    const storedToken = localStorage.getItem("accessToken");
+    const storedUser = localStorage.getItem("user");
+    if (storedToken && storedUser) {
+      setAccessToken(storedToken);
+      setUser(JSON.parse(storedUser));
     }
     setLoading(false);
   }, []);
 
-  // ✅ This function no longer makes an API call.
-  // It just updates context when login succeeds in Login.jsx.
-  const login = (userData, tokenData) => {
+  const login = (userData, token) => {
+    localStorage.setItem("accessToken", token);
+    localStorage.setItem("user", JSON.stringify(userData));
     setUser(userData);
-    setToken(tokenData);
-    localStorage.setItem('token', tokenData);
-    localStorage.setItem('username', userData.username);
-    localStorage.setItem('userRole', userData.role);
+    setAccessToken(token);
   };
 
   const logout = () => {
-    setUser(null);
-    setToken(null);
     localStorage.clear();
+    setUser(null);
+    setAccessToken(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, accessToken, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
