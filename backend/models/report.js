@@ -1,9 +1,9 @@
-// backend/models/report.js
 const mongoose = require('mongoose');
 
 const ReportSchema = new mongoose.Schema({
   unit: { type: mongoose.Schema.Types.ObjectId, ref: 'Unit', required: true },
   technician: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  auditor: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // ✅ NEW FIELD
   issues: {
     ramIssue: { type: Boolean, default: false },
     osIssue: { type: Boolean, default: false },
