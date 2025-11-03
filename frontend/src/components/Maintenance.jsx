@@ -1,7 +1,7 @@
 // src/pages/Maintenance.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles/Dashboard.css'; 
+import '../styles/Dashboard.css';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import ComputerLogo1 from '../assets/LOGO1.png';
@@ -11,12 +11,26 @@ import PcDisplayLogo from '../assets/PcDisplayHorizontal.png';
 import ClipboardLogo from '../assets/ClipboardCheck.png';
 import GearLogo from '../assets/GearFill.png';
 import OctagonLogo from '../assets/XOctagonFill.png';
-import StackLogo from '../assets/icon_6.png'; // Inventory icon
-import MenuButtonWide from '../assets/menubuttonwide.png'; // Unit Status icon
-import ClipboardX from '../assets/clipboardx.png'; // Reports icon
+import StackLogo from '../assets/icon_6.png';
+import MenuButtonWide from '../assets/menubuttonwide.png';
+import ClipboardX from '../assets/clipboardx.png';
 import PersonLogo from '../assets/Person.png';
-import ToolsLogo from '../assets/tools_logo.png'; // Import Tools Logo
-import AccountSettingLogo from '../assets/GearFill.png'; // Account Setting icon
+import ToolsLogo from '../assets/tools_logo.png';
+import AccountSettingLogo from '../assets/GearFill.png';
+
+// Recharts (used for donut chart)
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Tooltip,
+  Cell,
+} from 'recharts';
+
+// simple color palette for chart slices
+const COLORS = [
+  '#ffc05aff', '#ff6a00ff', '#ff8800ff', '#994500ff', '#ac5a1bff'
+];
 
 const Maintenance = () => {
   const [activeLink, setActiveLink] = useState(window.location.pathname);
@@ -41,8 +55,12 @@ const Maintenance = () => {
       try {
         const res = await api.get('/lab');
         if (!mounted) return;
-        setLabs(res.data || []);
-        if (res.data && res.data.length) setSelectedLab(res.data[0]._id);
+        const payload = res?.data ?? [];
+        setLabs(Array.isArray(payload) ? payload : (payload.labs || []));
+        if ((payload && payload.length) || (payload.labs && payload.labs.length)) {
+          const first = (Array.isArray(payload) ? payload[0] : payload.labs[0]);
+          setSelectedLab(first?._id ?? first?.id ?? null);
+        }
       } catch (err) {
         console.error('Failed to load labs', err);
       } finally {
@@ -59,9 +77,9 @@ const Maintenance = () => {
     async function fetchUnits() {
       setLoadingUnits(true);
       try {
-        const res = await api.get(`/units?labId=${selectedLab}`);
+        const res = await api.get('/units', { params: { labId: selectedLab } });
         if (!mounted) return;
-        setUnits(res.data || []);
+        setUnits(res?.data || []);
       } catch (err) {
         console.error('Failed to load units for lab', selectedLab, err);
         setUnits([]);
@@ -80,18 +98,44 @@ const Maintenance = () => {
     navigate(path);
   };
 
-  // fetch labs with aggregated maintenance counts
+  // fetch labs with aggregated maintenance counts (uses centralized `api`)
   const fetchLabsWithMaintenance = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API_BASE}/labs/with-maintenance-count`);
-      // expecting [{ _id, name, unitCount, maintenanceCount }, ...]
-      setLabs(res.data || []);
+      // IMPORTANT: backend must expose this route or change to the correct one.
+      const res = await api.get('/labs/with-maintenance-count');
+      // Accept res.data as array or wrapped object
+      const payload = res?.data;
+      const list = Array.isArray(payload) ? payload : (payload?.labs || payload?.data || []);
+      setLabs(list);
+      if (!selectedLab && Array.isArray(list) && list.length) {
+        setSelectedLab(list[0]._id || list[0].id);
+      }
     } catch (err) {
       console.error('fetchLabsWithMaintenance error', err);
-      // keep UI intact: show alert and empty data
-      window.alert('Failed to load maintenance data — check console for details.');
-      setLabs([]);
+      // If endpoint doesn't exist, try fallback: fetch /lab and then compute counts client-side (if API supplies maintenance info per unit)
+      try {
+        // attempt fallback GET /lab (already handled in separate effect, but try here too)
+        const fallback = await api.get('/lab');
+        const payload = fallback?.data ?? [];
+        const list = Array.isArray(payload) ? payload : (payload?.labs || []);
+        if (Array.isArray(list) && list.length) {
+          // try to derive maintenanceCount from lab.units if available
+          const normalized = await Promise.all(list.map(async (l) => {
+            const maintenanceCount = Number(l.maintenanceCount ?? (l.units ? l.units.filter(u => (u.status || '').toLowerCase().includes('maint')).length : 0));
+            return { ...l, maintenanceCount };
+          }));
+          setLabs(normalized);
+          if (!selectedLab && normalized.length) setSelectedLab(normalized[0]._id || normalized[0].id);
+        } else {
+          setLabs([]);
+        }
+      } catch (fallbackErr) {
+        console.warn('fallback fetch failed', fallbackErr);
+        // show user-friendly alert but don't break UI
+        window.alert('Failed to load maintenance data — please check backend. See console for details.');
+        setLabs([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -126,11 +170,7 @@ const Maintenance = () => {
           <span className="page-title">Under Maintenance</span>
         </div>
         <div className="nav-actions">
-          <img 
-            src={PersonLogo} 
-            alt="Profile Icon" 
-            className="profile-icon-dashboard"
-          />
+          <img src={PersonLogo} alt="Profile Icon" className="profile-icon-dashboard" />
         </div>
       </header>
 
@@ -138,8 +178,8 @@ const Maintenance = () => {
         <aside className="sidebar">
           <ul className="sidebar-menu">
             <li>
-              <a 
-                href="/dashboard" 
+              <a
+                href="/dashboard"
                 className={`sidebar-link ${activeLink === '/dashboard' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
@@ -151,8 +191,8 @@ const Maintenance = () => {
               </a>
             </li>
             <li>
-              <a 
-                href="/inventory" 
+              <a
+                href="/inventory"
                 className={`sidebar-link ${activeLink === '/inventory' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
@@ -164,8 +204,8 @@ const Maintenance = () => {
               </a>
             </li>
             <li>
-              <a 
-                href="/unit-status-auditor" 
+              <a
+                href="/unit-status-auditor"
                 className={`sidebar-link ${activeLink === '/unit-status-auditor' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
@@ -177,8 +217,8 @@ const Maintenance = () => {
               </a>
             </li>
             <li>
-              <a 
-                href="/reports-auditor" 
+              <a
+                href="/reports-auditor"
                 className={`sidebar-link ${activeLink === '/reports-auditor' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
@@ -190,8 +230,8 @@ const Maintenance = () => {
               </a>
             </li>
             <li>
-              <a 
-                href="/technicians" 
+              <a
+                href="/technicians"
                 className={`sidebar-link ${activeLink === '/technicians' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
@@ -203,8 +243,8 @@ const Maintenance = () => {
               </a>
             </li>
             <li>
-              <a 
-                href="/auditor-profile" 
+              <a
+                href="/auditor-profile"
                 className={`sidebar-link ${activeLink === '/auditor-profile' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.preventDefault();
@@ -279,7 +319,7 @@ const Maintenance = () => {
                       >
                         {chartData.map((entry, idx) => <Cell key={`c-${idx}`} fill={COLORS[idx % COLORS.length]} />)}
                       </Pie>
-                      <Tooltip content={<CustomTooltip />} /> 
+                      <Tooltip content={<CustomTooltip />} />
                     </PieChart>
                   </ResponsiveContainer>
 
