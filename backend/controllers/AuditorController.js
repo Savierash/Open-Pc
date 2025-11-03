@@ -138,10 +138,10 @@ exports.createReport = async (req, res) => {
     const newReport = new Report({
       unit: unitId,
       technician: technicianId, // ✅ assigned technician
-      createdBy: req.user._id,  // ✅ auditor who created the report
+      auditor: req.user._id,
       issues,
       otherIssues,
-      status: 'Open',
+      status: 'open',
     });
 
     await newReport.save();
@@ -150,6 +150,7 @@ exports.createReport = async (req, res) => {
     const populatedReport = await newReport.populate([
       { path: 'unit', select: 'name' },
       { path: 'technician', select: 'username email' },
+      { path: 'auditor', select: 'username email' },
     ]);
 
     res.status(201).json({
