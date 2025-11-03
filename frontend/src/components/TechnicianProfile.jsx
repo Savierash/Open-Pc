@@ -1,6 +1,4 @@
 // src/pages/TechnicianProfile.jsx
-import { PencilSquare } from "react-bootstrap-icons";
-
 import React, { useState, useEffect } from "react";
 import { useAuth } from '../context/AuthContext';
 import "../styles/TechnicianProfile.css";
@@ -28,6 +26,7 @@ const TechnicianProfile = () => {
   useEffect(() => {
     setActiveLink(window.location.pathname);
     fetchUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchUserData = async () => {
@@ -35,10 +34,12 @@ const TechnicianProfile = () => {
       const res = await axios.get(`${apiBaseUrl}/users/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setUser(res.data);
+      // if your API returns { user: {...} } adapt accordingly
+      const userData = res.data.user || res.data;
+      setUser(userData);
       setEditing({
-        contactNumber: res.data.contactNumber || '',
-        address: res.data.address || '',
+        contactNumber: userData.contactNumber || userData.phone || '',
+        address: userData.address || '',
       });
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -59,10 +60,8 @@ const TechnicianProfile = () => {
   const handleProfileImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     const formData = new FormData();
     formData.append('profileImage', file);
-
     try {
       const res = await axios.post(
         `${apiBaseUrl}/users/upload-profile-image`,
@@ -74,7 +73,8 @@ const TechnicianProfile = () => {
           },
         }
       );
-      setUser(prev => ({ ...prev, avatar: res.data.imageUrl }));
+      const imageUrl = res.data.imageUrl || res.data.url || res.data.path;
+      setUser(prev => ({ ...prev, avatar: imageUrl }));
     } catch (error) {
       console.error("Image upload failed:", error);
     }
@@ -82,11 +82,21 @@ const TechnicianProfile = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     navigate('/');
   };
 
   if (!user) return <p>Loading profile...</p>;
+
   const avatarUrl = user.avatar ? `${apiBaseUrl.replace("/api", "")}${user.avatar}` : PersonCircle;
+
+  // small inline pencil SVG used instead of external icon package
+  const PencilIcon = ({ width = 18, height = 18 }) => (
+    <svg width={width} height={height} viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
 
   return (
     <div className="dashboard">
@@ -102,7 +112,7 @@ const TechnicianProfile = () => {
         <div className="nav-actions">
           <img src={avatarUrl} alt="Profile Icon" className="profile-icon-dashboard" />
           <span className="profile-name">{user.username || "Technician"}</span>
-          <span className="profile-role">{user?.role?.name || "Role"}</span>
+          <span className="profile-role">{user?.role?.name || user?.role || "Role"}</span>
         </div>
       </header>
 
@@ -115,8 +125,16 @@ const TechnicianProfile = () => {
                 <span>Dashboard</span>
               </a>
             </li>
-            <li><a href="/unit-status-technician" className={`sidebar-link ${activeLink === "/unit-status-technician" ? "active" : ""}`} onClick={(e) => {e.preventDefault();navigate('/unit-status-technician');}}><img src={PcDisplayLogo} className="menu-icon" alt="Unit Status" /><span>Unit Status</span></a></li>
-            <li><a href="/reports-tech" className={`sidebar-link ${activeLink === '/reports-tech' ? 'active' : ''}`}onClick={(e) => {e.preventDefault();navigate('/reports-tech');}}><img src={ClipboardLogo} className="menu-icon" alt="Reports Icon" /><span>Reports</span></a></li>
+            <li>
+              <a href="/unit-status-technician" className={`sidebar-link ${activeLink === "/unit-status-technician" ? "active" : ""}`} onClick={(e) => {e.preventDefault();navigate('/unit-status-technician');}}>
+                <img src={PcDisplayLogo} className="menu-icon" alt="Unit Status" /><span>Unit Status</span>
+              </a>
+            </li>
+            <li>
+              <a href="/reports-tech" className={`sidebar-link ${activeLink === '/reports-tech' ? 'active' : ''}`} onClick={(e) => {e.preventDefault();navigate('/reports-tech');}}>
+                <img src={ClipboardLogo} className="menu-icon" alt="Reports Icon" /><span>Reports</span>
+              </a>
+            </li>
             <li>
               <a href="/technician-profile" className={`sidebar-link ${activeLink === "/technician-profile" ? "active" : ""}`} onClick={(e) => {e.preventDefault();navigate('/technician-profile');}}>
                 <img src={GearFill} className="menu-icon" alt="Account Setting" />
@@ -222,7 +240,10 @@ const TechnicianProfile = () => {
                 <div className="form-group">
                   <div className="input-with-icon">
                     <input type="password" value="........." readOnly />
-                    <img src={PencilSquare} alt="Edit Icon" className="input-icon" />
+                    {/* Inline SVG pencil icon */}
+                    <span className="input-icon" style={{ display: 'inline-flex', alignItems: 'center' }}>
+                      <PencilIcon width={18} height={18} />
+                    </span>
                   </div>
                 </div>
                 <button className="logout-button" onClick={handleLogout}>LOGOUT</button>
